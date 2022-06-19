@@ -27,9 +27,35 @@ Right now scPopGene is avaiable on github, you can install it through github
 ## 3. Usage 
 You can type the following command to get the help information.
 
-`python scPopGene.py --help`
+`python ./src/scPopGene.py  SCvarCall --help`
 
+`usage: scPopGene.py SCvarCall [-h] -b BAMFILE -c CHR [-o OUT] -r REFERENCE -p
+                              IMPUTATION_PANEL [-d DEPTH_FILTER]
+                              [-t ALT_RATIO] [-m MAX_MISMATCH]
+                              [-s MAX_SOFTCLIPPED] -a APP_PATH -i CELL_CLUSTER
 
+optional arguments:
+  -h, --help            show this help message and exit
+  -b BAMFILE, --bamFile BAMFILE
+                        The bam file for the study sample, the bam file should be sorted (default: None)
+  -c CHR, --chr CHR     The chromosome used for variant calling (default: None)
+  -o OUT, --out OUT     The output director (default: None)
+  -r REFERENCE, --reference REFERENCE
+                        The human genome reference used for alignment(default: None)
+  -p IMPUTATION_PANEL, --imputation-panel IMPUTATION_PANEL
+                        The population-level variant panel for variant refinement such as 1000 Genome 3 (default: None)
+  -d DEPTH_FILTER, --depth_filter DEPTH_FILTER
+                        The sequencing depth filter for variants not overlapped with public database (default: 50)
+  -t ALT_RATIO, --alt_ratio ALT_RATIO
+                        The minina allele frequency for variants as potential somatic mutation (default: 0.1)
+  -m MAX_MISMATCH, --max-mismatch MAX_MISMATCH
+                        The maximal mismatch allowed in one reads for variant calling (default: 3)
+  -s MAX_SOFTCLIPPED, --max-softClipped MAX_SOFTCLIPPED
+                        The maximal soft-clipped allowed in one reads for variant calling (default: 1)
+  -a APP_PATH, --app-path APP_PATH
+                        The app library paths used in the tool (default: None)
+  -i CELL_CLUSTER, --cell_cluster CELL_CLUSTER
+                        The cell cluster csv file used for somatic variant calling (default: None)`
 
 
 
