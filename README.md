@@ -3,10 +3,10 @@ Single Cell Population Genetics and Association Analysis Toolkit
 
 **scPopGene** is one python package for population analysis in single-cell studies, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `scPopMap` is developed to benefit the population-level association study for single cell studies. It can work on datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges. 
 It is composed of four modules: 
-* Germinle variant identification from shallow 10x scRNA-seq or scATAC-seq profiles. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to refine genotypes. 
-* Poteintal Somatic variant identification. The candidated variants with high alternative allele supporeted in study sample are further classifed based on their allele frequency patten among cell clusters (cell type/ cell states). 
-* Population ancestry analysis (TBD)
-* Association study/ GWAS variant annotation in single-cell level (TBD). 
+* **Germinle variant identification from shallow 10x scRNA-seq or scATAC-seq profiles**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to refine genotypes. 
+* **Poteintal Somatic variant identification**. The candidated variants with high alternative allele supporeted in study sample are further classifed based on their allele frequency patten among cell clusters (cell type/ cell states). The variant calling is mostly from `Monovar` developed in [Ken chen's lab] 
+* **Population ancestry analysis** (TBD)
+* **Association study/ GWAS variant annotation in single-cell level** (TBD). 
 
 
 ## 1. Dependencies
@@ -87,15 +87,15 @@ python  ../src/scPopGene.py    SCvarCall \
       -r  ../example/chr20_2Mb.hg38.fa  -d 200  -t 0.1  -m 3 -s 5
 ```
 
-!Important
+**!Important**
 * Current `scPopGene` only support one sample with one chromosome. The user can parallele the jobs with mulitple samples and chromosomes easily. 
-* Make sure whether the input chromsome have prefix `chr`. 
+* Make sure the input chromsome have prefix `chr` or not. 
 
 ## 4. Outut
 
 The most important results are in the folder `out/SCvarCall`: 
 
-* `chr20.germline.vcf` 
+* `chr20.germline.vcf`  
 In this vcf file, the germline variants are genotypes for the sutyd sample 
 ```
 ##fileformat=VCFv4.2
@@ -117,7 +117,7 @@ chr20   159104  .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.9
 chr20   175269  .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.9907     GT:DS:GP        1/1:1.98:0,0.02,0.98
 ```
 
-* `chr20.monova.vcf`
+* `chr20.monova.vcf`  
 In this vcf file, the high alternave allele supported variants are genotypes in cluster level for the study sample. Each column is the cluster identified from scRNA-seq/ATAC-seq clustering. 
 
 ```
