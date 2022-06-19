@@ -8,3 +8,19 @@ It is composed of four modules:
 * Population ancestry analysis (TBD)
 * Association study/ GWAS variant annotation in single-cell level (TBD). 
 
+
+## 1. Dependencies
+* python  (version >= 3.73)
+* java (open JDK>=1.8.0)
+* pandas>=1.2.3
+* pysam>=0.16.0.1
+* NumPy>=1.19.5
+* sciPy>=1.6.3
+* pillow>=8.2.0
+## 2. Installation 
+Right now scPopGene is avaiable on github, you can install it 
+`git clone https://github.com/KChen-lab/scPopGene.git`
+``
+
+
+
