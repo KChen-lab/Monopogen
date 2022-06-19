@@ -64,14 +64,28 @@ optional arguments:
 
 Here we provide demo of variant calling  based on data provided in the `example/` folder, which include:
 * `chr20_2Mb.rh.filter.sort.bam (.bai)`  
-  The bam file storing read alignment for one study sample. Current scPopGene does not support mulitple sample mode. 
+  The bam file storing read alignment for one study sample. Current `scPopGene` does not support mulitple sample mode. 
 * `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz`
   The reference panel with over 2,500 samples in 1000 Genome database. Only variants located in chr20: 0-2Mb are extracted. 
 * `chr20_2Mb.hg38.fa (.fai)`  
   The genome reference used for aligment. Only seuqence in chr20:0-20Mb are extracted.
 * `cell_cluster.csv`  
-  The cell cluster information. In the csv file, the first column is the cellID and second column is the cluster (can be derived from Seurat)
+  The cell cluster information. In the csv file, the first column is the cellID and second column is the cluster (can be derived from `Seurat`)
 
+ 
+## 4. Run 
+There is a bash script `./test/test.chr20.sh` to run above example in the folder `test`: 
+
+```
+python  ../src/scPopGene.py    SCvarCall \
+      -b  ../example/chr20_2Mb.rh.filter.sort.bam  \
+      -a  ../apps  \
+      -c chr20  \
+      -o out \
+      -i  ../example/cell_cluster.csv   \
+      -p  ../example/CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz  \
+      -r  ../example/chr20_2Mb.hg38.fa  -d 200  -t 0.1  -m 3 -s 5
+```
 
 
 
