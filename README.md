@@ -5,6 +5,6 @@ Single Cell Population Genetics and Association Analysis Toolkit
 It is composed of four modules: 
 * Germinle variant identification from shallow 10x scRNA-seq or scATAC-seq profiles. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to refine genotypes. 
 * Poteintal Somatic variant identification. The candidated variants with high alternative allele supporeted in study sample are further classifed based on their allele frequency patten among cell clusters (cell type/ cell states). 
-. * Population ancestry analysis (TBD)
+* Population ancestry analysis (TBD)
 * Association study/ GWAS variant annotation in single-cell level (TBD). 
 
