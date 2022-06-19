@@ -29,7 +29,8 @@ You can type the following command to get the help information.
 
 `python ./src/scPopGene.py  SCvarCall --help`
 
-`usage: scPopGene.py SCvarCall [-h] -b BAMFILE -c CHR [-o OUT] -r REFERENCE -p
+```
+usage: scPopGene.py SCvarCall [-h] -b BAMFILE -c CHR [-o OUT] -r REFERENCE -p
                               IMPUTATION_PANEL [-d DEPTH_FILTER]
                               [-t ALT_RATIO] [-m MAX_MISMATCH]
                               [-s MAX_SOFTCLIPPED] -a APP_PATH -i CELL_CLUSTER
@@ -55,7 +56,8 @@ optional arguments:
   -a APP_PATH, --app-path APP_PATH
                         The app library paths used in the tool (default: None)
   -i CELL_CLUSTER, --cell_cluster CELL_CLUSTER
-                        The cell cluster csv file used for somatic variant calling (default: None)`
+                        The cell cluster csv file used for somatic variant calling (default: None)
+  ```
 
 
 
