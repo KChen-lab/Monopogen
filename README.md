@@ -58,6 +58,15 @@ optional arguments:
   -i CELL_CLUSTER, --cell_cluster CELL_CLUSTER
                         The cell cluster csv file used for somatic variant calling (default: None)
   ```
+  
+  
+## 4. Examples
+
+Here we provide demo of variant calling  based on data provided in the `example/` folder, which include:
+*chr20_2Mb.rh.filter.sort.bam (.bai)
+  The bam file storing read alignment for one study sample. Current scPopGene does not support mulitple sample mode. 
+*
+
 
 
 
