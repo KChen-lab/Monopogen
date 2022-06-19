@@ -65,7 +65,7 @@ optional arguments:
 Here we provide demo of variant calling  based on data provided in the `example/` folder, which include:
 * `chr20_2Mb.rh.filter.sort.bam (.bai)`  
   The bam file storing read alignment for one study sample. Current `scPopGene` does not support mulitple sample mode. 
-* `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz`
+* `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz` 
   The reference panel with over 2,500 samples in 1000 Genome database. Only variants located in chr20: 0-2Mb are extracted. 
 * `chr20_2Mb.hg38.fa (.fai)`  
   The genome reference used for aligment. Only seuqences in chr20:0-20Mb are extracted.
