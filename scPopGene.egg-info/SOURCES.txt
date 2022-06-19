@@ -1,0 +1,7 @@
+README.md
+setup.py
+scPopGene.egg-info/PKG-INFO
+scPopGene.egg-info/SOURCES.txt
+scPopGene.egg-info/dependency_links.txt
+scPopGene.egg-info/requires.txt
+scPopGene.egg-info/top_level.txt
