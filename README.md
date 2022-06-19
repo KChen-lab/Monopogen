@@ -60,7 +60,7 @@ optional arguments:
   ```
   
   
-## 4. Examples
+## 4. Example
 
 Here we provide demo of variant calling  based on data provided in the `example/` folder, which include:
 * `chr20_2Mb.rh.filter.sort.bam (.bai)`  
@@ -91,7 +91,7 @@ python  ../src/scPopGene.py    SCvarCall \
 * Current `scPopGene` only support one sample with one chromosome. The user can parallele the jobs with mulitple samples and chromosomes easily. 
 * Make sure the input chromsome have prefix `chr` or not. 
 
-## 4. Outut
+## 4. Output
 
 The most important results are in the folder `out/SCvarCall`: 
 
@@ -158,6 +158,7 @@ chr20	1900266	.	G	A	323	PASS	AC=14;AF=0.44;AN=32;BaseQRankSum=0.37;DP=539;QD=0.6
 
 ```
 
+## 5. FAQs 
 
 
 
