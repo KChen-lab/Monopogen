@@ -87,6 +87,11 @@ python  ../src/scPopGene.py    SCvarCall \
       -r  ../example/chr20_2Mb.hg38.fa  -d 200  -t 0.1  -m 3 -s 5
 ```
 
+!Important
+* Current scPopGene` only support one sample with one chromosome. The user can parallele the jobs with mulitple samples and chromosomes easily. 
+* Make sure whether the input chromsome have prefix `chr`. 
+
+
 
 
 
