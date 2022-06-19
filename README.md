@@ -21,9 +21,7 @@ It is composed of four modules:
 Right now scPopGene is avaiable on github, you can install it  
 
 `git clone https://github.com/KChen-lab/scPopGene.git`
-
 `cd scPopGene`
-
 `pip install -e .`
 
 
