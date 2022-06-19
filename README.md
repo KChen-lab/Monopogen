@@ -18,11 +18,17 @@ It is composed of four modules:
 * sciPy>=1.6.3
 * pillow>=8.2.0
 ## 2. Installation 
-Right now scPopGene is avaiable on github, you can install it  
+Right now scPopGene is avaiable on github, you can install it through github 
 
-`git clone https://github.com/KChen-lab/scPopGene.git`
-`cd scPopGene`
-`pip install -e .`
+`git clone https://github.com/KChen-lab/scPopGene.git`  
+`cd scPopGene`  
+`pip install -e .`  
+
+## 3. Usage 
+You can type the following command to get the help information.
+
+`python scPopGene.py --help`
+
 
 
 
