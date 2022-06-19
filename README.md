@@ -96,7 +96,7 @@ python  ../src/scPopGene.py    SCvarCall \
 The most important results are in the folder `out/SCvarCall`: 
 
 * `chr20.germline.vcf`  
-In this vcf file, the germline variants are genotypes for the sutyd sample 
+In this vcf file, the germline variants are genotypes for the study sample 
 ```
 ##fileformat=VCFv4.2
 ##filedate=20220619
@@ -118,7 +118,7 @@ chr20   175269  .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.9
 ```
 
 * `chr20.monova.vcf`  
-In this vcf file, the high alternave allele supported variants are genotypes in cluster level for the study sample. Each column is the cluster identified from scRNA-seq/ATAC-seq clustering. 
+In this vcf file, the high alternave allele supported variants are genotyped in the cluster level for the study sample. Each column is the cluster identified from scRNA-seq/ATAC-seq clustering. 
 
 ```
 ##fileformat=VCFv4.1
