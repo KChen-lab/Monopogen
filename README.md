@@ -68,9 +68,9 @@ Here we provide demo of variant calling  based on data provided in the `example/
 * `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz`
   The reference panel with over 2,500 samples in 1000 Genome database. Only variants located in chr20: 0-2Mb are extracted. 
 * `chr20_2Mb.hg38.fa (.fai)`  
-  The genome reference used for aligment. Only seuqence in chr20:0-20Mb are extracted.
+  The genome reference used for aligment. Only seuqences in chr20:0-20Mb are extracted.
 * `cell_cluster.csv`  
-  The cell cluster information. In the csv file, the first column is the cellID and second column is the cluster (can be derived from `Seurat`)
+  The cell cluster information. In the csv file, the first column is the cellID and the second column is the cluster (can be derived from `Seurat`)
 
  
 ## 4. Run 
