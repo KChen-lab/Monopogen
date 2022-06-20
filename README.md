@@ -159,7 +159,7 @@ chr20	1900266	.	G	A	323	PASS	AC=14;AF=0.44;AN=32;BaseQRankSum=0.37;DP=539;QD=0.6
 ```
 
 ## 5. FAQs 
-* bcftools: error while loading shared libraries: libbz2.so.1.0: cannot open 
+* ***bcftools: error while loading shared libraries: libbz2.so.1.0: cannot open***
   Please include the `app` path in the `LD_LIBRARY_PATH` before running scPopGene
   ```
   path="XX/scPopGene"
