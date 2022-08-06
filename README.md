@@ -20,14 +20,14 @@ It is composed of four modules:
 ## 2. Installation 
 Right now scPopGene is avaiable on github, you can install it through github 
 
-`git clone https://github.com/KChen-lab/scPopGene.git`  
-`cd scPopGene`  
+`git clone https://github.com/KChen-lab/Monopogen.git`  
+`cd Monopogen`  
 `pip install -e .`  
 
 ## 3. Usage 
 You can type the following command to get the help information.
 
-`python ./src/scPopGene.py  SCvarCall --help`
+`python ./src/scMonopogen.py  SCvarCall --help`
 
 ```
 usage: scPopGene.py SCvarCall [-h] -b BAMFILE -c CHR [-o OUT] -r REFERENCE -p
