@@ -111,7 +111,7 @@ The most important results are in the folder `out/SCvarCall`:
 In this vcf file, the germline variants are genotyped for the study sample 
 ```
 ##fileformat=VCFv4.2
-##filedate=20220619
+##filedate=20220808
 ##source="beagle.27Jul16.86a.jar (version 4.1)"
 ##INFO=<ID=AF,Number=A,Type=Float,Description="Estimated ALT Allele Frequencies">
 ##INFO=<ID=AR2,Number=1,Type=Float,Description="Allelic R-Squared: estimated squared correlation between most probable REF dose and true REF dose">
@@ -120,13 +120,27 @@ In this vcf file, the germline variants are genotyped for the study sample
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 ##FORMAT=<ID=DS,Number=A,Type=Float,Description="estimated ALT dose [P(RA) + P(AA)]">
 ##FORMAT=<ID=GP,Number=G,Type=Float,Description="Estimated Genotype Probability">
-#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  19D013_European_F_78
-chr20   60291   .       G       T       .       PASS    AR2=0.00;DR2=0.00;AF=0.50       GT:DS:GP        0/1:1:0,1,0
-chr20   68303   .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.50       GT:DS:GP        0/1:1:0,1,0
-chr20   75250   .       C       T       .       PASS    AR2=0.00;DR2=0.00;AF=0.50       GT:DS:GP        0/1:1:0,1,0
-chr20   88108   .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.87       GT:DS:GP        1/1:1.74:0,0.26,0.74
-chr20   159104  .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.9944     GT:DS:GP        1/1:1.99:0,0.01,0.99
-chr20   175269  .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.9907     GT:DS:GP        1/1:1.98:0,0.02,0.98
+#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  test1   test2
+chr20   60291   .       G       T       .       PASS    AR2=0.00;DR2=0.00;AF=0.50       GT:DS:GP        0/1:1:0,1,0     0/1:1:0,1,0
+chr20   64506   .       C       T       .       PASS    AR2=0.00;DR2=0.00;AF=0.0051     GT:DS:GP        0/0:0.01:0.99,0.01,0    0/0:0.01:0.99,0.01,0
+chr20   68303   .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.50       GT:DS:GP        0/1:1:0,1,0     0/1:1:0,1,0
+chr20   75250   .       C       T       .       PASS    AR2=0.00;DR2=0.00;AF=0.50       GT:DS:GP        0/1:1:0,1,0     0/1:1:0,1,0
+chr20   88108   .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.87       GT:DS:GP        1/1:1.73:0,0.26,0.73    1/1:1.73:0,0.26,0.73
+chr20   159104  .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.9960     GT:DS:GP        1/1:1.99:0,0.01,0.99    1/1:1.99:0,0.01,0.99
+chr20   175269  .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.9903     GT:DS:GP        1/1:1.98:0,0.02,0.98    1/1:1.98:0,0.02,0.98
+chr20   186086  .       G       A       .       PASS    AR2=0.00;DR2=0.00;AF=0.983      GT:DS:GP        1/1:1.97:0,0.03,0.97    1/1:1.97:0,0.03,0.97
+chr20   186183  .       G       A       .       PASS    AR2=0.00;DR2=0.00;AF=0.983      GT:DS:GP        1/1:1.97:0,0.03,0.97    1/1:1.97:0,0.03,0.97
+chr20   198814  .       A       T       .       PASS    AR2=0.00;DR2=0.00;AF=0.50       GT:DS:GP        0/1:1:0.05,0.89,0.06    0/1:1:0.05,0.89,0.06
+chr20   231710  .       T       G       .       PASS    AR2=0.00;DR2=0.00;AF=0.70       GT:DS:GP        0/1:1.4:0,0.6,0.4       0/1:1.4:0,0.6,0.4
+chr20   240166  .       T       G       .       PASS    AR2=0.00;DR2=0.00;AF=0.49       GT:DS:GP        0/1:0.97:0.03,0.97,0    0/1:0.97:0.03,0.97,0
+chr20   240377  .       T       G       .       PASS    AR2=0.00;DR2=0.00;AF=0.49       GT:DS:GP        0/1:0.97:0.03,0.97,0    0/1:0.97:0.03,0.97,0
+chr20   247326  .       G       A       .       PASS    AR2=0.00;DR2=0.00;AF=0.9964     GT:DS:GP        1/1:1.99:0,0.01,0.99    1/1:1.99:0,0.01,0.99
+chr20   248854  .       T       C       .       PASS    AR2=0.00;DR2=0.00;AF=0.73       GT:DS:GP        0/1:1.47:0,0.53,0.47    0/1:1.47:0,0.53,0.47
+chr20   254891  .       C       T       .       PASS    AR2=0.00;DR2=0.00;AF=0.51       GT:DS:GP        0/1:1.02:0,0.97,0.03    0/1:1.02:0,0.97,0.03
+chr20   255081  .       G       A       .       PASS    AR2=0.00;DR2=0.00;AF=0.85       GT:DS:GP        1/1:1.7:0,0.3,0.7       1/1:1.7:0,0.3,0.7
+chr20   260997  .       G       A       .       PASS    AR2=0.00;DR2=0.00;AF=0.40       GT:DS:GP        0/1:0.8:0.2,0.8,0       0/1:0.8:0.2,0.8,0
+chr20   265294  .       G       T       .       PASS    AR2=0.00;DR2=0.00;AF=0.918      GT:DS:GP        1/1:1.84:0,0.16,0.84    1/1:1.84:0,0.16,0.84
+
 ```
 
 * `chr20.monova.vcf`  
