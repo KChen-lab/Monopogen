@@ -144,7 +144,7 @@ chr20   265294  .       G       T       .       PASS    AR2=0.00;DR2=0.00;AF=0.9
 ```
 
 * `chr20.monova.vcf`  
-In this vcf file, the high quality variants are further genotyped in the cluster level for the study sample. Each column is the cluster identified from scRNA-seq/ATAC-seq clustering. 
+In this vcf file, the high quality variants are further genotyped in the cluster level for the study sample. Each column is the cluster identified from scRNA-seq/ATAC-seq clustering. Note the somatic mutation module is still in the depvelopment stage. 
 
 ```
 ##fileformat=VCFv4.1
