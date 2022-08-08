@@ -1,5 +1,0 @@
-pandas>=1.2.3
-pysam>=0.16.0.1
-NumPy>=1.19.5
-sciPy>=1.6.3
-pillow>=8.2.0
