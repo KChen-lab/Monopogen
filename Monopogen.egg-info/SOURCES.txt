@@ -1,0 +1,7 @@
+README.md
+setup.py
+Monopogen.egg-info/PKG-INFO
+Monopogen.egg-info/SOURCES.txt
+Monopogen.egg-info/dependency_links.txt
+Monopogen.egg-info/requires.txt
+Monopogen.egg-info/top_level.txt
