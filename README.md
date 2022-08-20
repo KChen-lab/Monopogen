@@ -18,7 +18,7 @@ It is composed of four modules:
 * sciPy>=1.6.3
 * pillow>=8.2.0
 ## 2. Installation 
-Right now scPopGene is avaiable on github, you can install it through github 
+Right now Monopogen is avaiable on github, you can install it through github 
 
 `git clone https://github.com/KChen-lab/Monopogen.git`  
 `cd Monopogen`  
@@ -27,7 +27,7 @@ Right now scPopGene is avaiable on github, you can install it through github
 ## 3. Usage 
 You can type the following command to get the help information.
 
-`python ./src/scMonopogen.py  SCvarCall --help`
+`python ./src/Monopogen.py  SCvarCall --help`
 
 ```
 usage: Monopogen.py SCvarCall [-h] --bamFile BAMFILE --step {germline,bamFiltering,beagleImputation} --mode
