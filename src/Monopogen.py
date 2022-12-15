@@ -410,20 +410,20 @@ def SCvarCall(args):
 				cmd = "bash " + out+"/Script" + args.chr + "/" + record[1] +  "_runBeagle.sh"
 				if args.step == "germline" or  args.step=="all" or args.step=="beagleImputation":
 					runCMD(cmd,args)
-				#logger.info("Generating variant statistical information ...")
-				#if args.step == "germline" or args.step=="all" or args.step=="beagleImputation":
-			#		getDPinfo(args)
-				#logger.info("Extracting reads in potential somatic regions ...")
-				#if args.step == "somatic" or args.step == "all" or args.step=="beagleImputation":
-			#		BamExtract(args)
-				#logger.info("Splitting reads baed on cell cluster ID ...")
-				#if args.step == "somatic"  or args.step == "all" or args.step=="monovarCalling":
-				#	BamSplit(args)
-				#logger.info("Running monova ...")
-				#if args.step == "somatic" or args.step == "all" or args.step=="monovarCalling":
-				#	RunMonova(args)
-				#if args.step =="monovarFiltering" or args.step =="somatic" or args.step=="all":
-				#	Monova_filtering(args)
+				logger.info("Generating variant statistical information ...")
+				if args.step == "germline" or args.step=="all" or args.step=="beagleImputation":
+					getDPinfo(args)
+				logger.info("Extracting reads in potential somatic regions ...")
+				if args.step == "somatic" or args.step == "all" or args.step=="beagleImputation":
+					BamExtract(args)
+				logger.info("Splitting reads baed on cell cluster ID ...")
+				if args.step == "somatic"  or args.step == "all" or args.step=="monovarCalling":
+					BamSplit(args)
+				logger.info("Running monova ...")
+				if args.step == "somatic" or args.step == "all" or args.step=="monovarCalling":
+					RunMonova(args)
+				if args.step =="monovarFiltering" or args.step =="somatic" or args.step=="all":
+					Monova_filtering(args)
 
             
             
