@@ -107,7 +107,7 @@ We provide one demo of SNV calling based on data provided in the `example/` fold
 There is a bash script `./test/test.chr20.sh` to run above example in the folder `test`: 
 
 ```
-path="where is your Monopgen folder"
+path="XX/Monopogen"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
 
 python  ../src/Monopogen.py    SCvarCall \
@@ -212,7 +212,7 @@ chr20	1900266	.	G	A	323	PASS	AC=14;AF=0.44;AN=32;BaseQRankSum=0.37;DP=539;QD=0.6
 * ***bcftools: error while loading shared libraries: libbz2.so.1.0: cannot open***  
   Please include the `app` path in the `LD_LIBRARY_PATH` before running scPopGene
   ```
-  path="XX/scPopGene"
+  path="XX/Monopogen"
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
   ```
 ## 6. Reference
