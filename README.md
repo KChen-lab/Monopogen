@@ -7,8 +7,8 @@ SNV calling from single cell sequencing
 It is composed of four modules: 
 * **Germline SNV identification from sparse 10x scRNA-seq or scATAC-seq profiles**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to refine genotypes. 
 * **Potutive somatic variant or RNA editing events identification**. The SNVs with high alternative allele supporeted in study sample are further classifed based on their allele frequency patten among cell clusters (cell type/ cell states). The variant calling is mostly from `Monovar` developed in [Ken chen's lab](https://github.com/KChen-lab/MonoVar) in MDACC. Theoretically, germline SNVs can be detected in most of clusters while only specfic clusters for somatic mutations. 
-* **Population ancestry analysis** (TBD)
-* **Association study/ GWAS variant annotation in celluar level** (TBD). 
+
+The output of `Monopogen` will enable ancestry identificaiton on single cell samples and genome-wide association study on the celluar level if sample size is sufficient. 
 
 
 ## 1. Dependencies
