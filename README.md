@@ -1,12 +1,12 @@
 # Monopogen
 Population analysis from single cell sequencing
 
-**Monopogen** is an analysis package for population analysis from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` is developed to benefit the population-level ancestry and association study for single cell sequencing studies. It can work on datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges etc. 
+**Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` is developed to benefit the population-level ancestry and association study for single cell sequencing studies. It can work on datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges etc. 
 It is composed of four modules: 
-* **Germline variant identification from shallow 10x scRNA-seq or scATAC-seq profiles**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to refine genotypes. 
-* **Poteintal Somatic variant or RNA editing events identification**. The candidated variants with high alternative allele supporeted in study sample are further classifed based on their allele frequency patten among cell clusters (cell type/ cell states). The variant calling is mostly from `Monovar` developed in [Ken chen's lab](https://github.com/KChen-lab/MonoVar) in MDACC. This module is still in under development stage.
+* **Germline SNV identification from sparse 10x scRNA-seq or scATAC-seq profiles**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to refine genotypes. 
+* **Potutive somatic variant or RNA editing events identification**. The SNVs with high alternative allele supporeted in study sample are further classifed based on their allele frequency patten among cell clusters (cell type/ cell states). The variant calling is mostly from `Monovar` developed in [Ken chen's lab](https://github.com/KChen-lab/MonoVar) in MDACC. Theoretically, germline SNVs can be detected in most of clusters while only specfic clusters for somatic mutations. 
 * **Population ancestry analysis** (TBD)
-* **Association study/ GWAS variant annotation in single-cell level** (TBD). 
+* **Association study/ GWAS variant annotation in celluar level** (TBD). 
 
 
 ## 1. Dependencies
@@ -37,46 +37,68 @@ usage: Monopogen.py SCvarCall [-h] --bamFile BAMFILE --step {germline,bamFilteri
                               [--max-mismatch MAX_MISMATCH] [--max-softClipped MAX_SOFTCLIPPED] --cellCluster CELLCLUSTER
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --bamFile BAMFILE     The bam file for the study sample, the bam file should be sorted (default: None)
-  --step {germline,bamFiltering,beagleImputation}
-                        Germline varinat calling or somatic variant calling (default: all)
-  --mode {single,multiple}
-                        Call variants in single sample or multiple samples (default: single)
-  --chr CHR             The chromosome used for variant calling (default: None)
-  --out OUT             The output director (default: None)
-  --appPath APPPATH     The app library paths used in the tool (default: None)
-  --reference REFERENCE
-                        The human genome reference used for alignment [*.fasta] (default: None)
-  --imputation-panel IMPUTATION_PANEL
-                        The population-level variant panel for variant refinement such as 1000 Genome (default: None)
-  --depthFilter DEPTHFILTER
-                        The sequencing depth filter threshold for variants not overlapped with external database (default:
-                        50)
-  --altRatio ALTRATIO   The minina allele frequency threshold for variants as potential somatic mutation (default: 0.1)
-  --wildCluster WILDCLUSTER
-                        The mininal number of cluster supporting wilde type [for somatic variant calling] (default: 2)
-  --mutationCluster MUTATIONCLUSTER
-                        The mininal number of cluster supporting mutated type [for somatic variant calliing] (default: 1)
-  --max-mismatch MAX_MISMATCH
-                        The maximal mismatch allowed in one reads for variant calling (default: 3)
-  --max-softClipped MAX_SOFTCLIPPED
-                        The maximal soft-clipped allowed in one reads for variant calling (default: 1)
-  --cellCluster CELLCLUSTER
-                        The cell cluster csv file used for somatic variant calling (default: None)
+ usage: Monopogen.py SCvarCall [-h] -b BAMFILE -j STEP -y MODE -c CHR [-o OUT]
+                              -r REFERENCE -p IMPUTATION_PANEL
+                              [-d DEPTH_FILTER] [-l DEPTH_FILTER_MONOVAR]
+                              [-t ALT_RATIO] [-w WILDCLUSTER]
+                              [-u MUTATIONCLUSTER] [-m MAX_MISMATCH]
+                              [-s MAX_SOFTCLIPPED] -a APP_PATH -i CELL_CLUSTER
 
+optional arguments:
+  -h, --help            show this help message and exit
+  -b BAMFILE, --bamFile BAMFILE
+                        The bam file for the study sample, the bam file should
+                        be sorted (default: None)
+  -j STEP, --step STEP  varinat calling in germline of individual level or
+                        somatic variants in cluster level (default: all)
+  -y MODE, --mode MODE  single sample or multiple sample (default: None)
+  -c CHR, --chr CHR     The chromosome used for variant calling (default:
+                        None)
+  -o OUT, --out OUT     The output director (default: None)
+  -r REFERENCE, --reference REFERENCE
+                        The human genome reference used for alignment
+                        (default: None)
+  -p IMPUTATION_PANEL, --imputation-panel IMPUTATION_PANEL
+                        The population-level variant panel for variant
+                        refinement such as 1000 Genome 3 (default: None)
+  -d DEPTH_FILTER, --depth_filter DEPTH_FILTER
+                        The sequencing depth filter for variants not
+                        overlapped with public database (default: 50)
+  -l DEPTH_FILTER_MONOVAR, --depth_filter_monovar DEPTH_FILTER_MONOVAR
+                        The sequencing depth filter for variants not
+                        overlapped with public database (default: 50)
+  -t ALT_RATIO, --alt_ratio ALT_RATIO
+                        The minina allele frequency for variants as potential
+                        somatic mutation (default: 0.1)
+  -w WILDCLUSTER, --wildCluster WILDCLUSTER
+                        The mininal number of cluster support wilde type
+                        (default: 2)
+  -u MUTATIONCLUSTER, --mutationCluster MUTATIONCLUSTER
+                        The mininal number of cluster support mutated type
+                        (default: 1)
+  -m MAX_MISMATCH, --max-mismatch MAX_MISMATCH
+                        The maximal mismatch allowed in one reads for variant
+                        calling (default: 3)
+  -s MAX_SOFTCLIPPED, --max-softClipped MAX_SOFTCLIPPED
+                        The maximal soft-clipped allowed in one reads for
+                        variant calling (default: 1)
+  -a APP_PATH, --app-path APP_PATH
+                        The app library paths used in the tool (default: None)
+  -i CELL_CLUSTER, --cell_cluster CELL_CLUSTER
+                        The cell cluster csv file used for somatic variant
+                        calling (default: None)
   ```
   
   
 ## 4. Example
 
-Here we provide demo of variant calling  based on data provided in the `example/` folder, which include:
+We provide one demo of SNV calling based on data provided in the `example/` folder, which includes:
 * `chr20_2Mb.rh.filter.sort.bam (.bai)`  
   The bam file storing read alignment for one study sample. Current `Monopogen` supports both single and mulitple sample calling mode. Mulitple sample calling increase the sensitivity of variant detection. 
 * `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz` 
-  The reference panel with over 2,500 samples in 1000 Genome database. Only variants located in chr20: 0-2Mb are extracted. 
+  The reference panel with over 3,000 samples in 1000 Genome database. Only SNVs located in chr20: 0-2Mb were extracted in this vcf file. 
 * `chr20_2Mb.hg38.fa (.fai)`  
-  The genome reference used for aligment. Only seuqences in chr20:0-20Mb are extracted.
+  The genome reference used for aligment. Only seuqences in chr20:0-20Mb were extracted in this fasta file.
 * `cell_cluster.csv`  
   The cell cluster information. In the csv file, the first column is the cellID and the second column is the cluster (can be derived from `Seurat`)
 
@@ -85,22 +107,24 @@ Here we provide demo of variant calling  based on data provided in the `example/
 There is a bash script `./test/test.chr20.sh` to run above example in the folder `test`: 
 
 ```
+path="where is your Monopgen folder"
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
 
 python  ../src/Monopogen.py    SCvarCall \
-      --bamFile  bam.lst \
-      --mode multiple \
-      --step germline \
-      --appPath  ../apps  \
-      --chr 20  \
-      --out out \
-      --cellCluster  ../example/cell_cluster.csv   \
-      --imputation-panel  ../example/CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz  \
-      --reference  ../example/chr20_2Mb.hg38.fa
-      
+      -b  ../example/chr20_2Mb.rh.filter.sort.bam  \
+      -j all \
+      -y single  \
+      -a  ../apps  \
+      -c chr20  \
+      -o out \
+      -i  ../example/cell_cluster.csv   \
+      -p  ../example/CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz  \
+      -r  ../example/chr20_2Mb.hg38.fa  -d 200  -t 0.1  -m 3 -s 5
+
 ```
 
 **!Important**
-* Current `Monopogen` only support variant calling with one chromosome. The user can parallele the jobs with multiple chromosomes easily. 
+* Current `Monopogen` support variant calling with one chromosome. The user can parallele the jobs with multiple chromosomes easily. 
 
 
 ## 4. Output
@@ -108,7 +132,7 @@ python  ../src/Monopogen.py    SCvarCall \
 The most important results are in the folder `out/SCvarCall`: 
 
 * `chr20.germline.vcf`  
-In this vcf file, the germline variants are genotyped for the study sample 
+In this vcf file, the germline SNVs were genotyped for the study sample 
 ```
 ##fileformat=VCFv4.2
 ##filedate=20220808
@@ -143,8 +167,8 @@ chr20   265294  .       G       T       .       PASS    AR2=0.00;DR2=0.00;AF=0.9
 
 ```
 
-* `chr20.monova.vcf`  
-In this vcf file, the high quality variants are further genotyped in the cluster level for the study sample. Each column is the cluster identified from scRNA-seq/ATAC-seq clustering. Note the somatic mutation module is still in the depvelopment stage. 
+* `chr20.monovar.vcf`  
+In this vcf file, the high quality SNVs not presented in externtal panel were further genotyped in the cluster level for the study sample. Each column is the cluster identified from scRNA-seq/ATAC-seq clustering. 
 
 ```
 ##fileformat=VCFv4.1
