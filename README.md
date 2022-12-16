@@ -218,7 +218,7 @@ chr20	1900266	.	G	A	323	PASS	AC=14;AF=0.44;AN=32;BaseQRankSum=0.37;DP=539;QD=0.6
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
   ```
 ## 6. Citation
-[Dou J, Tan Y, Wang J, Cheng X, Han KY, Hon CC, Park WY, Shin JW, Chen H, Prabhakar S, Navin N. Monopogen, Chen K : single nucleotide variant calling from single cell sequencing. bioRxiv. 2022 Jan 1](https://www.biorxiv.org/content/10.1101/2022.12.04.519058v1.abstract)
+[Dou J, Tan Y, Wang J, Cheng X, Han KY, Hon CC, Park WY, Shin JW, Chen H, Prabhakar S, Navin N, Chen K. Monopogen : single nucleotide variant calling from single cell sequencing. bioRxiv. 2022 Jan 1](https://www.biorxiv.org/content/10.1101/2022.12.04.519058v1.abstract)
 
 
 
