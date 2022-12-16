@@ -125,10 +125,6 @@ python  ../src/Monopogen.py    SCvarCall \
 
 ```
 
-**!Important**
-* Current `Monopogen` support variant calling with one chromosome. The user can parallele the jobs with multiple chromosomes easily. 
-
-
 ## 4. Output
 
 The most important results are in the folder `out/SCvarCall`: 
