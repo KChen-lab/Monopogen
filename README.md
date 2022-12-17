@@ -208,6 +208,7 @@ chr20	1900266	.	G	A	323	PASS	AC=14;AF=0.44;AN=32;BaseQRankSum=0.37;DP=539;QD=0.6
 
 ## 7. FAQs 
 * *** where to download 1KG3 reference panel (hg38) ***
+  
   [3202 phased samples in 1KG3] (http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/)
 * ***bcftools: error while loading shared libraries: libbz2.so.1.0: cannot open***  
   Please include the `app` path in the `LD_LIBRARY_PATH` before running Monopogen
