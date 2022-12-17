@@ -209,12 +209,10 @@ chr20	1900266	.	G	A	323	PASS	AC=14;AF=0.44;AN=32;BaseQRankSum=0.37;DP=539;QD=0.6
 ## 7. FAQs 
 * ***where to download 1KG3 reference panel (hg38)***
   http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/
-* ***bcftools: error while loading shared libraries: libbz2.so.1.0: cannot open***  
-  Please include the `app` path in the `LD_LIBRARY_PATH` before running Monopogen
-  ```
-  path="XX/Monopogen"
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
-  ```
+  
+* ***how to perform downstream PCA-based projection or admixture analysis***  
+  PCA-based projection analysis can be peformed using [LASER 2.0](http://csg.sph.umich.edu/chaolong/LASER/)
+  
 ## 8. Citation
 [Dou J, Tan Y, Wang J, Cheng X, Han KY, Hon CC, Park WY, Shin JW, Chen H, Prabhakar S, Navin N, Chen K. Monopogen : single nucleotide variant calling from single cell sequencing. bioRxiv. 2022 Jan 1](https://www.biorxiv.org/content/10.1101/2022.12.04.519058v1.abstract)
 
