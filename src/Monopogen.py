@@ -379,12 +379,12 @@ def SCvarCall(args):
 		cmd4 = "zless -S " +  out + "/SCvarCall/" + args.chr + ".gp.vcf.gz | grep -v  0/0  > " +  out + "/SCvarCall/" + args.chr + ".germline.vcf"
 
 		with open(out+"/Script" + args.chr + "/runBeagle.sh","w") as f_out:
-			if args.step=="germline":
+			if args.step=="germline" or args.step=="all:
 				f_out.write(cmd1 + "\n")
 				f_out.write(cmd2 + "\n")
 				f_out.write(cmd3 + "\n")
 				f_out.write(cmd4 + "\n")
-			if args.step=="beagleImputation":
+			if args.step=="beagleImputation" or args.step=="all":
 				f_out.write(cmd1 + "\n")
 				f_out.write(cmd3 + "\n")
 				f_out.write(cmd4 + "\n")
