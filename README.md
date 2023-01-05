@@ -218,7 +218,7 @@ chr20	1900266	.	G	A	323	PASS	AC=14;AF=0.44;AN=32;BaseQRankSum=0.37;DP=539;QD=0.6
   
   `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/xx/apps`  
   
-* **AssertionError: Program vcftools cannot be found!***
+* **AssertionError: Program vcftools cannot be found!***  
   You may set the read/write permission on the folder `xx/apps` as 
   `chmod 770 -R  /xx/apps` 
  
