@@ -1,4 +1,4 @@
-
+# path = where your Monopogen is stored
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
 
 python  ../src/Monopogen.py    SCvarCall \
