@@ -212,6 +212,12 @@ chr20	1900266	.	G	A	323	PASS	AC=14;AF=0.44;AN=32;BaseQRankSum=0.37;DP=539;QD=0.6
   
 * ***how to perform downstream PCA-based projection or admixture analysis***  
   PCA-based projection analysis can be peformed using [LASER 2.0](http://csg.sph.umich.edu/chaolong/LASER/)
+   
+* ***bcftools: error while loading shared libraries: libbz2.so.1.0: not able to open shared object file: No such file or directly***  
+  Adding the `apps` folder of `Monopogen` in your library environment 
+  
+  `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/xx/apps`  
+ 
   
 ## 8. Citation
 [Dou J, Tan Y, Wang J, Cheng X, Han KY, Hon CC, Park WY, Shin JW, Chen H, Prabhakar S, Navin N, Chen K. Monopogen : single nucleotide variant calling from single cell sequencing. bioRxiv. 2022 Jan 1](https://www.biorxiv.org/content/10.1101/2022.12.04.519058v1.abstract)
