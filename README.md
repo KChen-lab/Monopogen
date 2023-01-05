@@ -106,7 +106,7 @@ We provide one demo of SNV calling based on data provided in the `example/` fold
 
  
 ## 5. Run 
-There is a bash script `./test/test.chr20.sh` to run above example in the folder `test`: 
+There is a bash script `./test/test.chr20.sh` to run above example in the folder `test`. Remember to update the path variable before you run the script!
 
 ```
 path="XX/Monopogen"
