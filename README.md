@@ -144,6 +144,30 @@ chr20   260997  .       G       A       .       PASS    AR2=0.00;DR2=0.00;AF=0.4
 chr20   265294  .       G       T       .       PASS    AR2=0.00;DR2=0.00;AF=0.918      GT:DS:GP        1/1:1.84:0,0.16,0.84    1/1:1.84:0,0.16,0.84
 
 ```
+## Run on multiple chromosomes and multiple samples 
+
+Users can submit jobs with multiple chromosomes in the parallele fashion as following:
+
+```
+path="XX/Monopogen"
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
+
+for chr in {1..22}
+do 
+  python  ../src/Monopogen.py    germline  \
+        -b  ../example/chr${chr}_2Mb.rh.filter.sort.bam  \
+        -y  single  \
+        -t  all  \
+        -a  ../apps  \
+        -c  chr${chr}  \
+        -o  out \
+        -d  10 \
+        -p  ../example/CCDG_14151_B01_GRM_WGS_2020-08-05_chr${chr}.filtered.shapeit2-duohmm-phased.vcf.gz  \
+        -r  ../example/chr${chr}_2Mb.hg38.fa   -m 3 -s 5
+done
+
+```
+
 
 
 ## 7. FAQs 
