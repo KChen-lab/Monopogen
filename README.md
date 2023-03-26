@@ -26,7 +26,7 @@ Right now Monopogen is avaiable on github, you can install it through github
 `cd Monopogen`  
 `pip install -e .`  
 
-## 3. Usage 
+## 3.1 Usage of germline SNVs calling 
 You can type the following command to get the help information.
 
 `python ./src/Monopogen.py  germline --help`
@@ -74,7 +74,7 @@ optional arguments:
   ```
   
   
-## 4. Example
+## Example data
 
 We provide one demo of SNV calling based on data provided in the `example/` folder, which includes:
 * `chr20_2Mb.rh.filter.sort.bam (.bai)`  
@@ -83,12 +83,9 @@ We provide one demo of SNV calling based on data provided in the `example/` fold
   The reference panel with over 3,000 samples in 1000 Genome database. Only SNVs located in chr20: 0-2Mb were extracted in this vcf file. 
 * `chr20_2Mb.hg38.fa (.fai)`  
   The genome reference used for read aligments. Only seuqences in chr20:0-20Mb were extracted in this fasta file.
-* `cell_cluster.csv`  
-  The cell cluster information. In the csv file, the first column is the cellID and the second column is the cluster (can be derived from `Seurat`)
 
- 
-## 5. Run 
-There is a bash script `./test/test.chr20.sh` to run above example in the folder `test`. Remember to update the path variable before you run the script!
+## Run 
+There is a bash script `./test/test.germline.sh` to run above example in the folder `test`. Remember to update the path variable before you run the script!
 
 ```
 path="XX/Monopogen"
@@ -108,7 +105,7 @@ python  ../src/Monopogen.py    germline  \
 
 ```
 
-## 6. Output
+## Output
 
 The most important results are in the folder `out/germline`: 
 
