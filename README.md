@@ -5,7 +5,7 @@ SNV calling from single cell sequencing data
 
 **Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges, scDNA-seq etc. 
 It is composed of three modules: 
-* **Data preprocess**. This modules remove reads with high alignment mismatches from single cell sequencing and also make format compatiable with Monopongen.
+* **Data preprocess**. This module removes reads with high alignment mismatches from single cell sequencing and also makes data formats compatiable with Monopongen.
 * **Germline SNV calling**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to improve both SNV calling accuracy and detection sensitivity. 
 * **Putative somatic SNV calling**. We extended the machinery of LD refinement from human population level to cell population level. We statistically phased the observed alleles with adjacent germline alleles to estimate the degree of LD, taking into consideration widespread sparseness and allelic dropout in single-cell sequencing data, and calculated a probabilistic score as an indicator of somatic SNVs.  The putative somatic SNVs were further genotyped at cell type/cluster level from `Monovar` developed in [Ken chen's lab](https://github.com/KChen-lab/MonoVar).
 
@@ -28,67 +28,54 @@ Right now Monopogen is avaiable on github, you can install it through github
 `pip install -e .`  
 
 ## 3. Usage of Monopogen
+  
 ## 3.1 Data preprocess
 
 You can type the following command to get the help information.
 
-`python ./src/Monopogen.py  germline --help`
+`python ./src/Monopogen.py  preProcess --help`
 
 ```
-usage: Monopogen.py germline [-h] -b BAMFILE -y {single,multi} -c CHR -t
-                             {bamQC,varScan,varImpute,varPhasing,all} [-o OUT]
-                             -r REFERENCE -p IMPUTATION_PANEL
-                             [-d DEPTH_FILTER_NOVELSNV] [-m MAX_MISMATCH]
-                             [-s MAX_SOFTCLIPPED] -a APP_PATH
+usage: Monopogen.py preProcess [-h] -b BAMFILE [-o OUT] -a APP_PATH
+                               [-m MAX_MISMATCH] [-t NTHREADS]
 
 optional arguments:
   -h, --help            show this help message and exit
   -b BAMFILE, --bamFile BAMFILE
                         The bam file for the study sample, the bam file should
-                        be sorted (default: None)
-  -y {single,multi}, --mode {single,multi}
-                        Single sample or multiple samples. Only available for
-                        germline variant calling mode. This step can increase
-                        variant detection. (default: None)
-  -c CHR, --chr CHR     The chromosome used for variant calling (default:
-                        None)
-  -t {bamQC,varScan,varImpute,varPhasing,all}, --step {bamQC,varScan,varImpute,varPhasing,all}
-                        Run germline variant calling step by step (default:
-                        all)
+                        be sorted. If there are multiple samples, each row
+                        with each sample (default: None)
   -o OUT, --out OUT     The output director (default: None)
-  -r REFERENCE, --reference REFERENCE
-                        The human genome reference used for alignment
-                        (default: None)
-  -p IMPUTATION_PANEL, --imputation-panel IMPUTATION_PANEL
-                        The population-level variant panel for variant
-                        imputation refinement, such as 1000 Genome 3 (default:
-                        None)
-  -d DEPTH_FILTER_NOVELSNV, --depth_filter_novelSNV DEPTH_FILTER_NOVELSNV
-                        The minimal read depth supported to call novel SNVs
-                        not listed in reference panel (default: 24)
-  -m MAX_MISMATCH, --max-mismatch MAX_MISMATCH
-                        The maximal mismatch allowed in one reads for variant
-                        calling (default: 3)
-  -s MAX_SOFTCLIPPED, --max-softClipped MAX_SOFTCLIPPED
-                        The maximal soft-clipped allowed in one reads for
-                        variant calling (default: 1)
   -a APP_PATH, --app-path APP_PATH
-                        The app library paths used in the tool (default: Non
-  ```
-  
-  
-## Example data
+                        The app library paths used in the tool (default: None)
+  -m MAX_MISMATCH, --max-mismatch MAX_MISMATCH
+                        The maximal alignment mismatch allowed in one reads
+                        for variant calling (default: 3)
+  -t NTHREADS, --nthreads NTHREADS
+                        Number of threads used for SNVs calling (default: 1)
+ ```
 
-We provide one demo of SNV calling based on data provided in the `example/` folder, which includes:
-* `chr20_2Mb.rh.filter.sort.bam (.bai)`  
-  The bam file storing read alignment for one study sample. Current `Monopogen` supports both single and mulitple sample calling mode. Mulitple sample calling will increase the sensitivity of variant detection. 
+We provide one example dataset provided the `example/` folder, which includes:
+* `A.bam (.bai)`  
+  The bam file storing read alignment for sample A.
+* `B.bam (.bai)`  
+  The bam file storing read alignment for sample B. 
 * `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz` 
   The reference panel with over 3,000 samples in 1000 Genome database. Only SNVs located in chr20: 0-2Mb were extracted in this vcf file. 
 * `chr20_2Mb.hg38.fa (.fai)`  
   The genome reference used for read aligments. Only seuqences in chr20:0-20Mb were extracted in this fasta file.
 
-## Run 
-There is a bash script `./test/test.germline.sh` to run above example in the folder `test`. Remember to update the path variable before you run the script!
+There is a bash script `./test/runPreprocess.sh` to run above example in the folder `test`. You need to prepare the bam file list for option `-b`. If you have multiple sample in the list file, `Monopogen` will run the joint calling which can increase the SNV calling accuracy and sensitivity. Run the test script as following:
+  
+```
+path="XXy/Monopogen"
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
+
+python  ${path}/src/Monopogen.py  preProcess -b bam.lst -o out  -a ${path}/apps -t 8
+
+```
+
+  
 
 ```
 path="XX/Monopogen"
