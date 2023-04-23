@@ -3,12 +3,13 @@ SNV calling from single cell sequencing data
 
 <image src="./example/Fig1.png" width="400"> 
 
-**Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` is developed to benefit the population-level ancestry and association study for single cell sequencing studies. It can work on datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges etc. 
-It is composed of four modules: 
-* **Germline SNV identification from sparse 10x scRNA-seq or scATAC-seq profiles**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to refine genotypes. 
-* **Putative somatic variant or RNA editing events identification**. The SNVs with high alternative allele supporeted in study sample are further classifed based on their allele frequency patten among cell clusters (cell type/ cell states). The variant calling is mostly from `Monovar` developed in [Ken chen's lab](https://github.com/KChen-lab/MonoVar) in MDACC. Theoretically, germline SNVs can be detected in most of clusters while only specfic clusters for somatic mutations. 
+**Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges, scDNA-seq etc. 
+It is composed of three modules: 
+* **Data preprocess**. This modules remove reads with high alignment mismatches from single cell sequencing and also make format compatiable with Monopongen.
+* **Germline SNV calling**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to improve both SNV calling accuracy and detection sensitivity. 
+* **Putative somatic SNV calling**. We extended the machinery of LD refinement from human population level to cell population level. We statistically phased the observed alleles with adjacent germline alleles to estimate the degree of LD, taking into consideration widespread sparseness and allelic dropout in single-cell sequencing data, and calculated a probabilistic score as an indicator of somatic SNVs.  The putative somatic SNVs were further genotyped at cell type/cluster level from `Monovar` developed in [Ken chen's lab](https://github.com/KChen-lab/MonoVar).
 
-The output of `Monopogen` will enable ancestry identificaiton on single cell samples and genome-wide association study on the celluar level if sample size is sufficient. 
+The output of `Monopogen` will enable 1) ancestry identificaiton on single cell samples; 2) genome-wide association study on the celluar level if sample size is sufficient, and 3) putative somatic SNV investigation.
 
 
 ## 1. Dependencies
@@ -26,7 +27,9 @@ Right now Monopogen is avaiable on github, you can install it through github
 `cd Monopogen`  
 `pip install -e .`  
 
-## 3.1 Usage of germline SNVs calling 
+## 3. Usage of Monopogen
+## 3.1 Data preprocess
+
 You can type the following command to get the help information.
 
 `python ./src/Monopogen.py  germline --help`
