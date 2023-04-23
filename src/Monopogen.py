@@ -17,6 +17,8 @@ import pandas as pd
 import numpy as np
 import gzip
 from pysam import VariantFile
+import multiprocessing as mp
+from multiprocessing import Pool
 
 
 LIB_PATH = os.path.abspath(
@@ -93,15 +95,20 @@ def validate_user_setting_germline(args):
 	#assert os.path.isfile(args.bamFile), "The bam list file {} cannot be found!".format(args.bamFile)
 	assert os.path.isfile(args.reference), "The genome reference fasta file {} cannot be found!".format(args.reference)
 	assert os.path.isfile(args.imputation_panel), "Filtered genotype file of 1KG3 ref panel {} cannot be found!".format(args.imputation_panel)
-	if args.mode=="single":
-		assert os.path.isfile(args.bamFile), "The bam file {} cannot be found!".format(args.bamFile)
-		assert os.path.isfile(args.bamFile + ".bai"), "The bam.bai file {} cannot be found!".format(args.bamFile)
-	if args.mode=="multiple":
-		assert os.path.isfile(args.bamFile), "The bam file {} cannot be found!".format(args.bamFile)
-		# check whether each bam file available	
-		with open(args.bamFile) as fh:
-			assert os.path.isfile(fh), "The bam file {} cannot be found!".format(fh)
-			assert os.path.isfile(fh + ".bai"), "The bam.bai file {} cannot be found!".format(fh)
+	assert os.path.isfile(args.region), "The region file {} cannot be found!".format(args.region)
+	# check whether each bam file available	
+	for chr in range(1, 23):
+		bamFile = args.out + "/Bam/chr" +  str(chr) +  ".filter.bam.lst"
+		with open(bamFile) as f_in:
+			for line in f_in:
+				line = line.strip()
+				assert os.path.isfile(line), "The bam file {} cannot be found!".format(line)
+				assert os.path.isfile(line + ".bai"), "The bam.bai file {} cannot be found!".format(line)
+	# check whether region files were set correctly 
+	with open(args.region) as f_in:
+		for line in f_in:
+			record = line.strip().split(",")
+			assert len(record)==3 or len(record)==1, "Every line has to have exactly 3 comma-delimited columns chr1,1,100000 or chr1 (on the whole chromosome)! Line with region {} does not satisify this requiremnt!".format(line)
 
 
 def check_dependencies(args):
@@ -120,7 +127,7 @@ def check_dependencies(args):
 
 
 
-def addChr(in_bam):
+def addChr(in_bam, samtools):
 	# edit the sequence names for your output header
 	prefix = 'chr'
 	out_bam=in_bam+"tmp.bam"
@@ -148,23 +155,31 @@ def addChr(in_bam):
 			outf.write(a)
 	input_bam.close()
 	outf.close()
-	os.system(args.samtools + " index " +  out_bam)
+	os.system(samtools + " index " +  out_bam)
 	os.system(" mv " + out_bam + " " + in_bam)
 	os.system(" mv " + out_bam + ".bai  " + in_bam + ".bai")
 
 
 
-def BamFilter(args):
-	infile = pysam.AlignmentFile(args.bamFile,"rb")
+def BamFilter(myargs):
+	bamFile = myargs.get("bamFile")
+	search_chr = myargs.get("chr")
+	chr = search_chr
+	id = myargs.get("id")
+	#samtools = myargs.get("samtools")
+	max_mismatch = myargs.get("max_mismatch")
+	out = myargs.get("out")
+
+	os.system("mkdir -p " + out +  "/Bam")
+	infile = pysam.AlignmentFile(bamFile,"rb")
 	contig_names = infile.references
 	cnt=0 
-	search_chr = args.chr
 	for contig in contig_names:
 		if contig.startswith("chr"):
 			cnt=cnt+1
 	if cnt==0:
-			logger.info("The contig {} does not contain the prefix 'chr' and we will add 'chr' on it ".format(args.bamFile))
-			search_chr = args.chr[3:]
+			logger.info("The contig {} does not contain the prefix 'chr' and we will add 'chr' on it ".format(search_chr))
+			search_chr = search_chr[3:]
 			#searchBam = args.bamFile+".bam"
 			#addChr(args.bamFile, searchBam)
 			#infile.close()
@@ -175,14 +190,14 @@ def BamFilter(args):
 	#print(tp)
 
 	if not "RG" in tp:
-		sampleID = os.path.splitext(os.path.basename(args.bamFile))[0]
+		sampleID = os.path.splitext(os.path.basename(myargs["bamFile"]))[0]
 		tp1 = [{'SM':sampleID,'ID':sampleID, 'LB':"0.1", 'PL':"ILLUMINA", 'PU':sampleID}]
 		tp.update({'RG': tp1})
 		#print(tp)
 		#tp['RG'][0]['SM'] = 
 		#tp['RG'][0]['ID'] = os.path.splitext(os.path.basename(args.bamFile))[0]
-	#print(tp)   
-	outfile =  pysam.AlignmentFile( args.out + "/Bam/" + args.chr + ".filter.bam", "wb", header=tp)
+  
+	outfile =  pysam.AlignmentFile( out + "/Bam/" +id + "_" + chr + ".filter.bam", "wb", header=tp)
 
 
 	for s in infile.fetch(search_chr):  
@@ -191,15 +206,17 @@ def BamFilter(args):
 			val= s.get_tag("NM")
 		if s.has_tag("nM"):
 			val= s.get_tag("nM")                  
-		if val < args.max_mismatch:
+		if val < max_mismatch:
 			outfile.write(s)
 	infile.close()
 	outfile.close()
 
-	os.system(args.samtools + " index " +  args.out + "/Bam/" + args.chr + ".filter.bam")
+	os.system(samtools + " index " +  out + "/Bam/" + id+ "_"  + chr + ".filter.bam")
 	if cnt ==0:
-		addChr(args.out + "/Bam/" + args.chr + ".filter.bam")
-	args.bam_filter = args.out + "/Bam/" + args.chr + ".filter.bam"
+		addChr(out + "/Bam/" +  id+ "_" + chr+ ".filter.bam")
+	bamfile = out + "/Bam/" +  id+ "_" + chr+ ".filter.bam"
+	return(bamfile)
+	#args.bam_filter = args.out + "/Bam/" + args.chr + ".filter.bam"
 
 def getDPinfo(args):
 	out = args.out
@@ -309,9 +326,9 @@ def BamSplit(args):
 		#os.system(samtools + " index " + out + "/Bam/split_bam/" + args.chr + "_" + str(clst[i]) + ".bam")
 		bamlist.write(out + "/Bam/split_bam/" + args.chr + "_" + str(clst[i]) + ".bam" + "\n")
 
-def runCMD(cmd, args):
-	#print(cmd)
-	os.system(cmd + " > " + args.logfile)
+def runCMD(cmd):
+
+	os.system(cmd)
 	#process = subprocess.run(cmd, shell=True, stdout=open(args.logfile, 'w'), stderr=open(args.logfile,'w'))
 	  
 
@@ -326,74 +343,46 @@ def germline(args):
 	check_dependencies(args)
 	out = args.out
 	os.system("mkdir -p " + out )
-	os.system("mkdir -p " + out +  "/Bam")
-	os.system("mkdir -p " + out +  "/germline")
-	os.system("mkdir -p " + out +  "/Script" + args.chr)
 	
-	samtools = args.samtools 
-	bcftools = args.bcftools 
-	#java = os.path.abspath(args.app_path) + "/java"
-	java =  args.java
-	beagle = args.beagle
-	if args.mode == "single":
-		if args.step == "bamQC" or args.step == "all":
-			logger.info("Filtering bam files...")
-			BamFilter(args)   
-		
-		args.bam_filter = args.out + "/Bam/" + args.chr + ".filter.bam"
+	os.system("mkdir -p " + out +  "/germline")
+	os.system("mkdir -p " + out +  "/Script")
 
-		cmd1 = samtools + " mpileup " + args.bam_filter + " -f "  + args.reference  + " -r " +  args.chr + " -q 20 -Q 20 -t DP -d 10000000 -v "
-		cmd1 = cmd1 + " | " + bcftools + " view " + " | "  + bcftools  + " norm -m-both -f " + args.reference 
-		cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL |" + args.bgzip +   " -c > " + out + "/germline/" +  args.chr + ".gl.vcf.gz" 
-		cmd2 = bcftools + " view " +  out + "/germline/" +  args.chr + ".gl.vcf.gz" + " -i 'FORMAT/DP>1' | " + bcftools + " call -cv  | " + args.bgzip +    "  -c > " +  out + "/SCvarCall/"  +  args.chr + ".gt.vcf.gz"
-		cmd3 = java + " -Xmx20g -jar " + beagle +  " gl=" +  out + "/germline/" +  args.chr + ".gl.vcf.gz"  +  " ref=" +  args.imputation_panel  + "  chrom=" + args.chr  + " out="   +  out + "/germline/" + args.chr + ".gp " + "impute=false  modelscale=2  nthreads=48  gprobs=true  niterations=0"
-		
-		cmd4 = "zless -S " +  out + "/germline/" + args.chr + ".gp.vcf.gz | grep -v  0/0  > " +  out + "/germline/" + args.chr + ".germline.vcf"
-		cmd5 = java + " -Xmx20g -jar " + beagle +  " gt=" +  out + "/germline/" +  args.chr + ".germline.vcf"  +  " ref=" +  args.imputation_panel   +  "  chrom=" + args.chr  + " out="   +  out + "/germline/" + args.chr + ".phased " + "impute=false  modelscale=2  nthreads=48  gprobs=true  niterations=0"
-		
 
-		if args.step == "varScan" or args.step == "all":
-			with open(out+"/Script" + args.chr + "/runVarScan.sh","w") as f_out:
-				#if args.step=="germline" or args.step=="all":
+	# check whether region files were set correctly 
+	joblst = []
+	with open(args.region) as f_in:
+		for line in f_in:
+			record = line.strip().split(",")
+			if(len(record)==1):
+				jobid = record[0]
+			if(len(record)==3):
+				jobid = record[0] + ":" + record[1] + "-" + record[2]
+			bam_filter = args.out + "/Bam/" +  record[0] +  ".filter.bam.lst"
+			cmd1 = samtools + " mpileup -b" + bam_filter + " -f "  + args.reference  + " -r " +  jobid + " -q 20 -Q 20 -t DP -d 10000000 -v "
+			cmd1 = cmd1 + " | " + bcftools + " view " + " | "  + bcftools  + " norm -m-both -f " + args.reference 
+			cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL |" + bgzip +   " -c > " + args.out + "/germline/" +  jobid + ".gl.vcf.gz" 
+			#cmd2 = bcftools + " view " +  out + "/germline/" +  jobid + ".gl.vcf.gz" + " -i 'FORMAT/DP>1' | " + bcftools + " call -cv  | " + bgzip +    "  -c > " +  args.out + "/SCvarCall/"  +  jobid + ".gt.vcf.gz"
+			cmd3 = java + " -Xmx20g -jar " + beagle +  " gl=" +  out + "/germline/" +  jobid + ".gl.vcf.gz"  +  " ref=" +  args.imputation_panel  + "  chrom=" + record[0] + " out="   +  out + "/germline/" + jobid + ".gp " + "impute=false  modelscale=2  nthreads=1  gprobs=true  niterations=0"
+			
+			cmd4 = "zless -S " +  out + "/germline/" + jobid + ".gp.vcf.gz | grep -v  0/0  > " +  out + "/germline/" + jobid + ".germline.vcf"
+			cmd5 = java + " -Xmx20g -jar " + beagle +  " gt=" +  out + "/germline/" +  jobid + ".germline.vcf"  +  " ref=" +  args.imputation_panel   +  "  chrom=" + record[0]  + " out="   +  out + "/germline/" + jobid+ ".phased " + "impute=false  modelscale=2  nthreads=48  gprobs=true  niterations=0"
+			f_out = open(out + "/Script/runGermline_" +  jobid +  ".sh","w")
+			if args.step == "varScan" or args.step == "all":
 				f_out.write(cmd1 + "\n")
-				f_out.write(cmd2 + "\n")
-			cmd = "bash " + out+"/Script" + args.chr +  "/runVarScan.sh"
-			runCMD(cmd,args)
-
-		if args.step == "varImpute" or args.step == "all":
-			with open(out+"/Script" + args.chr + "/runVarImpute.sh","w") as f_out:
+				#f_out.write(cmd2 + "\n")
+			if args.step == "varImpute" or args.step == "all":
 				f_out.write(cmd3 + "\n")
 				f_out.write(cmd4 + "\n")
-			cmd = "bash " + out+"/Script" + args.chr +  "/runVarImpute.sh"
-			print(cmd)
-			runCMD(cmd,args)
-			getDPinfo(args)
-		if args.step == "varPhasing" or args.step == "all":
-			with open(out+"/Script" + args.chr + "/runVarPhasing.sh","w") as f_out:
+			if args.step == "varPhasing" or args.step == "all":
 				f_out.write(cmd5 + "\n")
-			cmd = "bash " + out+"/Script" + args.chr +  "/runVarPhasing.sh"
-			print(cmd)
-			runCMD(cmd,args)
-			getDPinfo(args)
+			
+			joblst.append("bash " + out + "/Script/runGermline_" +  jobid +  ".sh")
+	f_out.close()
 
-      	
-	if args.mode == "multi":
-		#if args.step == "bamQC" or args.step == "all":
-		#	logger.info("Filtering bam files...")
-			#BamFilter(args.bamFile)
-		if args.step == "varScan" or args.step == "all" or args.stepp == "varImpute":
-			cmd1 = samtools + " mpileup -b " + args.bamFile + " -f "  + args.reference  + " -r " +  args.chr + " -q 20 -Q 20 -t DP -d 10000000 -v "
-			cmd1 = cmd1 + " | " + bcftools + " view " + " | "  + bcftools  + " norm -m-both -f " + args.reference 
-			cmd1 = cmd1 + " | grep -v \"<X>\"  | grep -v INDEL |" + args.bgzip +   " -c > " + out + "/germline/" +  args.chr + ".gl.vcf.gz" 
-			cmd2 = bcftools + " view " +  out + "/germline/" +  args.chr + ".gl.vcf.gz" + " -i 'FORMAT/DP>10' | " + bcftools + " call -cv  | " + args.bgzip +    "  -c > " +  out + "/SCvarCall/"  +  args.chr + ".gt.vcf.gz"
-			cmd3 = java + " -Xmx20g -jar " + beagle +  " gl=" +  out + "/germline/" +  args.chr + ".gl.vcf.gz"  +  " ref=" +  args.imputation_panel  + "  chrom=" + args.chr  + " out="   +  out + "/germline/" + args.chr + ".germline " + "impute=false  modelscale=2  nthreads=48  gprobs=true  niterations=0"
-			#cmd4 = "zless -S " +  out + "/SCvarCall/" + args.chr + ".gp.vcf.gz | grep -v  0/0  > " +  out + "/SCvarCall/" + args.chr + ".germline.vcf"
+	with Pool(processes=args.nthreads) as pool:
+		print(joblst)
+		result = pool.map(runCMD, joblst)
 
-			with open(out+"/Script" + args.chr + "runVarScan.sh","w") as f_out:
-					f_out.write(cmd1 + "\n")
-					f_out.write(cmd3 + "\n")
-			cmd = "bash " + out+"/Script" + args.chr +  "/runVarScan.sh"
-			runCMD(cmd,args)
 
 
 def validate_user_setting_somatic(args):
@@ -524,15 +513,56 @@ def somatic(args):
 
 
 
+def preProcess(args):
+	logger.info("Performing data preprocess before variant calling...")
+	print_parameters_given(args)
 
+	assert os.path.isfile(args.bamFile), "The bam file {} cannot be found!".format(args.bamFile)
+	out = args.out
+	os.system("mkdir -p " + out )
+	os.system("mkdir -p " + out +  "/Bam")
 
+	sample=[]
+	with open(args.bamFile) as f_in:
+			for line in f_in:
+				record = line.strip().split(",")
+				sample.append(record[0])
+				#logger.debug("Checking sample {}".format(record[0]))
+				assert len(record)==2, "Every line has to have exactly 2 comma-delimited columns! Line with sample name {} does not satisify this requiremnt!".format(record[0])
+				assert os.path.isfile(record[1]), "Bam file {} cannot be found!".format(record[1])
+				assert os.path.isfile(record[1]+".bai"), "Bam file {} has not been indexed!".format(record[1])
+				assert os.path.isabs(record[1]), "Please use absolute path for bam file {}!".format(record[1])
+
+	para_lst = []
+	with open(args.bamFile) as f_in:
+			for line in f_in:
+				record = line.strip().split(",")
+				logger.debug("PreProcessing sample {}".format(record[0]))
+				for chr in range(1, 23):
+					para_single  =  dict(chr = "chr" + str(chr), 
+						out = args.out, id = record[0], 
+						bamFile = record[1], 
+						max_mismatch = args.max_mismatch)
+					para_lst.append(para_single)
+					#print(args)
+	with Pool(processes=args.nthreads) as pool:
+		result = pool.map(BamFilter, para_lst)
+	# output the bam file list 
+
+	# generate postProcess bam files 
+	for chr in range(1, 23):
+		bamlist = open(args.out + "/Bam/chr" +  str(chr) +  ".filter.bam.lst","w")
+		for s in sample:
+			bamlist.write(args.out+"/Bam/"+s+"_chr"+str(chr)+".filter.bam\n")
+		bamlist.close()
+		
 
 def main():
 	parser = argparse.ArgumentParser(
 		description="""Monopogen: SNV calling from single cell sequencing
 		""",
 		epilog=
-		"""Typical modules: germline, somatic
+		"""Typical modules: preProcess, germline, somatic
 		""",
 		formatter_class=argparse.RawTextHelpFormatter)
 
@@ -540,33 +570,43 @@ def main():
 	
 	# every subcommand needs user config file
 	common_parser = argparse.ArgumentParser(add_help=False)
+
+	parser_preProcess = subparsers.add_parser('preProcess', parents=[common_parser],
+		help='Preprocess of bam files including removing reads with high alignment mismatches',
+		formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	parser_preProcess.add_argument('-b', '--bamFile', required=True,
+								help="The bam file for the study sample, the bam file should be sorted. If there are multiple samples, each row with each sample") 
+	parser_preProcess.add_argument('-o', '--out', required= False,
+								help="The output director")
+	parser_preProcess.add_argument('-a', '--app-path', required=True,
+								help="The app library paths used in the tool")
+	parser_preProcess.add_argument('-m', '--max-mismatch', required=False, type=int, default=3,
+								help="The maximal alignment mismatch allowed in one reads for variant calling")
+	parser_preProcess.add_argument('-t', '--nthreads', required=False, type=int, default=1,
+								help="Number of threads used for SNVs calling")
+	parser_preProcess.set_defaults(func=preProcess)
+
+
 	parser_germline = subparsers.add_parser('germline', parents=[common_parser],
 		help='Germline variant discovery, genotype calling from single cell data',
 		formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-	parser_germline.add_argument('-b', '--bamFile', required=True,
-								help="The bam file for the study sample, the bam file should be sorted") 
-	parser_germline.add_argument('-y', '--mode', required=True,
-								choices=['single','multi'],
-								help="Single sample or multiple samples. Only available for germline variant calling mode. This step can increase variant detection.")
-	parser_germline.add_argument('-c', '--chr', required= True, 
-								help="The chromosome used for variant calling")
-	parser_germline.add_argument('-t', '--step', required= True, default="all",
-								choices=['bamQC', 'varScan', 'varImpute' , 'varPhasing', 'all'],
+	parser_germline.add_argument('-r', '--region', required= True, 
+								help="The genome regions for variant calling")
+	parser_germline.add_argument('-s', '--step', required= True, default="all",
+								choices=['varScan', 'varImpute' , 'varPhasing', 'all'],
 								help="Run germline variant calling step by step")
 	parser_germline.add_argument('-o', '--out', required= False,
 								help="The output director")
-	parser_germline.add_argument('-r', '--reference', required= True, 
+	parser_germline.add_argument('-g', '--reference', required= True, 
 								help="The human genome reference used for alignment")
 	parser_germline.add_argument('-p', '--imputation-panel', required= True, 
 								help="The population-level variant panel for variant imputation refinement, such as 1000 Genome 3")
-	parser_germline.add_argument('-d', '--depth_filter_novelSNV', required=False, type=int, default=24,
-								help="The minimal read depth supported to call novel SNVs not listed in reference panel")
-	parser_germline.add_argument('-m', '--max-mismatch', required=False, type=int, default=3,
-								help="The maximal mismatch allowed in one reads for variant calling")
-	parser_germline.add_argument('-s', '--max-softClipped', required=False, type=int, default=1,
+	parser_germline.add_argument('-m', '--max-softClipped', required=False, type=int, default=1,
 								help="The maximal soft-clipped allowed in one reads for variant calling")
 	parser_germline.add_argument('-a', '--app-path', required=True,
 								help="The app library paths used in the tool")
+	parser_germline.add_argument('-t', '--nthreads', required=False, type=int, default=1,
+								help="Number of threads used for SNVs calling")
 	parser_germline.set_defaults(func=germline)
 
 
@@ -585,6 +625,7 @@ def main():
 	parser_somatic.set_defaults(func=somatic)
 
 	args = parser.parse_args()
+
 	if args.subcommand is None:
 		# if no command is specified, print help and exit
 		print("Please specify one subcommand! Exiting!")
@@ -592,39 +633,34 @@ def main():
 		parser.print_help()
 		exit(1)
 
-	# check if user configure exists
-	#assert os.path.isfile(args.userCfg), ("User config file {} cannot be found".format(args.userCfg))
-
 	# execute subcommand-specific function
-	print(args.subcommand)
 
+	
 	if args.subcommand == "somatic":
 		args.out = args.input_folder
 
-	args.logfile = args.out + "_" + args.chr + ".log"
-	if os.path.exists(args.logfile):
-		os.remove(args.logfile)
-	handler1 = logging.FileHandler(args.logfile)
-	handler1.setFormatter(logging.Formatter(
-		'[{asctime}] {levelname:8s} {filename} {message}', style='{'))
-	logger.addHandler(handler1)
 
-	args.out = os.path.abspath(args.out)
-	args.samtools  = os.path.abspath(args.app_path) + "/samtools" 
-	args.bcftools = os.path.abspath(args.app_path) + "/bcftools"
-	args.bgzip = os.path.abspath(args.app_path) + "/bgzip"
-	args.java =  "java"
-	args.beagle = os.path.abspath(args.app_path) + "/beagle.27Jul16.86a.jar"
-	if args.subcommand == "germline":
-		args.bamFile = os.path.abspath(args.bamFile)
+	
+	#args.logfile = args.out + "_" + args.chr + ".log"
+
+	#if os.path.exists(args.logfile):
+	#	os.remove(args.logfile)
+	#handler1 = logging.FileHandler(args.logfile)
+	#handler1.setFormatter(logging.Formatter(
+	#	'[{asctime}] {levelname:8s} {filename} {message}', style='{'))
+	#logger.addHandler(handler1)
+
+	global out, samtools, bcftools, bgzip, java, beagle 
+	out = os.path.abspath(args.out)
+	samtools  = os.path.abspath(args.app_path) + "/samtools" 
+	bcftools = os.path.abspath(args.app_path) + "/bcftools"
+	bgzip = os.path.abspath(args.app_path) + "/bgzip"
+	java =  "java"
+	beagle = os.path.abspath(args.app_path) + "/beagle.27Jul16.86a.jar"
+
 	args.func(args)
 
 	logger.info("Success! See instructions above.")
-
-
-
-
-
 
 
 
