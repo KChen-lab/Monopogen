@@ -2,6 +2,45 @@
 SNV calling from single cell sequencing data
 
 <image src="./example/Fig1.png" width="400"> 
+  
+  
+## Table of Contents
+
+[//]: # (BEGIN automated TOC section, any edits will be overwritten on next source refresh)
+
+* [Introduction](#introduction)
+* [Installation](#installation)
+* [Method Overview](#method-overview)
+* [Capabilities](#capabilities)
+  * [Known Limitations](#known-limitations)
+* [Input requirements](#input-requirements)
+  * [Sequencing Data](#sequencing-data)
+  * [Alignment Files](#alignment-files)
+  * [VCF Files](#vcf-files)
+* [Outputs](#outputs)
+  * [Variant prediction](#variant-prediction)
+    * [Germline](#germline)
+    * [Somatic](#somatic)
+  * [Statistics](#statistics)
+* [Run configuration and Execution](#run-configuration-and-execution)
+  * [Configuration](#configuration)
+    * [Somatic configuration example](#somatic-configuration-example)
+    * [Germline configuration example](#germline-configuration-example)
+    * [General configuration options](#general-configuration-options)
+    * [Advanced configuration options](#advanced-configuration-options)
+  * [Execution](#execution)
+    * [Advanced execution options](#advanced-execution-options)
+  * [Extended use cases](#extended-use-cases)
+    * [Improving runtime for references with many short contigs, such as GRCh38](#improving-runtime-for-references-with-many-short-contigs-such-as-grch38)
+    * [Exome/Targeted](#exometargeted)
+    * [De novo variant calling](#de-novo-variant-calling)
+    * [RNA-Seq](#rna-seq)
+    * [Heteroplasmic/pooled calling](#heteroplasmicpooled-calling)
+    * [Somatic callability](#somatic-callability)
+* [Special Topics](#special-topics)
+
+[//]: # (END automated TOC section, any edits will be overwritten on next source refresh)
+
 
 **Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges, scDNA-seq etc. 
 It is composed of three modules: 
