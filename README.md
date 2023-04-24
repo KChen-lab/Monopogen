@@ -15,7 +15,7 @@
   * [Germline SNV calling](#germline-snv-calling)
   * [Germline accuracy evaluation](#germline-accuracy-evaluation)
   * [Ancestry identification](#ancestry-identification)
-* [Somatic SNV calling from MASTER data](#somatic-snv-calling-from-master-data)
+* [Somatic SNV calling from scRNA-seq data](#somatic-snv-calling-from-master-data)
   * [Germline SNV calling](#germline-snv-calling)
   * [SVM filtering](#svm-filtering)
   * [LD refinement](#ld-refinement)
