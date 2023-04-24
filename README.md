@@ -14,6 +14,7 @@
   * [Run on the HPC or supercomputing environments](run_on_the_hpc_or_supercomputing_enviroments)
   * [Putative Somatic SNV calling](#putative-somatic-snv-calling)
 * [Germline SNV calling from snRNA-seq](#germline-snv-calling-from-snRNA-seq)
+  * [Data preprocess](#data-preprocess)
   * [Germline SNV calling](#germline-snv-calling)
   * [Germline accuracy evaluation](#germline-accuracy-evaluation)
   * [Ancestry identification](#ancestry-identification)
@@ -57,7 +58,9 @@ Right now Monopogen is avaiable on github, you can install it through github
 `cd Monopogen`  
 `pip install -e .`  
 
-## Data preprocess
+## Quick Start
+  
+**Data preprocess**
 
 You can type the following command to get the help information.
 
@@ -104,7 +107,7 @@ python  ${path}/src/Monopogen.py  preProcess -b bam.lst -o out  -a ${path}/apps 
 ```
 After running the `preProcess` module, there will be bam files after quality controls in the folder `out/Bam/` which will be used for downstream SNV calling.
   
-## Germline SNV calling  
+**Germline SNV calling**  
  
 You can type the following command to get the help information.
 
@@ -182,8 +185,7 @@ chr20   276086  .       T       A       .       PASS    .       GT      0|1     
 
 ```
   
- 
-## Run on the HPC or supercomputing environments
+**Run on the HPC or supercomputing environments**
 
 If there are multiple single cell RNA samples and you want to use Monopogen on germline SNV calling, you can enable the `-norun` option.
 
@@ -197,9 +199,10 @@ python  ${path}/src/Monopogen.py  germline  \
 ```
 The `-norun` module will generate jobs from different regions and you can submit them to HPC based on your own preference. The generated job files will be in `out/Script/`
 
-## Putative somatic SNV calling 
+**Putative somatic SNV calling** 
 
-## Ancestry identification
+## Germline SNV calling from snRNA-seq
+** 
 
 The germline SNVs from Monopogen enable us to perform sample level ancestry identification without external genotype data from matched bulk samples. This analysis can be performed using the PCA-based projection method [TRACE](http://csg.sph.umich.edu/chaolong/LASER/) programe. Here we use 2 snRNA samples from human retina atlas as an illustration. The outputs of `Monopogene` for two samples can be downloaded in [19D013](https://drive.google.com/file/d/1YN4U6I1OK6J6ZV90fd8twtynHlqNGVX2/view?usp=share_link) and [19D014](https://drive.google.com/file/d/1os-u9Fd00Osre_5NRiT1qBmNYQ37uf_W/view?usp=share_link). 
 
