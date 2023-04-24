@@ -11,6 +11,7 @@
 * [Quick Start](#quick-start)
   * [Data preprocess](#data-preprocess)
   * [Germline SNV calling](#germline-snv-calling)
+  * [Run on the HPC or supercomputing environments](run_on_the_hpc_or_supercomputing_enviroments)
   * [Putative Somatic SNV calling](#putative-somatic-snv-calling)
 * [Germline SNV calling from snRNA-seq](#germline-snv-calling-from-snRNA-seq)
   * [Germline SNV calling](#germline-snv-calling)
