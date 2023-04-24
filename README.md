@@ -5,12 +5,13 @@
 ## Table of Contents
 
 [//]: # (BEGIN automated TOC section, any edits will be overwritten on next source refresh)
-
 * [Introduction](#introduction)
 * [Installation](#installation)
 * [Data preprocess](#preProcess)
 * [Germline SNV calling](#germline)
 * [Putative Somatic SNV calling](#somatic)
+* [FAQ](#FAQ)
+* [Citation](#Citation)
 
 * [Input requirements](#input-requirements)
   * [Sequencing Data](#sequencing-data)
@@ -53,7 +54,7 @@ It is composed of three modules:
 The output of `Monopogen` will enable 1) ancestry identificaiton on single cell samples; 2) genome-wide association study on the celluar level if sample size is sufficient, and 3) putative somatic SNV investigation.
 
 ## Installation
-# Dependencies
+** Dependencies **
 * python  (version >= 3.73)
 * java (open JDK>=1.8.0)
 * pandas>=1.2.3
@@ -61,7 +62,7 @@ The output of `Monopogen` will enable 1) ancestry identificaiton on single cell 
 * NumPy>=1.19.5
 * sciPy>=1.6.3
 * pillow>=8.2.0
-# Installation 
+** Installation **
 Right now Monopogen is avaiable on github, you can install it through github 
 
 `git clone https://github.com/KChen-lab/Monopogen.git`  
@@ -212,7 +213,7 @@ The `-norun` module will generate jobs from different regions and you can submit
 
 
 
-## 7. FAQs 
+## FAQs 
 * ***where to download 1KG3 reference panel (hg38)***
   http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/
   
@@ -229,8 +230,7 @@ The `-norun` module will generate jobs from different regions and you can submit
   
   `chmod 770 -R  /xx/apps` 
  
-  
-## 8. Citation
+## Citation
 [Dou J, Tan Y, Wang J, Cheng X, Han KY, Hon CC, Park WY, Shin JW, Chen H, Prabhakar S, Navin N, Chen K. Monopogen : single nucleotide variant calling from single cell sequencing. bioRxiv. 2022 Jan 1](https://www.biorxiv.org/content/10.1101/2022.12.04.519058v1.abstract)
 
 
