@@ -152,7 +152,17 @@ python  ${path}/src/Monopogen.py  germline  \
 The `germline` module will generate the phased VCF files with name `*.phased.vcf.gz` in the folder `out/germline`. If there are multiple samples in the bam file list from `-b` option in `preProcess` module, the phased VCF files will contain genotypes from multiple samples. The output of phased genotypes are as following:
   
 ```
-
+##fileformat=VCFv4.2
+##filedate=20230422
+##source="beagle.27Jul16.86a.jar (version 4.1)"
+##INFO=<ID=AF,Number=A,Type=Float,Description="Estimated ALT Allele Frequencies">
+##INFO=<ID=AR2,Number=1,Type=Float,Description="Allelic R-Squared: estimated squared correlation betwe
+##INFO=<ID=DR2,Number=1,Type=Float,Description="Dosage R-Squared: estimated squared correlation betwee
+##INFO=<ID=IMP,Number=0,Type=Flag,Description="Imputed marker">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DS,Number=A,Type=Float,Description="estimated ALT dose [P(RA) + P(AA)]">
+##FORMAT=<ID=GP,Number=G,Type=Float,Description="Estimated Genotype Probability">
+#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  19D013_European_F_78    19D014_European_M_84
 chr20   68303   .       T       C       .       PASS    .       GT      1|0     1|1
 chr20   88108   .       T       C       .       PASS    .       GT      1|1     0|1
 chr20   127687  .       A       C       .       PASS    .       GT      1|1     1|1
