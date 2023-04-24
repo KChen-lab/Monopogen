@@ -8,9 +8,10 @@
 
 * [Introduction](#introduction)
 * [Installation](#installation)
-* [Data preprocess](#data-preprocess)
-* [Germline SNV calling](#germline-snv-calling)
-* [Putative Somatic SNV calling](#putative-somatic-snv-calling)
+* [Quick Start](#quick-start)
+  * [Data preprocess](#data-preprocess)
+  * [Germline SNV calling](#germline-snv-calling)
+  * [Putative Somatic SNV calling](#putative-somatic-snv-calling)
 * [Germline SNV calling from snRNA-seq](#germline-snv-calling-from-snRNA-seq)
   * [Germline SNV calling](#germline-snv-calling)
   * [Germline accuracy evaluation](#germline-accuracy-evaluation)
