@@ -201,7 +201,7 @@ Monopogen includes the script to run `TRACE` in `/scripts/runTrace.sh`. We can p
 bash  ${path}/scripts/runTrace.sh 19D015_Hispanic_M_73.germline.vcf 19D015
 bash  ${path}/scripts/runTrace.sh 19D013_European_F_78.germline.vcf 19D013
 ```
-The Projected PC coordinates for sample `19D015` and `19D013` can be seen in `19D015.HGDP.PC` and  `19D013.HGDP.PC`. Their projections on HGDP panel is
+The Projected PC coordinates for sample `19D015` and `19D013` can be seen in `19D015.HGDP.PC` and  `19D013.HGDP.PC`. Their projections on HGDP panel are
   
 <image src="./example/retina_snRNA_ancestry.png" width="600"> 
 
