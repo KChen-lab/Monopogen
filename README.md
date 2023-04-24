@@ -167,7 +167,7 @@ python  ${path}/src/Monopogen.py  germline  \
     --norun
 
 ```
-The '-norun' module will generate jobs from different regions and you can submit to HPC based on your own preference. The generated job files will be in 'out/Script/'
+The `-norun` module will generate jobs from different regions and you can submit them to HPC based on your own preference. The generated job files will be in `out/Script/`
 
 ## 3.3 Putative somatic SNV calling 
 
