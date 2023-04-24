@@ -191,7 +191,23 @@ The `-norun` module will generate jobs from different regions and you can submit
 
 ## Ancestry identification
 
-The germline SNVs from Monopogen enable us to perform sample level ancestry identification without external genotype data from matched bulk samples. This analysis can be performed using the PCA-based projection method [TRACE](http://csg.sph.umich.edu/chaolong/LASER/) programe. Here we used 2 snRNA samples from human retina atlas as an illustration. The outputs of `Monopogene` for two samples can be downloaded in [19D013](https://drive.google.com/file/d/1YN4U6I1OK6J6ZV90fd8twtynHlqNGVX2/view?usp=share_link) and [19D014](https://drive.google.com/file/d/1os-u9Fd00Osre_5NRiT1qBmNYQ37uf_W/view?usp=share_link). 
+The germline SNVs from Monopogen enable us to perform sample level ancestry identification without external genotype data from matched bulk samples. This analysis can be performed using the PCA-based projection method [TRACE](http://csg.sph.umich.edu/chaolong/LASER/) programe. Here we use 2 snRNA samples from human retina atlas as an illustration. The outputs of `Monopogene` for two samples can be downloaded in [19D013](https://drive.google.com/file/d/1YN4U6I1OK6J6ZV90fd8twtynHlqNGVX2/view?usp=share_link) and [19D014](https://drive.google.com/file/d/1os-u9Fd00Osre_5NRiT1qBmNYQ37uf_W/view?usp=share_link). 
+
+Users need to install [TRACE](http://csg.sph.umich.edu/chaolong/LASER/) programe. Make sure the HGDP panel information `HGDP/HGDP_938.geno` and `HGDP/HGDP_938.RefPC.coord` included in the downloaded package. Note, the genotypes in HGDP panel were identified on `GRCh37`, you need to `liftover` the output of Monopogen to `GRCh37` if you are calling SNVs using `GRCh38`. Genome version liftOver can be done using [Picard](https://gatk.broadinstitute.org/hc/en-us/articles/360037060932-LiftoverVcf-Picard-). 
+  
+Monopogen includes the script to run `TRACE` in `/scripts/runTrace.sh`. We can project the 2 snRNA samples on HGDP panel using
+
+```
+bash  ${path}/scripts/runTrace.sh 19D015_Hispanic_M_73.germline.vcf 19D015
+bash  ${path}/scripts/runTrace.sh 19D013_European_F_78.germline.vcf 19D013
+```
+The Projected PC coordinates for sample `19D015` and `19D013` can be seen in `19D015.HGDP.PC` and  `19D013.HGDP.PC`. Their projections on HGDP panel is
+  
+<image src="./example/retina_snRNA_ancestry.png" width="600"> 
+
+ 
+
+  
   
   
 
