@@ -1,5 +1,4 @@
-# Monopogen
-SNV calling from single cell sequencing data
+# Monopogen: SNV calling from single cell sequencing data
 
   
   
@@ -9,9 +8,10 @@ SNV calling from single cell sequencing data
 
 * [Introduction](#introduction)
 * [Installation](#installation)
-* [Method Overview](#method-overview)
-* [Capabilities](#capabilities)
-  * [Known Limitations](#known-limitations)
+* [Data preprocess](#preProcess)
+* [Germline SNV calling](#germline)
+* [Putative Somatic SNV calling](#somatic)
+
 * [Input requirements](#input-requirements)
   * [Sequencing Data](#sequencing-data)
   * [Alignment Files](#alignment-files)
@@ -43,6 +43,7 @@ SNV calling from single cell sequencing data
 ## Introduction
 **Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges, scDNA-seq etc. 
 <image src="./example/Fig1.png" width="400"> 
+  
 It is composed of three modules: 
 * **Data preprocess**. This module removes reads with high alignment mismatches from single cell sequencing and also makes data formats compatiable with Monopongen.
 * **Germline SNV calling**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to improve both SNV calling accuracy and detection sensitivity. 
@@ -51,7 +52,7 @@ It is composed of three modules:
 The output of `Monopogen` will enable 1) ancestry identificaiton on single cell samples; 2) genome-wide association study on the celluar level if sample size is sufficient, and 3) putative somatic SNV investigation.
 
 ## Installation
-## 1. Dependencies
+# Dependencies
 * python  (version >= 3.73)
 * java (open JDK>=1.8.0)
 * pandas>=1.2.3
@@ -59,16 +60,14 @@ The output of `Monopogen` will enable 1) ancestry identificaiton on single cell 
 * NumPy>=1.19.5
 * sciPy>=1.6.3
 * pillow>=8.2.0
-## 2. Installation 
+# Installation 
 Right now Monopogen is avaiable on github, you can install it through github 
 
 `git clone https://github.com/KChen-lab/Monopogen.git`  
 `cd Monopogen`  
 `pip install -e .`  
 
-## 3. Usage of Monopogen
-  
-## 3.1 Data preprocess
+## Data preprocess
 
 You can type the following command to get the help information.
 
@@ -115,7 +114,7 @@ python  ${path}/src/Monopogen.py  preProcess -b bam.lst -o out  -a ${path}/apps 
 ```
 After running the `preProcess` module, there will be bam files after quality controls in the folder `out/Bam/` which will be used for downstream SNV calling.
   
-## 3.2 Germline SNV calling  
+## Germline SNV calling  
  
 You can type the following command to get the help information.
 
@@ -208,7 +207,7 @@ python  ${path}/src/Monopogen.py  germline  \
 ```
 The `-norun` module will generate jobs from different regions and you can submit them to HPC based on your own preference. The generated job files will be in `out/Script/`
 
-## 3.3 Putative somatic SNV calling 
+## Putative somatic SNV calling 
 
 
 
