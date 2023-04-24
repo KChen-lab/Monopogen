@@ -1,7 +1,6 @@
 # Monopogen
 SNV calling from single cell sequencing data
 
-<image src="./example/Fig1.png" width="400"> 
   
   
 ## Table of Contents
@@ -41,8 +40,9 @@ SNV calling from single cell sequencing data
 
 [//]: # (END automated TOC section, any edits will be overwritten on next source refresh)
 
-
+## Introduction
 **Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges, scDNA-seq etc. 
+<image src="./example/Fig1.png" width="400"> 
 It is composed of three modules: 
 * **Data preprocess**. This module removes reads with high alignment mismatches from single cell sequencing and also makes data formats compatiable with Monopongen.
 * **Germline SNV calling**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to improve both SNV calling accuracy and detection sensitivity. 
@@ -50,7 +50,7 @@ It is composed of three modules:
 
 The output of `Monopogen` will enable 1) ancestry identificaiton on single cell samples; 2) genome-wide association study on the celluar level if sample size is sufficient, and 3) putative somatic SNV investigation.
 
-
+## Installation
 ## 1. Dependencies
 * python  (version >= 3.73)
 * java (open JDK>=1.8.0)
