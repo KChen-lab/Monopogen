@@ -11,7 +11,7 @@
 * [Quick Start](#quick-start)
   * [Data preprocess](#data-preprocess)
   * [Germline SNV calling](#germline-snv-calling)
-  * [Run on the HPC or supercomputing environments](#run_on_the_hpc_or_supercomputing_environments)
+  * [Run on the HPC](#run_on_the_hpc)
   * [Putative Somatic SNV calling](#putative-somatic-snv-calling)
 * [Germline SNV calling from snRNA-seq](#germline-snv-calling-from-snRNA-seq)
   * [Data preprocess](#data-preprocess)
@@ -185,7 +185,7 @@ chr20   276086  .       T       A       .       PASS    .       GT      0|1     
 
 ```
   
-### Run on the HPC or supercomputing environments ###
+### Run on the HPC ###
   
 If there are multiple single cell RNA samples and you want to use Monopogen on germline SNV calling, you can enable the `-norun` option.
 
