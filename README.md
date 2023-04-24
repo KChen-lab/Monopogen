@@ -58,7 +58,7 @@ Right now Monopogen is avaiable on github, you can install it through github
 `cd Monopogen`  
 `pip install -e .`  
 
-## Quick Start
+## Quick Start 
   
 **Data preprocess**
 
