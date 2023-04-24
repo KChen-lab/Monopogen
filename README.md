@@ -60,7 +60,7 @@ Right now Monopogen is avaiable on github, you can install it through github
 
 ## Quick Start 
   
-**Data preprocess**
+###Data preprocess###
 
 You can type the following command to get the help information.
 
@@ -107,7 +107,7 @@ python  ${path}/src/Monopogen.py  preProcess -b bam.lst -o out  -a ${path}/apps 
 ```
 After running the `preProcess` module, there will be bam files after quality controls in the folder `out/Bam/` which will be used for downstream SNV calling.
   
-**Germline SNV calling**  
+###Germline SNV calling###
  
 You can type the following command to get the help information.
 
@@ -185,7 +185,7 @@ chr20   276086  .       T       A       .       PASS    .       GT      0|1     
 
 ```
   
-**Run on the HPC or supercomputing environments**
+###Run on the HPC or supercomputing environments###
 
 If there are multiple single cell RNA samples and you want to use Monopogen on germline SNV calling, you can enable the `-norun` option.
 
@@ -199,7 +199,7 @@ python  ${path}/src/Monopogen.py  germline  \
 ```
 The `-norun` module will generate jobs from different regions and you can submit them to HPC based on your own preference. The generated job files will be in `out/Script/`
 
-**Putative somatic SNV calling** 
+###Putative somatic SNV calling###
 
 ## Germline SNV calling from snRNA-seq
 ** 
