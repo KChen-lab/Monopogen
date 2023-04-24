@@ -8,11 +8,11 @@
 
 * [Introduction](#introduction)
 * [Installation](#installation)
-* [Data preprocess](#preProcess)
-* [Germline SNV calling](#germline)
-* [Putative Somatic SNV calling](#somatic)
-* [FAQ](#FAQ)
-* [Citation](#Citation)
+* [Data preprocess](#data-preprocess)
+* [Germline SNV calling](#germline-snv-calling)
+* [Putative Somatic SNV calling](#putative-somatic-snv-calling)
+* [FAQs](#faqs)
+* [Citation](#citation)
 
 * [Input requirements](#input-requirements)
   * [Sequencing Data](#sequencing-data)
