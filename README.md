@@ -14,32 +14,6 @@
 * [FAQs](#faqs)
 * [Citation](#citation)
 
-* [Input requirements](#input-requirements)
-  * [Sequencing Data](#sequencing-data)
-  * [Alignment Files](#alignment-files)
-  * [VCF Files](#vcf-files)
-* [Outputs](#outputs)
-  * [Variant prediction](#variant-prediction)
-    * [Germline](#germline)
-    * [Somatic](#somatic)
-  * [Statistics](#statistics)
-* [Run configuration and Execution](#run-configuration-and-execution)
-  * [Configuration](#configuration)
-    * [Somatic configuration example](#somatic-configuration-example)
-    * [Germline configuration example](#germline-configuration-example)
-    * [General configuration options](#general-configuration-options)
-    * [Advanced configuration options](#advanced-configuration-options)
-  * [Execution](#execution)
-    * [Advanced execution options](#advanced-execution-options)
-  * [Extended use cases](#extended-use-cases)
-    * [Improving runtime for references with many short contigs, such as GRCh38](#improving-runtime-for-references-with-many-short-contigs-such-as-grch38)
-    * [Exome/Targeted](#exometargeted)
-    * [De novo variant calling](#de-novo-variant-calling)
-    * [RNA-Seq](#rna-seq)
-    * [Heteroplasmic/pooled calling](#heteroplasmicpooled-calling)
-    * [Somatic callability](#somatic-callability)
-* [Special Topics](#special-topics)
-
 [//]: # (END automated TOC section, any edits will be overwritten on next source refresh)
 
 ## Introduction
@@ -55,7 +29,7 @@ It is composed of three modules:
 The output of `Monopogen` will enable 1) ancestry identificaiton on single cell samples; 2) genome-wide association study on the celluar level if sample size is sufficient, and 3) putative somatic SNV investigation.
 
 ## Installation
-** Dependencies **
+**Dependencies**
 * python  (version >= 3.73)
 * java (open JDK>=1.8.0)
 * pandas>=1.2.3
@@ -63,7 +37,9 @@ The output of `Monopogen` will enable 1) ancestry identificaiton on single cell 
 * NumPy>=1.19.5
 * sciPy>=1.6.3
 * pillow>=8.2.0
-** Installation **
+  
+**Installation**
+  
 Right now Monopogen is avaiable on github, you can install it through github 
 
 `git clone https://github.com/KChen-lab/Monopogen.git`  
