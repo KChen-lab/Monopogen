@@ -191,6 +191,11 @@ The `-norun` module will generate jobs from different regions and you can submit
 
 ## Ancestry identification
 
+The germline SNVs from Monopogen enable us to perform sample level ancestry identification without external genotype data from matched bulk samples. This analysis can be performed using the PCA-based projection method [TRACE](http://csg.sph.umich.edu/chaolong/LASER/) programe. Here we used 2 snRNA samples from human retina atlas as an illustration. The outputs of `Monopogene` for two samples can be downloaded in [19D013](https://drive.google.com/file/d/1YN4U6I1OK6J6ZV90fd8twtynHlqNGVX2/view?usp=share_link) and [19D014](https://drive.google.com/file/d/1os-u9Fd00Osre_5NRiT1qBmNYQ37uf_W/view?usp=share_link). 
+  
+  
+
+
 
 
 ## FAQs 
