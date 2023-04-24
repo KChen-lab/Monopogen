@@ -155,29 +155,21 @@ chr20   276086  .       T       A       .       PASS    .       GT      0|1     
 ```
   
  
-## Run on multiple chromosomes and multiple samples 
+## Run on the HPC or supercomputing environments
 
-Users can submit jobs with multiple chromosomes in the parallele fashion as following:
-
-```
-path="XX/Monopogen"
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
-
-for chr in {1..22}
-do 
-  python  ../src/Monopogen.py    germline  \
-        -b  ../example/chr${chr}_2Mb.rh.filter.sort.bam  \
-        -y  single  \
-        -t  all  \
-        -a  ../apps  \
-        -c  chr${chr}  \
-        -o  out \
-        -d  10 \
-        -p  ../example/CCDG_14151_B01_GRM_WGS_2020-08-05_chr${chr}.filtered.shapeit2-duohmm-phased.vcf.gz  \
-        -r  ../example/chr${chr}_2Mb.hg38.fa   -m 3 -s 5
-done
+If there are multiple single cell RNA samples and you want to use Monopogen on germline SNV calling, you can enable the `-norun` option.
 
 ```
+python  ${path}/src/Monopogen.py  germline  \
+    -a   ${path}/apps -t 8   -r  region.lst \
+    -p  ../example/CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz  \
+    -g  ../example/chr20_2Mb.hg38.fa   -s all  -o out
+    --norun
+
+```
+The '-norun' module will generate jobs from different regions and you can submit to HPC based on your own preference. The generated job files will be in 'out/Script/'
+
+## 3.3 Putative somatic SNV calling 
 
 
 
