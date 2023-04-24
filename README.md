@@ -11,6 +11,7 @@
 * [Data preprocess](#data-preprocess)
 * [Germline SNV calling](#germline-snv-calling)
 * [Putative Somatic SNV calling](#putative-somatic-snv-calling)
+* [Ancestry identification](#ancestry-identification)
 * [FAQs](#faqs)
 * [Citation](#citation)
 
@@ -187,6 +188,8 @@ python  ${path}/src/Monopogen.py  germline  \
 The `-norun` module will generate jobs from different regions and you can submit them to HPC based on your own preference. The generated job files will be in `out/Script/`
 
 ## Putative somatic SNV calling 
+
+## Ancestry identification
 
 
 
