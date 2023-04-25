@@ -58,7 +58,18 @@ Right now Monopogen is avaiable on github, you can install it through github
 `pip install -e .`  
 
 ## Quick Start 
-  
+
+We provide an example dataset provided the `example/` folder, which includes:
+* `A.bam (.bai)`  
+  The bam file storing read alignment for sample A.
+* `B.bam (.bai)`  
+  The bam file storing read alignment for sample B. 
+* `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz`  
+  The reference panel with over 3,000 samples in 1000 Genome database. Only SNVs located in chr20: 0-2Mb were extracted in this vcf file. 
+* `chr20_2Mb.hg38.fa (.fai)`  
+  The genome reference used for read aligments. Only seuqences in chr20:0-2Mb were extracted in this fasta file.
+There are three test scripts in the `test/` folder `test/runPreprocess.sh`, `test/runGermline.sh`, `test/runSomatic.sh` for quick start of `Monopogen`
+
 ### Data preprocess ###
 
 You can type the following command to get the help information.
@@ -84,18 +95,7 @@ optional arguments:
   -t NTHREADS, --nthreads NTHREADS
                         Number of threads used for SNVs calling (default: 1)
  ```
-
-We provide one example dataset provided the `example/` folder, which includes:
-* `A.bam (.bai)`  
-  The bam file storing read alignment for sample A.
-* `B.bam (.bai)`  
-  The bam file storing read alignment for sample B. 
-* `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz`  
-  The reference panel with over 3,000 samples in 1000 Genome database. Only SNVs located in chr20: 0-2Mb were extracted in this vcf file. 
-* `chr20_2Mb.hg38.fa (.fai)`  
-  The genome reference used for read aligments. Only seuqences in chr20:0-20Mb were extracted in this fasta file.
-
-There is a bash script `./test/runPreprocess.sh` to run above example in the folder `test`. You need to prepare the bam file list for option `-b`. If you have multiple sample in this file, you can use more CPUs by setting `-t` to make `Monopogen` faster.  Run the test script as following:
+ You need to prepare the bam file list for option `-b`. If you have multiple sample in this file, you can use more CPUs by setting `-t` to make `Monopogen` faster.  Run the test script `test/runPreprocess.sh`
   
 ```
 path="XXy/Monopogen"
@@ -139,7 +139,7 @@ optional arguments:
                         Number of threads used for SNVs calling (default: 1)
  ```
 
-There is a bash script `./test/runGermline.sh` to run above example. You need to prepare the genome region file list for option `-r` with an example shown in `test/region.lst`. Each region is in one row. If you want to call the whole chromosome, you can only specficy the chromosome ID in each row.  Also you can use more CPUs by setting `-t` to make `Monopogen` faster when there are many genome regions.  Run the test script as following:
+You need to prepare the genome region file list for option `-r` with an example shown in `test/region.lst`. Each region is in one row. If you want to call the whole chromosome, you can only specficy the chromosome ID in each row.  Also you can use more CPUs by setting `-t` to make `Monopogen` faster when there are many genome regions.  Run the test script test/runGermline.sh as following:
   
 ```
 python  ${path}/src/Monopogen.py  germline  \
