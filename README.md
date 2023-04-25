@@ -13,7 +13,7 @@
   * [Germline SNV calling](#germline-snv-calling)
   * [Putative Somatic SNV calling](#putative-somatic-snv-calling)
 * [Germline SNV calling from snRNA-seq](#germline-snv-calling-from-snRNA-seq)
-* [Somatic SNV calling from scRNA-seq](#somatic-snv-calling-from-master-data)
+* [Somatic SNV calling from scRNA-seq](#somatic-snv-calling-from-scrna-seq)
 * [FAQs](#faqs)
 * [Citation](#citation)
 
