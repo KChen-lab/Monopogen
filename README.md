@@ -193,7 +193,7 @@ The `-norun` module will generate jobs from different regions and you can submit
 ### Putative somatic SNV calling ###
 
 ## Germline SNV calling from snRNA-seq
-We demonstrate the utilization of Monopogen on SNV calling, ancestry identification using 2 snRNA samples from human retina atlas. Please see the [Vignette] []
+We demonstrate the utilization of Monopogen on SNV calling, ancestry identification using 2 snRNA samples from human retina atlas. The 4 retina samples shown in Monopogen methodological paper are `19D013`, `19D014`, `19D015`, `19D016`. Thhe fastq files of these samples can be downloaded with SRA ID [SRR23617370](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501863), [SRR23617337](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501879), [SRR23617320](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441051) and [SRR23617310](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441045)
 
 ## Somatic SNV calling from scRNA-seq ##
 We demonstrate how the LD refinement model implemented in Monopogen can improve somatic SNV detection from scRNA-seq profiles without matched bulk WGS data available. Please see the [Vignette] []
