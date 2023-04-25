@@ -190,7 +190,9 @@ The `-norun` module will generate jobs from different regions and you can submit
 ### Putative somatic SNV calling ###
 
 ## Germline SNV calling from snRNA-seq
-We demonstrate the utilization of Monopogen on germline SNV calling, ancestry identification snRNA samples from human retina atlas. The 4 retina samples shown in Monopogen methodological paper are `19D013`, `19D014`, `19D015`, `19D016`. Thhe fastq files of these samples can be downloaded with from SRA database [SRR23617370](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501863), [SRR23617337](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501879), [SRR23617320](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441051) and [SRR23617310](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441045). Here we used `19D013` as an example (Analysis on other samples is the same). For convenience, we skipped the read alignment step and shared the alignmed bam file (Only reads from chr20 were extracted) in [19D013.snRNA.chr20.bam](https://drive.google.com/file/d/18-vdGY9hxbGP-Mm06IBpCCF-NZI9ltAU/view?usp=share_link) and  [19D013.snRNA.chr20.bam.bai](https://drive.google.com/file/d/1HEozx6gmX2Z05R8nElEFOBUhnqayMgAi/view?usp=share_link). After the bam file was downloaded, we can prepare for the `bam.lst` and `region.lst` as following
+We demonstrate the utilization of Monopogen on germline SNV calling, ancestry identification on snRNA samples from human retina atlas. The 4 retina samples shown in Monopogen methodological paper are `19D013`, `19D014`, `19D015`, `19D016`. Thhe fastq files of these samples can be downloaded with from SRA database [SRR23617370](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501863), [SRR23617337](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501879), [SRR23617320](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441051) and [SRR23617310](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441045). Here we used `19D013` as an example (analysis on other samples is the same). 
+### variant calling
+For convenience, we skipped the read alignment step and shared the alignmed bam file (Only reads from chr20 were extracted) in [19D013.snRNA.chr20.bam](https://drive.google.com/file/d/18-vdGY9hxbGP-Mm06IBpCCF-NZI9ltAU/view?usp=share_link) and  [19D013.snRNA.chr20.bam.bai](https://drive.google.com/file/d/1HEozx6gmX2Z05R8nElEFOBUhnqayMgAi/view?usp=share_link). Users also need to prepare for the [genome reference]() used for read alignment (for GRCh38) and [imputation panel from 1KG3](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/). We can prepare for the `bam.lst` and `region.lst` as following
 
 ```
 less bam.lst 
@@ -199,6 +201,42 @@ less bam.lst
 less region.lst
 chr20
 ```
+Please make sure all required files available
+```
+ls
+19D013.snRNA.chr20.bam
+19D013.snRNA.chr20.bam.bai
+bam.lst
+CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz
+GRCh38.chr20.fa
+region.lst
+```
+The data preprocess step can be run as (~3 mins)
+```
+path="/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen"
+${path}/src/Monopogen.py  preProcess -b bam.lst -o retina  -a ${path}/apps  -t 1
+[2023-04-25 16:23:05,747] INFO     Monopogen.py Performing data preprocess before variant calling...
+[2023-04-25 16:23:05,747] INFO     Monopogen.py Parameters in effect:
+[2023-04-25 16:23:05,748] INFO     Monopogen.py --subcommand = [preProcess]
+[2023-04-25 16:23:05,748] INFO     Monopogen.py --bamFile = [bam.lst]
+[2023-04-25 16:23:05,748] INFO     Monopogen.py --out = [retina]
+[2023-04-25 16:23:05,748] INFO     Monopogen.py --app_path = [/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps]
+[2023-04-25 16:23:05,748] INFO     Monopogen.py --max_mismatch = [3]
+[2023-04-25 16:23:05,748] INFO     Monopogen.py --nthreads = [1]
+[2023-04-25 16:23:05,765] DEBUG    Monopogen.py PreProcessing sample 19D013
+[2023-04-25 16:25:56,543] INFO     Monopogen.py Success! See instructions above.
+```
+The germline SNV calling can be run as (~xx mins)
+```
+${path}/src/Monopogen.py  germline  -a ${path}/apps  -r region.lst \
+ -p CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz \
+ -g  GRCh38.chr20.fa  -m 3 -s all  -o retina
+
+
+```
+The germline SNVs from `Monopogen` can be seen in the folder `retina/germline/chr20.phased.vcf.gz`
+
+
 
 
 
