@@ -1,7 +1,4 @@
 # Monopogen: SNV calling from single cell sequencing data
-
-  
-  
 ## Table of Contents
 
 [//]: # (BEGIN automated TOC section, any edits will be overwritten on next source refresh)
