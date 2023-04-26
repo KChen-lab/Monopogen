@@ -538,14 +538,227 @@ N_1/1_file2     0       60      8869    0
 N_./._file2     0       0       0       0
 ```
 The genotyping concordance is calculated as `97% ((60+723)/(60+723+13628+8869))`. The overall genotyping accuracy could be `95% (0.97*(1-0.02))`
+
 ### ancestry identification
-Here we demonstrate how we can identify ancestry background on snRNA sample `19D013` based on the output of `Monopogen`. Users can use [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software to project `19D013` on HGDP reference panel. The HGDP genotyping panel was already included in the [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software. Before that, we need to liftover Monopogen output from GRCh38 to GRCh37 to match the HGDP genotyping coordinates. 
+Here we demonstrate how we can identify ancestry background on snRNA sample `19D013` based on the output of `Monopogen`. Users can use [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software to project `19D013` on HGDP reference panel. The HGDP genotyping panel was already included in the [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software. Before that, we need to liftover Monopogen output from GRCh38 to GRCh37 to match the HGDP genotyping coordinates. The fasta file of GRCh37 on chr20 could be downloaded as [GRCh37.chr20.fa](https://drive.google.com/file/d/194eSsL4xRLQwwL_3VcWsNxMziSM8SyMB/view?usp=share_link).
 
 ```
+chain="${path}/resource/hg38ToHg19.over.chain.gz"
+GRCh37_chr20="GRCh37.chr20.fa"
+picard="${path}/apps/picard.jar"
+
+java -jar ${picard} CreateSequenceDictionary R=${GRCh37_chr20} O="GRCh37.chr20.dict"
+java -Xmx10g  -jar ${picard} LiftoverVcf I=./retina/germline/chr20.phased.vcf.gz    O=./retina/germline/chr20.phased.GRCh37.vcf.gz   R=${GRCh37_chr20}  CHAIN=${chain} REJECT="temp.vcf"   WARN_ON_MISSING_CONTIG=true
+
 ```
+The output will be as following
+```
+INFO    2023-04-26 01:45:14     CreateSequenceDictionary
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    CreateSequenceDictionary -R GRCh37.chr20.fa -O GRCh37.chr20.dict
+**********
+
+01:45:14.905 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+[Wed Apr 26 01:45:14 CDT 2023] CreateSequenceDictionary OUTPUT=GRCh37.chr20.dict REFERENCE=GRCh37.chr20.fa    TRUNCATE_NAMES_AT_WHITESPACE=true NUM_SEQUENCES=2147483647 VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Wed Apr 26 01:45:14 CDT 2023] Executing as jdou1@ldragon2 on Linux 3.10.0-1160.15.2.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_312-b07; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.26.10
+[Wed Apr 26 01:45:14 CDT 2023] picard.sam.CreateSequenceDictionary done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=2058354688
+To get help, see http://broadinstitute.github.io/picard/index.html#GettingHelp
+Exception in thread "main" picard.PicardException: /rsrch3/scratch/bcb/jdou1/scAncestry/retina/bam_backup/monopogen_demo1/GRCh37.chr20.dict already exists.  Delete this file and try again, or specify a different output file.
+        at picard.sam.CreateSequenceDictionary.doWork(CreateSequenceDictionary.java:220)
+        at picard.cmdline.CommandLineProgram.instanceMain(CommandLineProgram.java:308)
+        at picard.cmdline.PicardCommandLine.instanceMain(PicardCommandLine.java:103)
+        at picard.cmdline.PicardCommandLine.main(PicardCommandLine.java:113)
+INFO    2023-04-26 01:45:15     LiftoverVcf
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    LiftoverVcf -I ./retina/germline/chr20.phased.vcf.gz -O ./retina/germline/chr20.phased.GRCh37.vcf.gz -R GRCh37.chr20.fa -CHAIN /rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/resource/hg38ToHg19.over.chain.gz -REJECT temp.vcf -WARN_ON_MISSING_CONTIG true
+**********
 
 
+01:45:15.530 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+[Wed Apr 26 01:45:15 CDT 2023] LiftoverVcf INPUT=./retina/germline/chr20.phased.vcf.gz OUTPUT=./retina/germline/chr20.phased.GRCh37.vcf.gz CHAIN=/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/resource/hg38ToHg19.over.chain.gz REJECT=temp.vcf WARN_ON_MISSING_CONTIG=true REFERENCE_SEQUENCE=GRCh37.chr20.fa    LOG_FAILED_INTERVALS=true WRITE_ORIGINAL_POSITION=false WRITE_ORIGINAL_ALLELES=false LIFTOVER_MIN_MATCH=1.0 ALLOW_MISSING_FIELDS_IN_HEADER=false RECOVER_SWAPPED_REF_ALT=false TAGS_TO_REVERSE=[AF] TAGS_TO_DROP=[MAX_AF] DISABLE_SORT=false VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Wed Apr 26 01:45:15 CDT 2023] Executing as jdou1@ldragon2 on Linux 3.10.0-1160.15.2.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_312-b07; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.26.10
+INFO    2023-04-26 01:45:15     LiftoverVcf     Loading up the target reference genome.
+INFO    2023-04-26 01:45:16     LiftoverVcf     Lifting variants over and sorting (not yet writing the output file.)
+WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr3 that is not part of the target reference.
+WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr22 that is not part of the target reference.
+WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr9_gl000198_random that is not part of the target reference.
+WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chrUn_gl000241 that is not part of the target reference.
+WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr4 that is not part of the target reference.
+WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr14 that is not part of the target reference.
+WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr8 that is not part of the target reference.
+WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr12 that is not part of the target reference.
+INFO    2023-04-26 01:45:16     LiftoverVcf     Processed 23755 variants.
+INFO    2023-04-26 01:45:16     LiftoverVcf     184 variants failed to liftover.
+INFO    2023-04-26 01:45:16     LiftoverVcf     99 variants lifted over but had mismatching reference alleles after lift over.
+INFO    2023-04-26 01:45:16     LiftoverVcf     1.1913% of variants were not successfully lifted over and written to the output.
+INFO    2023-04-26 01:45:16     LiftoverVcf     liftover success by source contig:
+INFO    2023-04-26 01:45:16     LiftoverVcf     chr20: 23472 / 23755 (98.8087%)
+INFO    2023-04-26 01:45:16     LiftoverVcf     lifted variants by target contig:
+INFO    2023-04-26 01:45:16     LiftoverVcf     chr20: 23472
+WARNING 2023-04-26 01:45:16     LiftoverVcf     99 variants with a swapped REF/ALT were identified, but were not recovered.  See RECOVER_SWAPPED_REF_ALT and associated caveats.
+INFO    2023-04-26 01:45:16     LiftoverVcf     Writing out sorted records to final VCF.
+[Wed Apr 26 01:45:16 CDT 2023] picard.vcf.LiftoverVcf done. Elapsed time: 0.02 minutes.
+Runtime.totalMemory()=2058354688
+```
+Given SNVs from chr20 only is not enough to identify individual ancestry, we provided the VCF files [19D013.GRCh37.vcf.gz]() by mering all 22 chromosomes. Users can run other chromosome using the same way as we did . Then we can run `TRACE` to project `19D013` on HGDP panel 
+```
+zless -S ./retina/germline/19D013.phased.GRCh37.vcf.gz  | awk '{gsub(/\chr/, "")}1'  > 19D013.trace.vcf
+/rsrch1/bcb/kchen_group/ytan1/LASER-2.04/vcf2geno/vcf2geno --inVcf 19D013.trace.vcf  --out 19D013.trace
+/rsrch1/bcb/kchen_group/ytan1/LASER-2.04/trace  -s 19D013.trace.geno  \
+  -g /rsrch1/bcb/kchen_group/ytan1/LASER-2.04/HGDP/HGDP_938.geno \
+  -c /rsrch1/bcb/kchen_group/ytan1/LASER-2.04/HGDP/HGDP_938.RefPC.coord  \
+```
+The output is
+```
+Analysis started at: Wed Apr 26 02:33:45 2023
+The following parameters are available.  Ones with "[]" are in effect:
 
+Available Options
+           Input/Output : --inVcf [19D013.trace.vcf], --out [19D013.trace]
+          People Filter : --peopleIncludeID [], --peopleIncludeFile []
+                          --peopleExcludeID [], --peopleExcludeFile []
+            Site Filter : --rangeList [], --rangeFile []
+      Auxilary Function : --keepDuplication, --updateID []
+Skip duplicated variant site:  [ 1      2257207 .       C       T ]
+Skip duplicated variant site:  [ 1      42276367        .       A       T ]
+Skip duplicated variant site:  [ 1      144952346       .       G       A ]
+Skip duplicated variant site:  [ 1      156706559       .       A       G ]
+Skip duplicated variant site:  [ 1      220986516       .       C       T ]
+Skip duplicated variant site:  [ 1      237281500       .       G       T ]
+Skip duplicated variant site:  [ 2      42518616        .       C       G ]
+Skip duplicated variant site:  [ 2      191267889       .       G       C ]
+Skip duplicated variant site:  [ 3      65996570        .       T       C ]
+Skip duplicated variant site:  [ 4      42593642        .       G       T ]
+Skip duplicated variant site:  [ 4      89850542        .       T       C ]
+Skip duplicated variant site:  [ 4      162791383       .       T       C ]
+Skip duplicated variant site:  [ 5      146778988       .       C       G ]
+Skip duplicated variant site:  [ 6      77761603        .       G       A ]
+Skip duplicated variant site:  [ 6      148867757       .       T       C ]
+Skip duplicated variant site:  [ 7      746451  .       A       G ]
+Skip duplicated variant site:  [ 7      2605905 .       C       G ]
+Skip duplicated variant site:  [ 7      7845898 .       T       C ]
+Skip duplicated variant site:  [ 7      16667686        .       A       T ]
+Skip duplicated variant site:  [ 7      26868032        .       A       G ]
+Skip duplicated variant site:  [ 7      39209642        .       C       G ]
+Skip duplicated variant site:  [ 7      97890297        .       C       A ]
+Skip duplicated variant site:  [ 7      129431052       .       C       A ]
+Skip duplicated variant site:  [ 7      133500313       .       A       T ]
+Skip duplicated variant site:  [ 8      1210501 .       T       G ]
+Skip duplicated variant site:  [ 8      2703064 .       A       C ]
+Skip duplicated variant site:  [ 8      19239747        .       A       G ]
+Skip duplicated variant site:  [ 8      32449785        .       C       T ]
+Skip duplicated variant site:  [ 8      107142923       .       G       C ]
+Skip duplicated variant site:  [ 8      119585345       .       G       C ]
+Skip duplicated variant site:  [ 9      95864623        .       C       A ]
+Skip duplicated variant site:  [ 10     89084826        .       C       G ]
+Skip duplicated variant site:  [ 11     746992  .       T       G ]
+Skip duplicated variant site:  [ 11     7441194 .       T       A ]
+Skip duplicated variant site:  [ 11     9904151 .       C       T ]
+Skip duplicated variant site:  [ 11     12934969        .       A       C ]
+Skip duplicated variant site:  [ 11     82934026        .       C       T ]
+Skip duplicated variant site:  [ 12     123882977       .       G       C ]
+Skip duplicated variant site:  [ 12     133493988       .       C       G ]
+Skip duplicated variant site:  [ 13     107948877       .       C       G ]
+Skip duplicated variant site:  [ 15     35071084        .       A       T ]
+Skip duplicated variant site:  [ 16     3508704 .       C       G ]
+Skip duplicated variant site:  [ 17     15420960        .       T       A ]
+Skip duplicated variant site:  [ 18     56371446        .       C       G ]
+Skip duplicated variant site:  [ 18     77922913        .       A       C ]
+Skip duplicated variant site:  [ 19     1489460 .       C       T ]
+Skip duplicated variant site:  [ 22     50273174        .       A       C ]
+Total 830699 VCF records have converted successfully
+Total 1 people and 830652 markers are outputted
+
+=====================================================================
+====    TRACE: fasT and Robust Ancestry Coordinate Estimation    ====
+====          Version 1.03, Last updated on Dec/30/2016          ====
+====          (C) 2013-2016 Chaolong Wang, GNU GPL v3.0          ====
+=====================================================================
+Started at: Wed Apr 26 02:33:48 2023
+
+1 individuals are detected in the STUDY_FILE.
+830652 loci are detected in the STUDY_FILE.
+938 individuals are detected in the GENO_FILE.
+Warning: Two datasets have different alleles at locus [8:2929436]: [A,G] vs [A,T].
+Warning: Two datasets have different alleles at locus [12:5734319]: [A,G] vs [A,C].
+Warning: Two datasets have different alleles at locus [13:109351901]: [T,G] vs [T,A].
+632958 loci are detected in the GENO_FILE.
+938 individuals are detected in the COORD_FILE.
+100 PCs are detected in the COORD_FILE.
+
+Parameter values used in execution:
+-------------------------------------------------
+STUDY_FILE (-s) 19D013.trace.geno
+GENO_FILE (-g)  /rsrch1/bcb/kchen_group/ytan1/LASER-2.04/HGDP/HGDP_938.geno
+COORD_FILE (-c) /rsrch1/bcb/kchen_group/ytan1/LASER-2.04/HGDP/HGDP_938.RefPC.coord
+OUT_PREFIX (-o) trace
+DIM (-k)        2
+DIM_HIGH (-K)   20
+THRESHOLD (-t)  1e-06
+MIN_LOCI (-l)   100
+FIRST_IND (-x)  1
+LAST_IND (-y)   1
+KNN_ZSCORE (-knn)       10
+RANDOM_SEED (-seed)     0
+NUM_THREADS (-nt)       8
+-------------------------------------------------
+
+Wed Apr 26 02:33:54 2023
+Identify 85497 loci shared by STUDY_FILE and GENO_FILE.
+Exclude 3 loci that have different alleles in two datasets.
+The analysis will base on the remaining 85494 shared loci.
+
+Wed Apr 26 02:33:54 2023
+Reading reference genotype data ...
+
+Wed Apr 26 02:35:05 2023
+Calculating reference covariance matrix ...
+
+Wed Apr 26 02:35:06 2023
+Reading reference PCA coordinates ...
+
+Wed Apr 26 02:35:06 2023
+Analyzing study individuals ...
+Procrustean PCA coordinates are output to 'trace.ProPC.coord'.
+
+Finished at: Wed Apr 26 02:35:06 2023
+=====================================================================
+```
+The PCA coordinates of `19D013` is in the file `trace.ProPC.coord`. 
+
+```
+less trace.ProPC.coord
+```
+ 
+```
+popID   indivID L       K       t       Z       PC1     PC2
+19D013_European_F_78    19D013_European_F_78    2546    20      0.98445 7.45623 93.869  164.372
+```
+We can show it on the HGDP PCA plot as 
+
+```
+Rscript ${path}/resource/plotTrace.R  ${path}/resource/HGDP.PC.csv  trace.ProPC.coord 19D013_onHGDP
+```
+ 
+<image src="./example/19D013.onHGDP.png" width="600"> 
+
+
+ 
 
 
 ## Somatic SNV calling from scRNA-seq ##
