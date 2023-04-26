@@ -27,7 +27,7 @@
 It is composed of three modules: 
 * **Data preprocess**. This module removes reads with high alignment mismatches from single cell sequencing and also makes data formats compatiable with Monopongen.
 * **Germline SNV calling**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to improve both SNV calling accuracy and detection sensitivity. 
-* **Putative somatic SNV calling**. We extended the machinery of LD refinement from human population level to cell population level. We statistically phased the observed alleles with adjacent germline alleles to estimate the degree of LD, taking into consideration widespread sparseness and allelic dropout in single-cell sequencing data, and calculated a probabilistic score as an indicator of somatic SNVs.  The putative somatic SNVs were further genotyped at cell type/cluster level from `Monovar` developed in [Ken chen's lab](https://github.com/KChen-lab/MonoVar).
+* **Putative somatic SNV calling**. We extended the machinery of LD refinement from human population level to cell population level. We statistically phase the observed alleles with adjacent germline alleles to estimate the degree of LD, taking into consideration widespread sparseness and allelic dropout in single-cell sequencing data, and calculated a probabilistic score as an indicator of somatic SNVs.  The putative somatic SNVs are further genotyped at cell type/cluster level from `Monovar` developed in [Ken chen's lab](https://github.com/KChen-lab/MonoVar).
 
 The output of `Monopogen` will enable 1) ancestry identificaiton on single cell samples; 2) genome-wide association study on the celluar level if sample size is sufficient, and 3) putative somatic SNV investigation.
 
@@ -51,7 +51,7 @@ Right now Monopogen is avaiable on github, you can install it through github
 
 ## Quick Start 
 
-We provide an example dataset provided the `example/` folder, which includes:
+For quick start of Monopogen, we provide an example dataset provided the `example/` folder, which includes:
 * `A.bam (.bai)`  
   The bam file storing read alignment for sample A.
 * `B.bam (.bai)`  
@@ -65,9 +65,8 @@ There are three test scripts in the `test/` folder `test/runPreprocess.sh`, `tes
 ### Data preprocess ###
 
 You can type the following command to get the help information.
-
 ```
-path="XXX/Monopogen"  # where to download Monopogen
+path="XXX/Monopogen"  # where Monopogen is downloaded
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
 python ${path}/src/Monopogen.py  preProcess --help`
 ```
@@ -91,26 +90,20 @@ optional arguments:
   -t NTHREADS, --nthreads NTHREADS
                         Number of threads used for SNVs calling (default: 1)
  ```
- You need to prepare the bam file list for option `-b`. If you have multiple sample in this file, you can use more CPUs by setting `-t` to make `Monopogen` faster.  Run the test script `test/runPreprocess.sh`
-  
+ You need to prepare the bam file list for option `-b`. 
 ```
 path="XXy/Monopogen"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
-
-python  ${path}/src/Monopogen.py  preProcess -b bam.lst -o out  -a ${path}/apps -t 8
-
+python  ${path}/src/Monopogen.py  preProcess -b bam.lst -o out  -a ${path}/apps
 ```
 After running the `preProcess` module, there will be bam files after quality controls in the folder `out/Bam/` used for downstream SNV calling.
   
 ### Germline SNV calling ###
- 
 You can type the following command to get the help information.
-
 ```
 python ${path}/src/Monopogen.py  germline --help`
 ```
 The output is 
- 
 ```
 usage: Monopogen.py germline [-h] -r REGION -s
                              {varScan,varImpute,varPhasing,all} [-o OUT] -g
@@ -137,12 +130,11 @@ optional arguments:
   -t NTHREADS, --nthreads NTHREADS
                         Number of threads used for SNVs calling (default: 1)
  ```
-
-You need to prepare the genome region file list for option `-r` with an example shown in `test/region.lst`. Each region is in one row. If you want to call the whole chromosome, you can only specficy the chromosome ID in each row.  Also you can use more CPUs by setting `-t` to make `Monopogen` faster when there are many genome regions.  Run the test script test/runGermline.sh as following:
+You need to prepare the genome region file list for option `-r` with an example shown in `test/region.lst`. Each region is in one row. Run the test script test/runGermline.sh as following:
   
 ```
 python  ${path}/src/Monopogen.py  germline  \
-    -a   ${path}/apps -t 8   -r  region.lst \
+    -a   ${path}/apps -t 1   -r  region.lst \
     -p  ../example/CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz  \
     -g  ../example/chr20_2Mb.hg38.fa   -s all  -o out
 
@@ -185,7 +177,6 @@ chr20   276086  .       T       A       .       PASS    .       GT      0|1     
 ### Run on the HPC ###
   
 If there are multiple single cell RNA samples and you want to use Monopogen on germline SNV calling, you can enable the `-norun` option.
-
 ```
 python  ${path}/src/Monopogen.py  germline  \
     -a   ${path}/apps -t 8   -r  region.lst \
