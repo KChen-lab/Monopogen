@@ -226,17 +226,275 @@ ${path}/src/Monopogen.py  preProcess -b bam.lst -o retina  -a ${path}/apps  -t 1
 [2023-04-25 16:23:05,765] DEBUG    Monopogen.py PreProcessing sample 19D013
 [2023-04-25 16:25:56,543] INFO     Monopogen.py Success! See instructions above.
 ```
-The germline SNV calling can be run as (~xx mins)
+The germline SNV calling can be run as (~80 mins).
+ 
 ```
 ${path}/src/Monopogen.py  germline  -a ${path}/apps  -r region.lst \
  -p CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz \
  -g  GRCh38.chr20.fa  -m 3 -s all  -o retina
+ 
+ [2023-04-25 16:30:39,749] INFO     Monopogen.py Performing germline variant calling...
+[2023-04-25 16:30:39,749] INFO     Monopogen.py Parameters in effect:
+[2023-04-25 16:30:39,749] INFO     Monopogen.py --subcommand = [germline]
+[2023-04-25 16:30:39,749] INFO     Monopogen.py --region = [region.lst]
+[2023-04-25 16:30:39,749] INFO     Monopogen.py --step = [all]
+[2023-04-25 16:30:39,749] INFO     Monopogen.py --out = [retina]
+[2023-04-25 16:30:39,749] INFO     Monopogen.py --reference = [GRCh38.chr20.fa]
+[2023-04-25 16:30:39,749] INFO     Monopogen.py --imputation_panel = [CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz]
+[2023-04-25 16:30:39,749] INFO     Monopogen.py --max_softClipped = [3]
+[2023-04-25 16:30:39,749] INFO     Monopogen.py --app_path = [/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps]
+[2023-04-25 16:30:39,749] INFO     Monopogen.py --nthreads = [1]
+[2023-04-25 16:30:39,750] INFO     Monopogen.py Checking existence of essenstial resource files...
+[2023-04-25 16:30:39,754] INFO     Monopogen.py Checking dependencies...
+['bash retina/Script/runGermline_chr20.sh']
+[fai_load] build FASTA index.
+[mpileup] 1 samples in 1 input files
+(mpileup) Max depth is above 1M. Potential memory hog!
+Lines   total/split/realigned/skipped:  56054517/437864/36916/0
+beagle.27Jul16.86a.jar (version 4.1)
+Copyright (C) 2014-2015 Brian L. Browning
+Enter "java -jar beagle.27Jul16.86a.jar" for a summary of command line arguments.
+Start time: 05:10 PM CDT on 25 Apr 2023
 
+Command line: java -Xmx18204m -jar beagle.jar
+  gl=retina/germline/chr20.gl.vcf.gz
+  ref=CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz
+  chrom=chr20
+  out=retina/germline/chr20.gp
+  impute=false
+  modelscale=2
+  nthreads=1
+  gprobs=true
+  niterations=0
+
+No genetic map is specified: using 1 cM = 1 Mb
+
+reference samples:    3202
+target samples:          1
+
+Window 1 [ chr20:60291-64332055 ]
+reference markers:   31534
+target markers:      31531
+
+Starting burn-in iterations
+
+Window=1 Iteration=1
+Time for building model:         2 minutes 8 seconds
+Time for sampling (singles):     24 seconds
+DAG statistics
+mean edges/level: 52     max edges/level: 123
+mean edges/node:  1.169  mean count/edge: 123
+
+Window=1 Iteration=2
+Time for building model:         2 minutes 18 seconds
+Time for sampling (singles):     26 seconds
+DAG statistics
+mean edges/level: 52     max edges/level: 124
+mean edges/node:  1.157  mean count/edge: 123
+
+Window=1 Iteration=3
+Time for building model:         2 minutes 23 seconds
+Time for sampling (singles):     25 seconds
+DAG statistics
+mean edges/level: 52     max edges/level: 125
+mean edges/node:  1.158  mean count/edge: 123
+
+Window=1 Iteration=4
+Time for building model:         2 minutes 17 seconds
+Time for sampling (singles):     24 seconds
+DAG statistics
+mean edges/level: 52     max edges/level: 129
+mean edges/node:  1.158  mean count/edge: 123
+
+Window=1 Iteration=5
+Time for building model:         2 minutes 11 seconds
+Time for sampling (singles):     25 seconds
+DAG statistics
+mean edges/level: 52     max edges/level: 126
+mean edges/node:  1.158  mean count/edge: 123
+
+Window=1 Iteration=6
+Time for building model:         2 minutes 8 seconds
+Time for sampling (singles):     37 seconds
+DAG statistics
+mean edges/level: 52     max edges/level: 124
+mean edges/node:  1.157  mean count/edge: 123
+
+Window=1 Iteration=7
+Time for building model:         2 minutes 10 seconds
+Time for sampling (singles):     35 seconds
+DAG statistics
+mean edges/level: 52     max edges/level: 122
+mean edges/node:  1.158  mean count/edge: 123
+
+Window=1 Iteration=8
+Time for building model:         2 minutes 13 seconds
+Time for sampling (singles):     37 seconds
+DAG statistics
+mean edges/level: 52     max edges/level: 124
+mean edges/node:  1.156  mean count/edge: 123
+
+Window=1 Iteration=9
+Time for building model:         2 minutes 13 seconds
+Time for sampling (singles):     35 seconds
+DAG statistics
+mean edges/level: 52     max edges/level: 128
+mean edges/node:  1.158  mean count/edge: 123
+
+Window=1 Iteration=10
+Time for building model:         2 minutes 15 seconds
+Time for sampling (singles):     36 seconds
+DAG statistics
+mean edges/level: 52     max edges/level: 120
+mean edges/node:  1.158  mean count/edge: 123
+
+Number of reference markers:     31534
+Number of target markers:        31531
+Total time for building model: 22 minutes 17 seconds
+Total time for sampling:       5 minutes 4 seconds
+Total run time:                29 minutes 44 seconds
+
+End time: 05:40 PM CDT on 25 Apr 2023
+beagle.27Jul16.86a.jar (version 4.1) finished
+beagle.27Jul16.86a.jar (version 4.1)
+Copyright (C) 2014-2015 Brian L. Browning
+Enter "java -jar beagle.27Jul16.86a.jar" for a summary of command line arguments.
+Start time: 05:40 PM CDT on 25 Apr 2023
+
+Command line: java -Xmx18204m -jar beagle.jar
+  gt=retina/germline/chr20.germline.vcf
+  ref=CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz
+  chrom=chr20
+  out=retina/germline/chr20.phased
+  impute=false
+  modelscale=2
+  nthreads=48
+  gprobs=true
+  niterations=0
+
+No genetic map is specified: using 1 cM = 1 Mb
+
+reference samples:    3202
+target samples:          1
+
+Window 1 [ chr20:60291-64331516 ]
+reference markers:   23755
+target markers:      23755
+
+Starting burn-in iterations
+
+Window=1 Iteration=1
+Time for building model:         1 minute 29 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 51     max edges/level: 122
+mean edges/node:  1.206  mean count/edge: 126
+
+Window=1 Iteration=2
+Time for building model:         1 minute 31 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 50     max edges/level: 115
+mean edges/node:  1.194  mean count/edge: 128
+
+Window=1 Iteration=3
+Time for building model:         1 minute 29 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 50     max edges/level: 124
+mean edges/node:  1.194  mean count/edge: 128
+
+Window=1 Iteration=4
+Time for building model:         1 minute 30 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 50     max edges/level: 117
+mean edges/node:  1.194  mean count/edge: 128
+
+Window=1 Iteration=5
+Time for building model:         1 minute 18 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 50     max edges/level: 119
+mean edges/node:  1.193  mean count/edge: 128
+
+Window=1 Iteration=6
+Time for building model:         1 minute 20 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 50     max edges/level: 116
+mean edges/node:  1.194  mean count/edge: 128
+
+Window=1 Iteration=7
+Time for building model:         1 minute 19 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 50     max edges/level: 124
+mean edges/node:  1.192  mean count/edge: 128
+
+Window=1 Iteration=8
+Time for building model:         1 minute 20 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 50     max edges/level: 119
+mean edges/node:  1.194  mean count/edge: 128
+
+Window=1 Iteration=9
+Time for building model:         1 minute 23 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 50     max edges/level: 121
+mean edges/node:  1.192  mean count/edge: 128
+
+Window=1 Iteration=10
+Time for building model:         1 minute 21 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 50     max edges/level: 117
+mean edges/node:  1.193  mean count/edge: 128
+
+Number of markers:               23755
+Total time for building model: 14 minutes 0 seconds
+Total time for sampling:       2 seconds
+Total run time:                15 minutes 7 seconds
+
+End time: 05:55 PM CDT on 25 Apr 2023
+beagle.27Jul16.86a.jar (version 4.1) finished
+[2023-04-25 17:55:37,771] INFO     Monopogen.py Success! See instructions above.
 
 ```
-The germline SNVs from `Monopogen` can be seen in the folder `retina/germline/chr20.phased.vcf.gz`
+The germline SNVs from `Monopogen` can be seen in the folder `retina/germline/chr20.phased.vcf.gz`. These phased genotypes can be used for downstream ancestry identification, association study, and somatic SNV calling.
 
+```
+##fileformat=VCFv4.2
+##filedate=20230425
+##source="beagle.27Jul16.86a.jar (version 4.1)"
+##INFO=<ID=AF,Number=A,Type=Float,Description="Estimated ALT Allele Frequencies">
+##INFO=<ID=AR2,Number=1,Type=Float,Description="Allelic R-Squared: estimated squared correlation b
+##INFO=<ID=DR2,Number=1,Type=Float,Description="Dosage R-Squared: estimated squared correlation be
+##INFO=<ID=IMP,Number=0,Type=Flag,Description="Imputed marker">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DS,Number=A,Type=Float,Description="estimated ALT dose [P(RA) + P(AA)]">
+##FORMAT=<ID=GP,Number=G,Type=Float,Description="Estimated Genotype Probability">
+#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  19D013_European_F_78
+chr20   60291   .       G       T       .       PASS    .       GT      1|0
+chr20   68303   .       T       C       .       PASS    .       GT      1|0
+chr20   75250   .       C       T       .       PASS    .       GT      1|0
+chr20   88108   .       T       C       .       PASS    .       GT      1|1
+chr20   101574  .       G       A       .       PASS    .       GT      1|0
+chr20   101576  .       G       A       .       PASS    .       GT      1|1
+chr20   159104  .       T       C       .       PASS    .       GT      1|1
+chr20   175269  .       T       C       .       PASS    .       GT      1|1
+chr20   186086  .       G       A       .       PASS    .       GT      1|1
+chr20   186183  .       G       A       .       PASS    .       GT      1|1
+chr20   198814  .       A       T       .       PASS    .       GT      1|0
+chr20   203580  .       G       A       .       PASS    .       GT      1|1
+chr20   213223  .       G       C       .       PASS    .       GT      0|1
+chr20   213244  .       A       G       .       PASS    .       GT      0|1
+chr20   231710  .       T       G       .       PASS    .       GT      1|1
 
+```
+We can validate the genotyping accuracy and sensitvity (recall) by comparing Monopogen outputs with matched WGS-based genotypes. Users can download the WGS-based genotypes from chr22 only []()
 
 
 
