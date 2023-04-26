@@ -236,7 +236,7 @@ ${path}/src/Monopogen.py  germline  -a ${path}/apps  -r region.lst \
  -p CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz \
  -g  GRCh38.chr20.fa  -m 3 -s all  -o retina
  
- [2023-04-25 16:30:39,749] INFO     Monopogen.py Performing germline variant calling...
+[2023-04-25 16:30:39,749] INFO     Monopogen.py Performing germline variant calling...
 [2023-04-25 16:30:39,749] INFO     Monopogen.py Parameters in effect:
 [2023-04-25 16:30:39,749] INFO     Monopogen.py --subcommand = [germline]
 [2023-04-25 16:30:39,749] INFO     Monopogen.py --region = [region.lst]
@@ -539,7 +539,10 @@ N_./._file2     0       0       0       0
 ```
 The genotyping concordance is calculated as `97% ((60+723)/(60+723+13628+8869))`. The overall genotyping accuracy could be `95% (0.97*(1-0.02))`
 ### ancestry identification
+Here we demonstrate how we can identify ancestry background on snRNA sample `19D013` based on the output of `Monopogen`. Users can use [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software to project `19D013` on HGDP reference panel. The HGDP genotyping panel was already included in the [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software. Before that, we need to liftover Monopogen output from GRCh38 to GRCh37 to match the HGDP genotyping coordinates. 
 
+```
+```
 
 
 
