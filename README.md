@@ -66,8 +66,12 @@ There are three test scripts in the `test/` folder `test/runPreprocess.sh`, `tes
 
 You can type the following command to get the help information.
 
-`python ./src/Monopogen.py  preProcess --help`
-
+```
+path="XXX/Monopogen"  # where to download Monopogen
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
+python ${path}/src/Monopogen.py  preProcess --help`
+```
+Output is 
 ```
 usage: Monopogen.py preProcess [-h] -b BAMFILE [-o OUT] -a APP_PATH
                                [-m MAX_MISMATCH] [-t NTHREADS]
@@ -102,8 +106,11 @@ After running the `preProcess` module, there will be bam files after quality con
  
 You can type the following command to get the help information.
 
-`python ./src/Monopogen.py  germline --help`
-
+```
+python ${path}/src/Monopogen.py  germline --help`
+```
+The output is 
+ 
 ```
 usage: Monopogen.py germline [-h] -r REGION -s
                              {varScan,varImpute,varPhasing,all} [-o OUT] -g
@@ -175,7 +182,6 @@ chr20   275932  .       A       G       .       PASS    .       GT      0|1     
 chr20   276086  .       T       A       .       PASS    .       GT      0|1     1|0
 
 ```
-  
 ### Run on the HPC ###
   
 If there are multiple single cell RNA samples and you want to use Monopogen on germline SNV calling, you can enable the `-norun` option.
@@ -186,7 +192,6 @@ python  ${path}/src/Monopogen.py  germline  \
     -p  ../example/CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz  \
     -g  ../example/chr20_2Mb.hg38.fa   -s all  -o out
     --norun
-
 ```
 The `-norun` module will generate jobs from different regions and you can submit them to HPC based on your own preference. The generated job files will be in `out/Script/`
 
@@ -199,9 +204,16 @@ For convenience, we skipped the read alignment step and shared the alignmed bam 
 
 ```
 less bam.lst 
+```
+The output is 
+```
 19D013.snRNA.chr20.bam
-
+```
+```
 less region.lst
+```
+The output is 
+```
 chr20
 ```
 Please make sure all required files available
@@ -218,6 +230,9 @@ The data preprocess step can be run as (~3 mins)
 ```
 path="/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen"
 ${path}/src/Monopogen.py  preProcess -b bam.lst -o retina  -a ${path}/apps  -t 1
+```
+The output is 
+```
 [2023-04-25 16:23:05,747] INFO     Monopogen.py Performing data preprocess before variant calling...
 [2023-04-25 16:23:05,747] INFO     Monopogen.py Parameters in effect:
 [2023-04-25 16:23:05,748] INFO     Monopogen.py --subcommand = [preProcess]
@@ -235,7 +250,9 @@ The germline SNV calling can be run as (~80 mins).
 ${path}/src/Monopogen.py  germline  -a ${path}/apps  -r region.lst \
  -p CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz \
  -g  GRCh38.chr20.fa  -m 3 -s all  -o retina
- 
+```
+The output is 
+```
 [2023-04-25 16:30:39,749] INFO     Monopogen.py Performing germline variant calling...
 [2023-04-25 16:30:39,749] INFO     Monopogen.py Parameters in effect:
 [2023-04-25 16:30:39,749] INFO     Monopogen.py --subcommand = [germline]
@@ -502,7 +519,10 @@ We can validate the genotyping accuracy and sensitvity (recall) by comparing Mon
 
 ```
 vcftools --gzvcf  ./retina/germline/chr20.phased.vcf.gz    --diff  19D013.wgs.chr20.vcf   --diff-discordance-matrix --out  19D013  --chr chr20
+```
  
+The output is 
+```
 VCFtools - 0.1.15
 (C) Adam Auton and Anthony Marcketta 2009
 
@@ -525,7 +545,6 @@ Found 464 sites only in main file.
 Found 85853 sites only in second file.
 After filtering, kept 23755 out of a possible 23755 Sites
 Run Time = 0.00 seconds
-
 ```
 `Monopogen` can detect `21.3% (23290/(23290+85853))` germline SNVs although the singel cell data is quite sparisty. Remarkably, the false positive rate is lower than `2% (464/(464+23290))`. The genotype concordance could be further examined based on the overlapped 23290 SNVs by looking at the output of `19D013.diff.discordance_matrix`. 
 
@@ -754,7 +773,8 @@ We can show it on the HGDP PCA plot as
 ```
 Rscript ${path}/resource/plotTrace.R  ${path}/resource/HGDP.PC.csv  trace.ProPC.coord 19D013_onHGDP
 ```
- 
+The PCA projection plot will be shown generated in `19D013_onHGDP.pdf` 
+
  
 <image src="./example/19D013.onHGDP.png" width="600"> 
 
