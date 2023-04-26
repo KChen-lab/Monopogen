@@ -10,6 +10,9 @@
   * [Germline SNV calling](#germline-snv-calling)
   * [Putative Somatic SNV calling](#putative-somatic-snv-calling)
 * [Germline SNV calling from snRNA-seq](#germline-snv-calling-from-snRNA-seq)
+  * [variant calling](#variant-calling)
+  * [genotyping accuracy evaluation](#genotyping-accuracy-evaluation)
+  * [ancestry identification](#ancestry-identification)
 * [Somatic SNV calling from scRNA-seq](#somatic-snv-calling-from-scrna-seq)
 * [FAQs](#faqs)
 * [Citation](#citation)
@@ -463,7 +466,7 @@ beagle.27Jul16.86a.jar (version 4.1) finished
 [2023-04-25 17:55:37,771] INFO     Monopogen.py Success! See instructions above.
 
 ```
-The germline SNVs from `Monopogen` can be seen in the folder `retina/germline/chr20.phased.vcf.gz`. These phased genotypes can be used for downstream ancestry identification, association study, and somatic SNV calling.
+The final output of germline SNVs from `Monopogen` are in the folder `retina/germline/chr20.phased.vcf.gz`. These phased genotypes could be used for downstream ancestry identification, association study, and somatic SNV calling.
 
 ```
 ##fileformat=VCFv4.2
@@ -494,7 +497,8 @@ chr20   213244  .       A       G       .       PASS    .       GT      0|1
 chr20   231710  .       T       G       .       PASS    .       GT      1|1
 
 ```
-We can validate the genotyping accuracy and sensitvity (recall) by comparing Monopogen outputs with matched WGS-based genotypes. Users can download the WGS-based genotypes from chr22 only [19D013.wgs.chr20.vcf](https://drive.google.com/file/d/1u55oZgNiwzj5PXeIHCn4NF9dAQlb9uwk/view?usp=share_link). We can use the [vcftools](https://vcftools.sourceforge.net/) to compare genotypes of Monopogen to the gold standard. 
+### genotyping accuracy evaluation
+We can validate the genotyping accuracy and sensitvity (recall) by comparing Monopogen outputs with matched WGS-based genotypes. Users can download the WGS-based genotypes from chr22 only [19D013.wgs.chr20.vcf](https://drive.google.com/file/d/1u55oZgNiwzj5PXeIHCn4NF9dAQlb9uwk/view?usp=share_link). We use [vcftools](https://vcftools.sourceforge.net/) to compare genotypes of Monopogen to the gold standard. 
 
 ```
 vcftools --gzvcf  ./retina/germline/chr20.phased.vcf.gz    --diff  19D013.wgs.chr20.vcf   --diff-discordance-matrix --out  19D013  --chr chr20
@@ -523,7 +527,7 @@ After filtering, kept 23755 out of a possible 23755 Sites
 Run Time = 0.00 seconds
 
 ```
-`Monopogen` can detect `21.3% (23290/(23290+85853))` germline SNVs although the singel cell data is quite sparisty. Remarkably, the false positive rate is lower than `2% (464/(464+23290))`. We can also check the genotype concordance based on the overlapped 23290 SNVs by looking at the output of `19D013.diff.discordance_matrix`. 
+`Monopogen` can detect `21.3% (23290/(23290+85853))` germline SNVs although the singel cell data is quite sparisty. Remarkably, the false positive rate is lower than `2% (464/(464+23290))`. The genotype concordance could be further examined based on the overlapped 23290 SNVs by looking at the output of `19D013.diff.discordance_matrix`. 
 
 ```
 less 19D013.diff.discordance_matrix
@@ -533,8 +537,8 @@ N_0/1_file2     0       13628   723     0
 N_1/1_file2     0       60      8869    0
 N_./._file2     0       0       0       0
 ```
-The genotyping concordance is `97% ((60+723)/(60+723+13628+8869))`. The overall genotyping accuracy could be calculated as `95% (0.97*(1-0.02))`
- 
+The genotyping concordance is calculated as `97% ((60+723)/(60+723+13628+8869))`. The overall genotyping accuracy could be `95% (0.97*(1-0.02))`
+### ancestry identification
 
 
 
