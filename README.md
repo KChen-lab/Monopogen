@@ -773,7 +773,7 @@ We can show it on the HGDP PCA plot as
 ```
 Rscript ${path}/resource/plotTrace.R  ${path}/resource/HGDP.PC.csv  trace.ProPC.coord 19D013_onHGDP
 ```
-The PCA projection plot will be shown generated in `19D013_onHGDP.pdf` 
+The PCA projection plot will be generated as `19D013_onHGDP.pdf` 
 
  
 <image src="./example/19D013.onHGDP.png" width="600"> 
