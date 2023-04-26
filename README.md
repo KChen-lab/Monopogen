@@ -634,7 +634,7 @@ INFO    2023-04-26 01:45:16     LiftoverVcf     Writing out sorted records to fi
 [Wed Apr 26 01:45:16 CDT 2023] picard.vcf.LiftoverVcf done. Elapsed time: 0.02 minutes.
 Runtime.totalMemory()=2058354688
 ```
-Given SNVs from chr20 only is not enough to identify individual ancestry, we provided the VCF files [19D013.GRCh37.vcf.gz]() by mering all 22 chromosomes. Users can run other chromosome using the same way as we did . Then we can run `TRACE` to project `19D013` on HGDP panel 
+Given SNVs from chr20 only is not enough to identify individual ancestry, we provided the VCF files [19D013.phased.GRCh37.vcf.gz]() by mering all 22 chromosomes. Users can run other chromosome using the same way as we did . Then we can run `TRACE` to project `19D013` on HGDP panel 
 ```
 zless -S ./retina/germline/19D013.phased.GRCh37.vcf.gz  | awk '{gsub(/\chr/, "")}1'  > 19D013.trace.vcf
 /rsrch1/bcb/kchen_group/ytan1/LASER-2.04/vcf2geno/vcf2geno --inVcf 19D013.trace.vcf  --out 19D013.trace
