@@ -191,7 +191,7 @@ python  ${path}/src/Monopogen.py  germline  \
     -a   ${path}/apps -t 8   -r  region.lst \
     -p  ../example/CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz  \
     -g  ../example/chr20_2Mb.hg38.fa   -s all  -o out
-    --norun
+    --norun TRUE
 ```
 The `-norun` module will generate jobs from different regions and you can submit them to HPC based on your own preference. The generated job files will be in `out/Script/`
 
