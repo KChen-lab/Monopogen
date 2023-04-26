@@ -755,6 +755,7 @@ We can show it on the HGDP PCA plot as
 Rscript ${path}/resource/plotTrace.R  ${path}/resource/HGDP.PC.csv  trace.ProPC.coord 19D013_onHGDP
 ```
  
+ 
 <image src="./example/19D013.onHGDP.png" width="600"> 
 
 
