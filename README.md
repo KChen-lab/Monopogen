@@ -135,7 +135,7 @@ You need to prepare the genome region file list for option `-r` with an example 
 ```
 python  ${path}/src/Monopogen.py  germline  \
     -a   ${path}/apps -t 1   -r  region.lst \
-    -p  ../example/CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz  \
+    -p  ../example/  \
     -g  ../example/chr20_2Mb.hg38.fa   -s all  -o out
 
 ```
@@ -180,7 +180,7 @@ If there are multiple single cell RNA samples and you want to use Monopogen on g
 ```
 python  ${path}/src/Monopogen.py  germline  \
     -a   ${path}/apps -t 8   -r  region.lst \
-    -p  ../example/CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz  \
+    -p  ../example/  \
     -g  ../example/chr20_2Mb.hg38.fa   -s all  -o out
     --norun TRUE
 ```
