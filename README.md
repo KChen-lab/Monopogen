@@ -130,7 +130,7 @@ optional arguments:
   -t NTHREADS, --nthreads NTHREADS
                         Number of threads used for SNVs calling (default: 1)
  ```
-You need to prepare the genome region file list for option `-r` with an example shown in `test/region.lst`. Each region is in one row. Run the test script test/runGermline.sh as following:
+You need to prepare the genome region file list for option `-r` with an example shown in `test/region.lst`. We also included an optimal genome region file in `${path}/resource/GRCh38.region.lst` for the whole genome SNV calling. Each region is in one row. Run the test script test/runGermline.sh as following:
   
 ```
 python  ${path}/src/Monopogen.py  germline  \
@@ -191,7 +191,7 @@ The `-norun` module will generate jobs from different regions and you can submit
 ## Germline SNV calling from snRNA-seq
 We demonstrate the utilization of Monopogen on germline SNV calling, ancestry identification on snRNA samples from human retina atlas. The 4 retina samples shown in Monopogen methodological paper are `19D013`, `19D014`, `19D015`, `19D016`. Thhe fastq files of these samples can be downloaded with from SRA database [SRR23617370](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501863), [SRR23617337](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501879), [SRR23617320](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441051) and [SRR23617310](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441045). Here we used `19D013` as an example (analysis on other samples is the same). 
 ### variant calling
-For convenience, we skipped the read alignment step and shared the alignmed bam file (Only reads from chr20 were extracted) in [19D013.snRNA.chr20.bam](https://drive.google.com/file/d/18-vdGY9hxbGP-Mm06IBpCCF-NZI9ltAU/view?usp=share_link) and  [19D013.snRNA.chr20.bam.bai](https://drive.google.com/file/d/1HEozx6gmX2Z05R8nElEFOBUhnqayMgAi/view?usp=share_link). Users also need to prepare for the [genome reference]() used for read alignment (for GRCh38) and [imputation panel from 1KG3](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/). We can prepare for the `bam.lst` and `region.lst` as following
+For convenience, we skipped the read alignment step and shared the alignmed bam file (Only reads from chr20 were extracted) in [19D013.snRNA.chr20.bam](https://drive.google.com/file/d/18-vdGY9hxbGP-Mm06IBpCCF-NZI9ltAU/view?usp=share_link) and  [19D013.snRNA.chr20.bam.bai](https://drive.google.com/file/d/1HEozx6gmX2Z05R8nElEFOBUhnqayMgAi/view?usp=share_link). Users also need to prepare for the GRCh38 reference (with `chr` as prefix in the sequence ID) used for read alignment and [1KG3 imputation panel from 1KG3](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/). We can prepare for the `bam.lst` and `region.lst` as following
 
 ```
 less bam.lst 
@@ -550,7 +550,7 @@ N_./._file2     0       0       0       0
 The genotyping concordance is calculated as `97% ((60+723)/(60+723+13628+8869))`. The overall genotyping accuracy could be `95% (0.97*(1-0.02))`
 
 ### ancestry identification
-Here we demonstrate how we can identify ancestry background on snRNA sample `19D013` based on the output of `Monopogen`. Users can use [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software to project `19D013` on HGDP reference panel. The HGDP genotyping panel was already included in the [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software. Before that, we need to liftover Monopogen output from GRCh38 to GRCh37 to match the HGDP genotyping coordinates. The fasta file of GRCh37 on chr20 could be downloaded as [GRCh37.chr20.fa](https://drive.google.com/file/d/194eSsL4xRLQwwL_3VcWsNxMziSM8SyMB/view?usp=share_link).
+Here we demonstrate how we can identify ancestry background on snRNA sample `19D013` based on the output of `Monopogen`. Users can use [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software to project `19D013` on HGDP reference panel. The HGDP genotyping panel was already included in the [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software. Before that, we need to liftover Monopogen output from GRCh38 to GRCh37 to match the HGDP genotyping coordinates. The fasta file of GRCh37 on chr20 could be downloaded as [GRCh37.chr20.fa](https://drive.google.com/file/d/194eSsL4xRLQwwL_3VcWsNxMziSM8SyMB/view?usp=share_link). 
 
 ```
 chain="${path}/resource/hg38ToHg19.over.chain.gz"
