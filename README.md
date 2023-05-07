@@ -778,18 +778,20 @@ We demonstrate how the LD refinement model implemented in Monopogen can improve 
 
 ### preprocess ###
 To remove reads with high alignment mismatches, we first run the preprocess step by setting the bam file list `bam.lst` as 
+
 ```
 less bam.lst
 bm,chr20.maester_scRNA.bam
 ```
 The data preprocess can be run as (~3 mins)
+
 ```
 path="/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
 python  ${path}/src/Monopogen.py  preProcess -b bam.lst -o bm  -a ${path}/apps -t 1
 ```
-
 The output could be 
+
 ```
 [2023-05-07 08:37:50,307] INFO     Monopogen.py Performing data preprocess before variant calling...
 [2023-05-07 08:37:50,307] INFO     germline.py Parameters in effect:
@@ -820,14 +822,13 @@ The output could be
 [2023-05-07 08:37:51,674] INFO     germline.py The contig chr18 does not contain the prefix 'chr' and we will add 'chr' on it
 [2023-05-07 08:37:51,733] INFO     germline.py The contig chr19 does not contain the prefix 'chr' and we will add 'chr' on it
 [2023-05-07 08:37:51,797] INFO     germline.py The contig chr20 does not contain the prefix 'chr' and we will add 'chr' on it
-finished
 [2023-05-07 08:40:36,298] INFO     germline.py The contig chr21 does not contain the prefix 'chr' and we will add 'chr' on it
 [2023-05-07 08:40:36,362] INFO     germline.py The contig chr22 does not contain the prefix 'chr' and we will add 'chr' on it
 [2023-05-07 08:40:36,538] INFO     Monopogen.py Success! See instructions above.
 ```
 ### germline calling ###
 To detect putative somatic SNVs, we need to call germline module to build the LD refinement model. The required `region.lst` could be set as 
-```
+
 ```
 less region.lst
 chr20
