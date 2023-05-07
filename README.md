@@ -37,11 +37,15 @@ The output of `Monopogen` will enable 1) ancestry identificaiton on single cell 
 **Dependencies**
 * python  (version >= 3.73)
 * java (open JDK>=1.8.0)
+* R (version >= 4.0.0)
 * pandas>=1.2.3
 * pysam>=0.16.0.1
 * NumPy>=1.19.5
 * sciPy>=1.6.3
 * pillow>=8.2.0
+* data.table(R package; version >=1.14.8)
+* e1071 (R package; 1.7-13)
+* 
   
 **Installation**
   
