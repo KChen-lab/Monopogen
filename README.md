@@ -8,7 +8,6 @@
 * [Quick Start](#quick-start)
   * [Data preprocess](#data-preprocess)
   * [Germline SNV calling](#germline-snv-calling)
-  * [Putative Somatic SNV calling](#putative-somatic-snv-calling)
 * [Germline SNV calling from snRNA-seq](#germline-snv-calling-from-snRNA-seq)
   * [variant calling](#variant-calling)
   * [genotyping accuracy evaluation](#genotyping-accuracy-evaluation)
@@ -772,8 +771,7 @@ The PCA projection plot will be generated as `19D013_onHGDP.pdf`
 
 
 ## Somatic SNV calling from scRNA-seq ##
-We demonstrate how the LD refinement model implemented in Monopogen can improve somatic SNV detection from scRNA-seq profiles without matched bulk WGS data available. We are developing some multi-threading modules to accelate the putative somatic SNV scanning. The somatic SNV module will be planned to included on May 6 2023.
-
+We demonstrate how the LD refinement model implemented in Monopogen can improve somatic SNV detection from scRNA-seq profiles without matched bulk WGS data available. We used the benchmarking dataset of bone marrow single cell samples from Miller et al.,[https://www.nature.com/articles/s41587-022-01210-8]. The raw fastq files could be downloaded from SRA database with SRR15598778[https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598778], SRR15598779[https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598779], SRR15598780[https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598780], SRR15598781[https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598781], and SRR15598782[https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598782]
 ## FAQs 
 * ***where to download 1KG3 reference panel (hg38)***
   http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/
