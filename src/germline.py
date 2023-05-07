@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""
-The main interface of monopgen
-"""
 
 import argparse
 import sys
@@ -41,8 +38,6 @@ handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter(
 	'[{asctime}] {levelname:8s} {filename} {message}', style='{'))
 logger.addHandler(handler)
-
-
 
 
 def print_parameters_given(args):
@@ -211,80 +206,14 @@ def BamFilter(myargs):
 			outfile.write(s)
 	infile.close()
 	outfile.close()
+	print("finished")
 
 	os.system(samtools + " index " +  out + "/Bam/" + id+ "_"  + chr + ".filter.bam")
 	if cnt ==0:
-		addChr(out + "/Bam/" +  id+ "_" + chr+ ".filter.bam")
+		addChr(out + "/Bam/" +  id+ "_" + chr+ ".filter.bam", samtools)
 	bamfile = out + "/Bam/" +  id+ "_" + chr+ ".filter.bam"
 	return(bamfile)
 	#args.bam_filter = args.out + "/Bam/" + args.chr + ".filter.bam"
-
-def getDPinfo(args):
-	out = args.out
-	gp_vcf_in = VariantFile(out + "/germline/" +  args.chr + ".gp.vcf.gz") 
-	gp_info = {}
-	gp_info_GT = {}
-	error_rate = {}
-	error_rate_cnt = {}
-	for rec in gp_vcf_in.fetch():
-		GT = [value['GT'] for value in rec.samples.values()][0]
-		GP = [value['GP'] for value in rec.samples.values()][0]
-		GT = str(GT[0]) + "/" + str(GT[1])
-		GP = str(GP[0]) + "," + str(GP[1]) + "," + str(GP[2])
-		id = str(rec.chrom)+":"+str(rec.pos) + ":" + rec.ref + ":" + rec.alts[0]
-		gp_info[id] = GT + ";" + GP
-		gp_info_GT[id] = GT
-
-	gl_vcf_in = VariantFile(out + "/germline/" +  args.chr + ".gl.vcf.gz") 
-	gl_vcf_dp4 = open(out + "/germline/" +  args.chr + ".gl.vcf.DP4","w")
-	gl_vcf_filter_dp4 = open(out + "/germline/" +  args.chr + ".gl.vcf.filter.DP4","w")
-	gl_vcf_filter_bed = open(out + "/germline/" +  args.chr + ".gl.vcf.filter.hc.bed","w")
-	gl_vcf_filter_txt = open(out + "/germline/" +  args.chr + ".gl.vcf.filter.hc.pos","w")
-
-	args.depth_filter_novelSNV = 10
-	for rec in gl_vcf_in.fetch():
-		info_var = rec.info['I16']
-		id = str(rec.chrom)+":"+str(rec.pos) + ":" + rec.ref + ":" + rec.alts[0]
-		gp_info_var = "NA"
-		if (id in gp_info):
-			gp_info_var = gp_info[id]
-			base = rec.ref + "-" + rec.alts[0]
-			if (gp_info_GT[id]=="0/0"): 
-				allele_ratio = (info_var[2] + info_var[3])/(info_var[0] + info_var[1] + 1)
-				if (base not in error_rate):
-					error_rate[base] = 0
-					error_rate_cnt[base] = 0
-				error_rate[base]=allele_ratio + error_rate[base]
-				error_rate_cnt[base] = error_rate_cnt[base] + 1
-
-		a =  "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(rec.chrom, rec.pos, rec.ref, rec.alts[0], rec.info['DP'], info_var[0], info_var[1], info_var[2], info_var[3], gp_info_var)
-		gl_vcf_dp4.write(a)
-
-		# include all variants from germline 
-		if (info_var[0] + info_var[1]>=4 and info_var[2] + info_var[3]>=4 or (id in gp_info)):
-			tol_ref = info_var[0] + info_var[1]
-			tol_alt = info_var[2] + info_var[3]		
-			if(tol_ref > 0 and tol_alt/tol_ref>0.01):
-				b = "{}\t{}\t{}\n".format(rec.chrom, rec.pos-1, rec.pos)
-				gl_vcf_filter_bed.write(b)
-				b = "{}\t{}\n".format(rec.chrom, rec.pos)
-				gl_vcf_filter_txt.write(b)
-				gl_vcf_filter_dp4.write(a)
-
-def BamExtract(args):
-	samtools = os.path.abspath(args.app_path) + "/samtools" 
-	out = os.path.abspath(args.out)
-	inbam = out + "/Bam/" + args.chr + ".filter.bam"
-	outbam =  out + "/Bam/" + args.chr + ".filter.targeted.bam"
-	# remembr to update bed file   ls -lrt
-
-	cmd1 = samtools + " view " + " -b  -L " + out + "/germline/" +  args.chr + ".gl.vcf.filter.hc.bed " + inbam + " -o " + outbam
-	with open(out+"/Script" + args.chr + "/BamExtract.sh","w") as f_out:
-		f_out.write(cmd1 + "\n")
-		f_out.write(samtools + " index " +  outbam + "\n")
-	cmd="bash " + out+"/Script" + args.chr + "/BamExtract.sh"
-	runCMD(cmd,args)
-
 
 
 def robust_get_tag(read, tag_name):  
@@ -293,160 +222,7 @@ def robust_get_tag(read, tag_name):
 	except KeyError:
 		return "NotFound"
 
-def BamSplit(args):
-	out = args.out
-	bam_filter =  out + "/Bam/" + args.chr + ".filter.targeted.bam"
-	assert os.path.isfile(bam_filter), "Bam filtering target file {} cannot be found! Please run germline mode firslty if you want to call somatic mutaitons".format(bam_filter)
-	samtools = args.samtools 
-	os.system("mkdir -p " + out + "/Bam/split_bam/")
-	cell_clst = pd.read_csv(args.cell_cluster)   
-	df = pd.DataFrame(cell_clst, columns= ['cell','cluster'])
-	clst = df['cluster'].unique()
-	clst_num = len(clst)
-	bamlist = open(out + "/Bam/split_bam/" +  args.chr + ".file.lst","w")
-	for i in range(clst_num):
-		a = df['cell'][df['cluster']==clst[i]]
-		#print(a)
-		a = a.to_list()
-		infile = pysam.AlignmentFile(bam_filter,"rb")
-		# Note to change the read groups 
-
-		tp =infile.header.to_dict()
-		tp['RG'][0]['SM'] = "clst" + str(clst[i])
-		tp['RG'][0]['ID'] = "clst" + str(clst[i])
-		outfile =  pysam.AlignmentFile( out + "/Bam/split_bam/" + args.chr + "_" + str(clst[i]) + ".bam", "wb", header=tp)
-		for s in infile:
-			t  = robust_get_tag(s,"CB")
-			if t in a:
-				outfile.write(s)
-		
-		outfile.close()
-		infile.close()
-		cmd=samtools + " index " + out + "/Bam/split_bam/" + args.chr + "_" + str(clst[i]) + ".bam"
-		runCMD(cmd,args)
-		#os.system(samtools + " index " + out + "/Bam/split_bam/" + args.chr + "_" + str(clst[i]) + ".bam")
-		bamlist.write(out + "/Bam/split_bam/" + args.chr + "_" + str(clst[i]) + ".bam" + "\n")
-
 def runCMD(cmd):
 
 	os.system(cmd)
 	#process = subprocess.run(cmd, shell=True, stdout=open(args.logfile, 'w'), stderr=open(args.logfile,'w'))
-	  
-
-def validate_user_setting_somatic(args):
-
-	assert os.path.isdir(args.out), "The germline output folder {} cannot be found! Please run germline module.".format(args.out)
-	args.bam_filter = args.out + "/Bam/" + args.chr + ".filter.bam"
-	assert os.path.isfile(args.bam_filter), "The filtered bam file {} cannot be found! Please run germline module".format(args.bam_filter)
-	args.vcf_germline = args.out + "/germline/" + args.chr + ".germline.vcf"
-	assert os.path.isfile(args.vcf_germline), "The germline vcf file {} cannot be found! Please run germline module".format(args.vcf_germline)
-	args.vcf_depth = args.out + "/germline/" +  args.chr + ".gl.vcf.DP4"
-	assert os.path.isfile(args.vcf_depth), "The sequencing depth file {} cannot be found! Please run germline module".format(args.vcf_depth)
-	assert os.path.isfile(args.barcode), "The cell barcode file {} cannot be found!".format(args.barcode)
-
-
-def vcf2mat(args):
-	vcf_germline_phased = VariantFile(args.out + "/germline/" +  args.chr + "_phased.vcf.gz") 
-	error  = open(args.out + "/germline/" +  args.chr + ".gl.vcf.filter.DP4", "r")
-	vcf_in = VariantFile(args.out + "/germline/" +  args.chr + ".gl.filter.hc.cell.vcf.gz") 
-	mat_out = gzip.open(args.out + "/germline/" +  args.chr + ".gl.filter.hc.cell.mat.gz","wt")
-	allele_info = {}
-	phase_info =  {}
-	error_info ={}
-
-	with open(args.out + "/germline/" +  args.chr + ".gl.vcf.filter.DP4",'r') as fp:
-		for line in fp:
-			data = line.split("\t")
-			id=str(data[0])+":"+str(data[1])
-			if re.search("0/0",data[9]):
-				error_info[id] = "0|0"
-				print(id)
-
-	n = len(list((vcf_in.header.samples)))
-	for rec in vcf_germline_phased.fetch():
-		id = str(rec.chrom)+":"+str(rec.pos)
-		allele =  rec.ref + ":" + rec.alts[0]
-		phase = rec.samples.values()[0]['GT']
-		phase = str(phase[0]) + "|" + str(phase[1])
-		allele_info[id] = allele
-		phase_info[id] = phase
-
-	for rec in vcf_in.fetch():
-		#print(rec.samples.values())
-
-		id = str(rec.chrom)+":"+str(rec.pos)
-		allele =  rec.ref + ":" + rec.alts[0]
-		DP = rec.info["DP"]
-		a = [None]*(4+n)
-		a[0] = id
-		a[1] = allele
-		a[2] = str(DP)
-		a[3] = ".|."
-		matched_allele = 1 
-		i = 3
-
-		# note the 1|1 genotypes are not used 
-		if (id in phase_info):
-			a[3] = phase_info[id]
-			if not allele==allele_info[id]:
-				matched_allele == 0
-			if matched_allele and phase_info[id]=="0|1": 
-				for value in rec.samples.values():
-					ref = value['DP4'][0] +  value['DP4'][1]
-					alt = value['DP4'][2] +  value['DP4'][3]
-					i = i + 1
-					a[i] = str(ref)+"|"+str(alt)
-				mat_out.write('\t'.join(a))
-				mat_out.write('\n')
-			if matched_allele and phase_info[id]=="1|0": 
-				for value in rec.samples.values():
-					ref = value['DP4'][0] +  value['DP4'][1]
-					alt = value['DP4'][2] +  value['DP4'][3]
-					i = i + 1
-					a[i] = str(alt)+"|"+str(ref)
-				mat_out.write('\t'.join(a))
-				mat_out.write('\n')
-		else:
-			if (id in error_info):
-				a[3] = error_info[id]
-			for value in rec.samples.values():
-				ref = value['DP4'][0] +  value['DP4'][1]
-				alt = value['DP4'][2] +  value['DP4'][3]
-				i = i + 1
-				a[i] = str(ref)+"/"+str(alt)
-			mat_out.write('\t'.join(a))
-			mat_out.write('\n')
-
-	mat_out.close()
-	vcf_in.close()
-
-
-
-
-def bam2mat(args): 
-
-	samtools = os.path.abspath(args.app_path) + "/samtools"
-	beagle =  os.path.abspath(args.app_path) + "/beagle.27Jul16.86a.jar" 
-	bam_filter =  args.out + "/Bam/" + args.chr + ".filter.targeted.bam"
-	snv_pos =  args.out + "/germline/" + args.chr + ".gl.vcf.filter.hc.bed"
-	bam_lst = args.out + "/Bam/cell_bam.lst"
-	vcf_out = args.out + "/germline/" + args.chr + ".gl.filter.hc.cell.vcf.gz"
-	out = args.out
-
-	cmd = samtools + " mpileup  -u -q 20 -Q 20  -t DP4   -d 10000000  -l " + snv_pos + " -b " + bam_lst + " -f  /rsrch3/scratch/bcb/jdou1/scAncestry/ref/fasta/genome.fa | " +  args.bcftools + " view | bgzip -c > " + vcf_out
-	args.map = "/rsrch3/scratch/bcb/jdou1/scAncestry/ref/1KG3/plink." + args.chr + ".phase.addchr.GRCh38.map"
-	args.imputation_panel  = "/rsrch3/scratch/bcb/jdou1/scAncestry/ref/1KG3/CCDG_14151_B01_GRM_WGS_2020-08-05_" + args.chr + ".filtered.shapeit2-duohmm-phased.vcf.gz"
-	cmd3 = args.java + " -Xmx20g -jar " + beagle +  " gt=" +  out + "/germline/" +  args.chr + ".gt.vcf.gz  map="  + args.map +  " ref=" +  args.imputation_panel  + "  chrom=" + args.chr  + " out="   +  args.out + "/germline/" + args.chr + "_phased " + "impute=false  modelscale=2  nthreads=48  gprobs=true  niterations=0"
-		
-	with open(args.out+"/Script" + args.chr + "/Bam2mat.sh","w") as f_out:
-		#f_out.write(cmd3 + "\n")
-		f_out.write(cmd + "\n")
-	cmd="bash " + args.out+"/Script" + args.chr + "/Bam2mat.sh"
-	
-	runCMD(cmd,args)
-	vcf2mat(args)
-
-    
-#def somatic_haplotype(args):
-
-
