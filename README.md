@@ -844,8 +844,242 @@ ${path}/src/Monopogen.py  germline  -a ${path}/apps  -r region.lst \
  -p ./ \
  -g  GRCh38.chr20.fa  -m 3 -s all  -o bm
 ```
+This will take ~ 25 mins with output as 
+```
+[2023-05-07 09:25:43,724] INFO     Monopogen.py Performing germline variant calling...
+[2023-05-07 09:25:43,724] INFO     germline.py Parameters in effect:
+[2023-05-07 09:25:43,724] INFO     germline.py --subcommand = [germline]
+[2023-05-07 09:25:43,724] INFO     germline.py --region = [region.lst]
+[2023-05-07 09:25:43,724] INFO     germline.py --step = [all]
+[2023-05-07 09:25:43,724] INFO     germline.py --out = [bm]
+[2023-05-07 09:25:43,724] INFO     germline.py --reference = [GRCh38.chr20.fa]
+[2023-05-07 09:25:43,724] INFO     germline.py --imputation_panel = [./]
+[2023-05-07 09:25:43,724] INFO     germline.py --max_softClipped = [3]
+[2023-05-07 09:25:43,724] INFO     germline.py --app_path = [/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps]
+[2023-05-07 09:25:43,724] INFO     germline.py --nthreads = [1]
+[2023-05-07 09:25:43,724] INFO     germline.py --norun = [FALSE]
+[2023-05-07 09:25:43,724] INFO     Monopogen.py Checking existence of essenstial resource files...
+[2023-05-07 09:25:43,777] INFO     Monopogen.py Checking dependencies...
+['bash bm/Script/runGermline_chr20.sh']
+[mpileup] 1 samples in 1 input files
+(mpileup) Max depth is above 1M. Potential memory hog!
+Lines   total/split/realigned/skipped:  10933032/105880/21378/0
+beagle.27Jul16.86a.jar (version 4.1)
+Copyright (C) 2014-2015 Brian L. Browning
+Enter "java -jar beagle.27Jul16.86a.jar" for a summary of command line arguments.
+Start time: 09:33 AM CDT on 07 May 2023
+
+Command line: java -Xmx18204m -jar beagle.jar
+  gl=bm/germline/chr20.gl.vcf.gz
+  ref=./CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz
+  chrom=chr20
+  out=bm/germline/chr20.gp
+  impute=false
+  modelscale=2
+  nthreads=1
+  gprobs=true
+  niterations=0
+
+No genetic map is specified: using 1 cM = 1 Mb
+
+reference samples:    3202
+target samples:          1
+
+Window 1 [ chr20:273372-39851321 ]
+reference markers:   10486
+target markers:      10486
+
+Starting burn-in iterations
+
+Window=1 Iteration=1
+Time for building model:         39 seconds
+Time for sampling (singles):     7 seconds
+DAG statistics
+mean edges/level: 49     max edges/level: 129
+mean edges/node:  1.183  mean count/edge: 131
+
+Window=1 Iteration=2
+Time for building model:         40 seconds
+Time for sampling (singles):     7 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 124
+mean edges/node:  1.167  mean count/edge: 133
+
+Window=1 Iteration=3
+Time for building model:         37 seconds
+Time for sampling (singles):     7 seconds
+DAG statistics
+mean edges/level: 49     max edges/level: 125
+mean edges/node:  1.164  mean count/edge: 131
+
+Window=1 Iteration=4
+Time for building model:         39 seconds
+Time for sampling (singles):     7 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 122
+mean edges/node:  1.166  mean count/edge: 133
+
+Window=1 Iteration=5
+Time for building model:         39 seconds
+Time for sampling (singles):     7 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 119
+mean edges/node:  1.167  mean count/edge: 133
+
+Window=1 Iteration=6
+Time for building model:         44 seconds
+Time for sampling (singles):     11 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 121
+mean edges/node:  1.166  mean count/edge: 133
+
+Window=1 Iteration=7
+Time for building model:         37 seconds
+Time for sampling (singles):     11 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 132
+mean edges/node:  1.167  mean count/edge: 133
+
+Window=1 Iteration=8
+Time for building model:         39 seconds
+Time for sampling (singles):     11 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 125
+mean edges/node:  1.168  mean count/edge: 133
+
+Window=1 Iteration=9
+Time for building model:         35 seconds
+Time for sampling (singles):     10 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 133
+mean edges/node:  1.165  mean count/edge: 133
+
+Window=1 Iteration=10
+Time for building model:         40 seconds
+Time for sampling (singles):     11 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 134
+mean edges/node:  1.167  mean count/edge: 133
+
+Number of markers:               10486
+Total time for building model: 6 minutes 31 seconds
+Total time for sampling:       1 minute 30 seconds
+Total run time:                10 minutes 19 seconds
+
+End time: 09:43 AM CDT on 07 May 2023
+beagle.27Jul16.86a.jar (version 4.1) finished
+beagle.27Jul16.86a.jar (version 4.1)
+Copyright (C) 2014-2015 Brian L. Browning
+Enter "java -jar beagle.27Jul16.86a.jar" for a summary of command line arguments.
+Start time: 09:43 AM CDT on 07 May 2023
+
+Command line: java -Xmx18204m -jar beagle.jar
+  gt=bm/germline/chr20.germline.vcf
+  ref=./CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz
+  chrom=chr20
+  out=bm/germline/chr20.phased
+  impute=false
+  modelscale=2
+  nthreads=1
+  gprobs=true
+  niterations=0
+
+No genetic map is specified: using 1 cM = 1 Mb
+
+reference samples:    3202
+target samples:          1
+
+Window 1 [ chr20:273372-39851321 ]
+reference markers:    9130
+target markers:       9130
+
+Starting burn-in iterations
+
+Window=1 Iteration=1
+Time for building model:         28 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 123
+mean edges/node:  1.203  mean count/edge: 133
+
+Window=1 Iteration=2
+Time for building model:         31 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 129
+mean edges/node:  1.183  mean count/edge: 133
+
+Window=1 Iteration=3
+Time for building model:         29 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 47     max edges/level: 123
+mean edges/node:  1.184  mean count/edge: 136
+
+Window=1 Iteration=4
+Time for building model:         32 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 47     max edges/level: 119
+mean edges/node:  1.185  mean count/edge: 136
+
+Window=1 Iteration=5
+Time for building model:         30 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 123
+mean edges/node:  1.183  mean count/edge: 133
+
+Window=1 Iteration=6
+Time for building model:         30 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 47     max edges/level: 128
+mean edges/node:  1.184  mean count/edge: 136
+
+Window=1 Iteration=7
+Time for building model:         29 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 47     max edges/level: 125
+mean edges/node:  1.184  mean count/edge: 136
+
+Window=1 Iteration=8
+Time for building model:         33 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 47     max edges/level: 123
+mean edges/node:  1.185  mean count/edge: 136
+
+Window=1 Iteration=9
+Time for building model:         28 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 48     max edges/level: 127
+mean edges/node:  1.183  mean count/edge: 133
+
+Window=1 Iteration=10
+Time for building model:         33 seconds
+Time for sampling (singles):     0 seconds
+DAG statistics
+mean edges/level: 47     max edges/level: 118
+mean edges/node:  1.186  mean count/edge: 136
+
+Number of markers:                9130
+Total time for building model: 5 minutes 3 seconds
+Total time for sampling:       1 second
+Total run time:                6 minutes 59 seconds
+
+End time: 09:50 AM CDT on 07 May 2023
+beagle.27Jul16.86a.jar (version 4.1) finished
+[2023-05-07 09:50:21,243] INFO     Monopogen.py Success! See instructions above.
+
+```
+
 ### ld refinement on putative somatic SNVs ###
 One advantage of Monopogen is to extend the machinery of LD refinement from human population level to cell population level. 
+
+
 
 ## FAQs 
 * ***where to download 1KG3 reference panel (hg38)***
