@@ -13,6 +13,9 @@
   * [genotyping accuracy evaluation](#genotyping-accuracy-evaluation)
   * [ancestry identification](#ancestry-identification)
 * [Somatic SNV calling from scRNA-seq](#somatic-snv-calling-from-scrna-seq)
+  * [preprocess](#preprocess)
+  * [germline calling](#germline-calling)
+  * [ld refinement on putative somatic SNVs](ld-refinement-on-putative-somatic-SNVs)
 * [FAQs](#faqs)
 * [Citation](#citation)
 
@@ -771,7 +774,74 @@ The PCA projection plot will be generated as `19D013_onHGDP.pdf`
 
 
 ## Somatic SNV calling from scRNA-seq ##
-We demonstrate how the LD refinement model implemented in Monopogen can improve somatic SNV detection from scRNA-seq profiles without matched bulk WGS data available. We used the benchmarking dataset of bone marrow single cell samples from [Miller et al.,](https://www.nature.com/articles/s41587-022-01210-8). The raw fastq files could be downloaded from SRA database with [SRR15598778](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598778), [SRR15598779](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598779), [SRR15598780](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598780), [SRR15598781](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598781), and [SRR15598782](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598782).
+We demonstrate how the LD refinement model implemented in Monopogen can improve somatic SNV detection from scRNA-seq profiles without matched bulk WGS data available. We used the benchmarking dataset of bone marrow single cell samples from [Miller et al.,](https://www.nature.com/articles/s41587-022-01210-8). The raw fastq files could be downloaded from SRA database with [SRR15598778](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598778), [SRR15598779](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598779), [SRR15598780](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598780), [SRR15598781](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598781), and [SRR15598782](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598782). For convenience, we shared with the the downloaded bam file from chromosome 20 [chr20.master_scRNA.bam]. 
+
+### preprocess ###
+To remove reads with high alignment mismatches, we first run the preprocess step by setting the bam file list `bam.lst` as 
+```
+less bam.lst
+bm,chr20.maester_scRNA.bam
+```
+The data preprocess can be run as (~3 mins)
+```
+path="/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen"
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${path}/apps
+python  ${path}/src/Monopogen.py  preProcess -b bam.lst -o bm  -a ${path}/apps -t 1
+```
+
+The output could be 
+```
+[2023-05-07 08:37:50,307] INFO     Monopogen.py Performing data preprocess before variant calling...
+[2023-05-07 08:37:50,307] INFO     germline.py Parameters in effect:
+[2023-05-07 08:37:50,307] INFO     germline.py --subcommand = [preProcess]
+[2023-05-07 08:37:50,307] INFO     germline.py --bamFile = [bam.lst]
+[2023-05-07 08:37:50,307] INFO     germline.py --out = [bm]
+[2023-05-07 08:37:50,307] INFO     germline.py --app_path = [/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps]
+[2023-05-07 08:37:50,307] INFO     germline.py --max_mismatch = [3]
+[2023-05-07 08:37:50,307] INFO     germline.py --nthreads = [1]
+[2023-05-07 08:37:50,336] DEBUG    Monopogen.py PreProcessing sample bm
+[2023-05-07 08:37:50,615] INFO     germline.py The contig chr1 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:50,712] INFO     germline.py The contig chr2 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:50,775] INFO     germline.py The contig chr3 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:50,835] INFO     germline.py The contig chr4 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:50,894] INFO     germline.py The contig chr5 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:50,957] INFO     germline.py The contig chr6 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,019] INFO     germline.py The contig chr7 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,079] INFO     germline.py The contig chr8 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,144] INFO     germline.py The contig chr9 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,203] INFO     germline.py The contig chr10 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,261] INFO     germline.py The contig chr11 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,318] INFO     germline.py The contig chr12 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,379] INFO     germline.py The contig chr13 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,442] INFO     germline.py The contig chr14 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,502] INFO     germline.py The contig chr15 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,558] INFO     germline.py The contig chr16 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,616] INFO     germline.py The contig chr17 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,674] INFO     germline.py The contig chr18 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,733] INFO     germline.py The contig chr19 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:37:51,797] INFO     germline.py The contig chr20 does not contain the prefix 'chr' and we will add 'chr' on it
+finished
+[2023-05-07 08:40:36,298] INFO     germline.py The contig chr21 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:40:36,362] INFO     germline.py The contig chr22 does not contain the prefix 'chr' and we will add 'chr' on it
+[2023-05-07 08:40:36,538] INFO     Monopogen.py Success! See instructions above.
+```
+### germline calling ###
+To detect putative somatic SNVs, we need to call germline module to build the LD refinement model. The required `region.lst` could be set as 
+```
+```
+less region.lst
+chr20
+```
+Users also need to preprare for following files `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz` from [1KG3 imputation panel from 1KG3](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/) and `GRCh38.chr20.fa`. 
+
+```
+${path}/src/Monopogen.py  germline  -a ${path}/apps  -r region.lst \
+ -p CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz \
+ -g  GRCh38.chr20.fa  -m 3 -s all  -o bm
+```
+
+### ld refinement on putative somatic SNVs ###
+
 ## FAQs 
 * ***where to download 1KG3 reference panel (hg38)***
   http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/
