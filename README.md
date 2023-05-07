@@ -774,7 +774,7 @@ The PCA projection plot will be generated as `19D013_onHGDP.pdf`
 
 
 ## Somatic SNV calling from scRNA-seq ##
-We demonstrate how the LD refinement model implemented in Monopogen can improve somatic SNV detection from scRNA-seq profiles without matched bulk WGS data available. We used the benchmarking dataset of bone marrow single cell samples from [Miller et al.,](https://www.nature.com/articles/s41587-022-01210-8). The raw fastq files could be downloaded from SRA database with [SRR15598778](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598778), [SRR15598779](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598779), [SRR15598780](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598780), [SRR15598781](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598781), and [SRR15598782](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598782). For convenience, we shared with the the downloaded bam file from chromosome 20 [chr20.master_scRNA.bam]. 
+We demonstrate how the LD refinement model implemented in Monopogen can improve somatic SNV detection from scRNA-seq profiles without matched bulk WGS data available. We used the benchmarking dataset of bone marrow single cell samples from [Miller et al.,](https://www.nature.com/articles/s41587-022-01210-8). The raw fastq files could be downloaded from SRA database with [SRR15598778](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598778), [SRR15598779](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598779), [SRR15598780](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598780), [SRR15598781](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598781), and [SRR15598782](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598782). For convenience, we shared with the the downloaded bam file from chromosome 20 [chr20.master_scRNA.bam](). 
 
 ### preprocess ###
 To remove reads with high alignment mismatches, we first run the preprocess step by setting the bam file list `bam.lst` as 
@@ -837,11 +837,11 @@ Users also need to preprare for following files `CCDG_14151_B01_GRM_WGS_2020-08-
 
 ```
 ${path}/src/Monopogen.py  germline  -a ${path}/apps  -r region.lst \
- -p CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz \
+ -p ./ \
  -g  GRCh38.chr20.fa  -m 3 -s all  -o bm
 ```
-
 ### ld refinement on putative somatic SNVs ###
+One advantage of Monopogen is to extend the machinery of LD refinement from human population level to cell population level. 
 
 ## FAQs 
 * ***where to download 1KG3 reference panel (hg38)***
