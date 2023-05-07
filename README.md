@@ -45,7 +45,7 @@ The output of `Monopogen` will enable 1) ancestry identificaiton on single cell 
 * pillow>=8.2.0
 * data.table(R package; version >=1.14.8)
 * e1071 (R package; 1.7-13)
-* 
+* ggplot2
   
 **Installation**
   
