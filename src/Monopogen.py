@@ -18,6 +18,7 @@ import numpy as np
 import gzip
 from pysam import VariantFile
 from germline import *
+from somatic import *
 import multiprocessing as mp
 from multiprocessing import Pool
 
@@ -84,12 +85,15 @@ def germline(args):
 			f_out = open(out + "/Script/runGermline_" +  jobid +  ".sh","w")
 			if args.step == "varScan" or args.step == "all":
 				f_out.write(cmd1 + "\n")
+			#NSNV = withSNVs(out + "/germline/" +  jobid + ".gl.vcf.gz")
 				#f_out.write(cmd2 + "\n")
 			if args.step == "varImpute" or args.step == "all":
-				f_out.write(cmd3 + "\n")
-				f_out.write(cmd4 + "\n")
+				#if NSNV>100:
+					f_out.write(cmd3 + "\n")
+					f_out.write(cmd4 + "\n")
 			if args.step == "varPhasing" or args.step == "all":
-				f_out.write(cmd5 + "\n")
+				#if NSNV>100:
+					f_out.write(cmd5 + "\n")
 			
 			joblst.append("bash " + out + "/Script/runGermline_" +  jobid +  ".sh")
 	f_out.close()
@@ -102,10 +106,80 @@ def germline(args):
 def somatic(args):
 	
 	validate_user_setting_somatic(args)
-	getDPinfo(args)
-	BamExtract(args)
-	# assume that we have split bam file into cell level
-	bam2mat(args)
+	os.system("mkdir -p " + args.out +  "/somatic")
+
+	chr_lst = []
+	region_lst = []
+	with open(args.region) as f_in:
+		for line in f_in:
+			record = line.strip().split(",")
+			if(len(record)==1):
+			 	region = record[0]
+			if(len(record)==3):
+				region = record[0] + ":" + record[1] + "-" + record[2]
+			chr_lst.append(record[0])
+			region_lst.append(region)
+
+	if args.step=="featureInfo" or args.step=="all":
+		logger.info("Get feature information from sequencing data...")
+		
+		joblst = []
+		for id in region_lst:
+			joblst.append(id+">"+args.out)
+		with Pool(processes=args.nthreads) as pool:
+			result = pool.map(featureInfo, joblst)
+		
+		chr_lst = list(set(chr_lst))
+		joblst = []
+		for id in chr_lst:
+			joblst.append(id+">"+args.out+">"+args.app_path)
+		with Pool(processes=args.nthreads) as pool:
+			result = pool.map(bamExtract, joblst)
+
+		os.system("mkdir -p " + out + "/Bam/split_bam/")
+		cell_clst = pd.read_csv(args.barcode)   
+		df = pd.DataFrame(cell_clst, columns= ['cell','id'])
+		cell_lst = df['cell'].unique()
+		joblst = []
+		for chr in chr_lst:
+			for cell in cell_lst:
+				para = chr + ":" + cell + ":" + args.out + ":" + args.app_path
+				joblst.append(para)
+		with Pool(processes=args.nthreads) as pool:
+			result = pool.map(bamSplit, joblst)
+
+		# generate the bam file list 
+		for chr in chr_lst:
+			cell_bam = open(out + "/Bam/split_bam/cell" + chr + ".bam.lst","w")
+			for cell in cell_lst:
+				cell_bam.write(out + "/Bam/split_bam/" + chr + "_" + cell + ".bam\n")
+			cell_bam.close()
+
+
+	if args.step=="cellScan" or args.step=="all":
+		logger.info("Get single cell level information from sequencing data...")
+
+		joblst = []
+		for id in region_lst:
+			joblst.append(id+">"+chr+">"+args.out+">"+args.app_path+">"+args.reference)
+		with Pool(processes=args.nthreads) as pool:
+			result = pool.map(jointCall, joblst)
+
+		joblst = []
+		for id in region_lst:
+			joblst.append(id+">"+args.out)
+		with Pool(processes=args.nthreads) as pool:
+			result = pool.map(vcf2mat, joblst)
+
+	if args.step=="LDrefinement" or args.step=="all":
+		logger.info("Run LD refinement ...")
+
+		joblst = []
+		for id in region_lst:
+			joblst.append(id+">"+args.out+">"+args.app_path)
+		with Pool(processes=args.nthreads) as pool:
+			result = pool.map(LDrefinement, joblst)
+
 
 
 
@@ -141,7 +215,6 @@ def preProcess(args):
 						max_mismatch = args.max_mismatch,
 						samtools = samtools)
 					para_lst.append(para_single)
-					#print(args)
 	with Pool(processes=args.nthreads) as pool:
 		result = pool.map(BamFilter, para_lst)
 	# output the bam file list 
@@ -209,19 +282,24 @@ def main():
 								help="Generate the job scripts only. The jobs will not be run.")
 	parser_germline.set_defaults(func=germline)
 
-
-
 	parser_somatic = subparsers.add_parser('somatic', parents=[common_parser],
-		help='Somatic variant calling from single cell data',
+		help='Somatic variant calling from single cell sequencing',
 		formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 	parser_somatic.add_argument('-i', '--input-folder', required=True,
 								help="The output folder from previous germline module")
-	parser_somatic.add_argument('-c', '--chr', required= True, 
-								help="The chromosome used for variant calling")
+	parser_somatic.add_argument('-r', '--region', required= True, 
+								help="The genome region for variant calling")
 	parser_somatic.add_argument('-l', '--barcode', required= True, 
 								help="The csv file including cell barcode information")
 	parser_somatic.add_argument('-a', '--app-path', required=True,
 								help="The app library paths used in the tool")
+	parser_somatic.add_argument('-t', '--nthreads', required=False, type=int, default=1,
+								help="Number of jobs used for SNV calling") 
+	parser_somatic.add_argument('-s', '--step', required=True,
+								choices=['featureInfo', 'cellScan' , 'LDrefinement', 'monovar', 'all'],
+								help="Run germline variant calling step by step")
+	parser_somatic.add_argument('-g', '--reference', required= True, 
+								help="The human genome reference used for alignment")
 	parser_somatic.set_defaults(func=somatic)
 
 	args = parser.parse_args()
@@ -238,9 +316,6 @@ def main():
 	
 	if args.subcommand == "somatic":
 		args.out = args.input_folder
-
-
-
 
 	global out, samtools, bcftools, bgzip, java, beagle 
 	out = os.path.abspath(args.out)
