@@ -239,7 +239,7 @@ The germline SNV calling can be run as (~80 mins).
  
 ```
 ${path}/src/Monopogen.py  germline  -a ${path}/apps  -r region.lst \
- -p CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz \
+ -p ./ \
  -g  GRCh38.chr20.fa  -m 3 -s all  -o retina
 ```
 The output is 
