@@ -15,7 +15,7 @@
 * [Somatic SNV calling from scRNA-seq](#somatic-snv-calling-from-scrna-seq)
   * [preprocess](#preprocess)
   * [germline calling](#germline-calling)
-  * [ld refinement on putative somatic SNVs](ld-refinement-on-putative-somatic-SNVs)
+  * [ld refinement on putative somatic SNVs](#ld-refinement-on-putative-somatic-SNVs)
 * [FAQs](#faqs)
 * [Citation](#citation)
 
