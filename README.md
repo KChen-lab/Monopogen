@@ -1075,7 +1075,6 @@ beagle.27Jul16.86a.jar (version 4.1) finished
 [2023-05-07 09:50:21,243] INFO     Monopogen.py Success! See instructions above.
 
 ```
-
 ### ld refinement on putative somatic SNVs ###
 One advantage of Monopogen is to extend the machinery of LD refinement from human population level to cell population level. Users need to prepare for the cell barcode file [CB_7K.maester_scRNA.csv](https://drive.google.com/file/d/1LhNYpU194kaBevW5nd2ORX7qO3pigQOH/view?usp=share_link). There are three steps `featureInfo`, `cellScan`, and `LDrefinement` to call putative somatic SNVs. Here we show the step one by one. 
 
