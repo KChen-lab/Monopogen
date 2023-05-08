@@ -141,6 +141,7 @@ def somatic(args):
 		df = pd.DataFrame(cell_clst, columns= ['cell','id'])
 		cell_lst = df['cell'].unique()
 		joblst = []
+
 		for chr in chr_lst:
 			for cell in cell_lst:
 				para = chr + ":" + cell + ":" + args.out + ":" + args.app_path
@@ -161,6 +162,8 @@ def somatic(args):
 
 		joblst = []
 		for id in region_lst:
+			record = id.strip().split(":")
+			chr = record[0]
 			joblst.append(id+">"+chr+">"+args.out+">"+args.app_path+">"+args.reference)
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(jointCall, joblst)

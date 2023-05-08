@@ -170,8 +170,12 @@ def bamSplit(para):
 	outfile =  pysam.AlignmentFile( out + "/Bam/split_bam/" + chr + "_" + cell  + ".bam", "wb", header=tp)
 	for s in infile:
 		t  = robust_get_tag(s,"CB")
-		if t==cell:
-			outfile.write(s)
+		if not t=="NotFound":
+			if t==cell:
+				outfile.write(s)
+		else:
+			if re.search(cell, s.query_name):
+				outfile.write(s)
 	
 	outfile.close()
 	infile.close()
