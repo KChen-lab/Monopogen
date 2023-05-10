@@ -165,8 +165,8 @@ def somatic(args):
 			record = id.strip().split(":")
 			chr = record[0]
 			joblst.append(id+">"+chr+">"+args.out+">"+args.app_path+">"+args.reference)
-		with Pool(processes=args.nthreads) as pool:
-			result = pool.map(jointCall, joblst)
+		#with Pool(processes=args.nthreads) as pool:
+		#	result = pool.map(jointCall, joblst)
 
 		joblst = []
 		for id in region_lst:
