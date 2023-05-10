@@ -1109,7 +1109,40 @@ Lines   total/split/realigned/skipped:  1593789/42248/4781/0
 [E::idx_find_and_load] Could not retrieve index file for 'bm/somatic/chr20.cell.gl.vcf.gz'
 [2023-05-08 11:12:18,811] INFO     Monopogen.py Success! See instructions above.
 ```
+Finally, we can run the LD refinment step to further improve the putative somatic SNV detection as (taking ~3 mins) 
 
+```
+python  ${path}/src/Monopogen.py  somatic  \
+    -a   ${path}/apps  -r  region.lst  -t 50 \
+    -i  bm  -l  CB_7K.maester_scRNA.csv   -s LDrefinement     \
+    -g   GRCh38.chr20.fa
+```
+After running the `LDrefinment` step, there would be three key files `chr20.putativeSNVs.csv`, `chr20.germlineTwoLoci_model.csv`, and `chr20.germlineTrioLoci_model.csv` in the output directory `bm/somatic`. The `chr20.germlineTwoLoci_model.csv` and `chr20.germlineTrioLoci_model.csv` enable us to examine the rationale of the LD model in sparse data at the cell population level. 
+ 
+<image src="./example/maester.chr20_LDrefinement_germline.png" width="600"> 
+
+Users can filter putative somatic SNVs based on the file `chr20.putativeSNVs.csv` with column `POS>0.5` and `p_LDrefine>0.25`. The `NA` values in `p_LDrefine` column denotes that there are no germline SNVs tagged on putative somatic SNVs. 
+```
+chr	pos	ref	alt	Dep	dep1	dep2	dep3	dep4	genotype	QS	VDB	RPB	MQB	BQB	MQSB	SGB	MQ0F	region	POS	NEG	p_twoLoci	p_trioLoci	p_LDrefine	p_twoLoci_adj	p_trioLoci_adj
+chr20	276310	A	G	22	11	2	9	0	.|.	0	0.59	0	1	1	1	-0.66	0	1	0.553597195	0.446402805	NA	NA	NA	NA	NA
+chr20	299130	A	C	39	6	17	8	6	.|.	0.96	0.62	0.05	1	0.91	1	-0.69	0	2	0.445978934	0.554021066	NA	NA	NA	NA	NA
+chr20	391901	A	G	9	5	0	4	0	.|.	0.62	0.56	0.89	0.89	0.97	NA	-0.56	0	4	0.970583071	0.029416929	NA	NA	NA	NA	NA
+chr20	425837	A	G	103	3	95	0	4	.|.	0.51	0.97	0.43	0.08	0.96	0.99	-0.56	0	5	0.071524315	0.928475685	0.7	0.8	0.2	0.3	0.2
+chr20	427055	A	G	442	0	429	0	6	.|.	0.01	0.99	0.96	1	0.94	NA	-0.62	0	5	0.038551	0.961449	NA	0.372395983	0.372395983	NA	0.372395983
+chr20	427069	A	G	388	0	378	0	7	.|.	0.05	0.98	0.46	1	0.94	NA	-0.64	0	5	0.020986531	0.979013469	NA	0.350192624	0.350192624	NA	0.350192624
+chr20	436781	A	G	112	70	23	17	0	.|.	0	0.84	0	1	0.98	1	-0.69	0	6	0.040635023	0.959364977	0.470670508	0.330233798	0.330233798	0.470670508	0.330233798
+chr20	438622	T	G	162	7	70	0	5	.|.	0.28	0.94	0.93	1	1	1	-0.59	0	7	0.11962506	0.88037494	NA	0.666666667	0.333333333	NA	0.333333333
+chr20	440781	A	G	59	20	7	31	0	.|.	0	0.47	0	0.98	0.92	1	-0.69	0	7	0.795252421	0.204747579	0.378852264	0.5	0.378852264	0.378852264	0.5
+chr20	442668	A	G	25	13	0	11	0	.|.	0	0.55	0	1	0.93	NA	-0.68	0	7	0.630010366	0.369989634	NA	0.5	0.5	NA	0.5
+chr20	444566	T	G	10	0	5	0	5	.|.	0.01	0.53	0.86	0.86	0.43	NA	-0.59	0	8	0.959527227	0.040472773	NA	NA	NA	NA	NA
+chr20	452769	A	G	12	5	2	5	0	.|.	0	0.57	0.9	0.51	0.95	0	-0.59	0	9	0.592415093	0.407584907	1	1	0	0	0
+chr20	452853	T	C	83	76	0	2	2	.|.	0.01	0.95	0.52	1	0.92	1	-0.56	0	9	0.075033259	0.924966741	0.259449653	0.5	0.259449653	0.259449653	0.5
+chr20	452987	T	C	182	167	3	4	0	.|.	0.25	0.98	0.34	0.88	0.85	0.41	-0.56	0	9	0.016531416	0.983468584	0.601041269	0.241867697	0.241867697	0.398958731	0.241867697
+chr20	476423	T	C	22	1	15	0	6	.|.	0.18	0.73	0.54	0.84	1	1	-0.62	0	10	0.460680424	0.539319576	0.441497332	0.5	0.441497332	0.441497332	0.5
+chr20	476737	T	C	29	5	15	0	9	.|.	0.04	0.69	0.09	1	0.98	1	-0.66	0	10	0.321040037	0.678959963	0.818678414	1	0	0.181321586	0
+
+```
+ 
 ## FAQs 
 * ***where to download 1KG3 reference panel (hg38)***
   http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/
