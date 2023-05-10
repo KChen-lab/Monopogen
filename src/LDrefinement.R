@@ -214,7 +214,7 @@ weigthedP <- function(dis=NULL, match=NULL, table=NULL){
 
 calcP <- function(twoloci = NULL, trioloci=NULL, somaticIndex = NULL){
   
-  binsize <- c(0, 100,  500, 1000, 2500,  5000, 7500,  10000, 20000, 50000, 100000, 500000, 1000000000000000000)
+  binsize <- c(0, 100,200,300,400, 500, 1000, 2500,  5000, 7500,  10000, 20000, 50000, 100000, 500000, 1000000000000000000)
   table2 <- data.frame("bin"=binsize[seq(2,length(binsize),1)], "tol"=NA, "match"=NA, "Prob"=NA)
   for(i in seq(2,length(binsize),1)){
     pos <-which(twoloci$germline_dis<binsize[i] & twoloci$germline_dis>=binsize[i-1])
@@ -285,15 +285,15 @@ somaticLD <- function(mat=NULL, svm=NULL){
   somaticIndex <- which(index%in%testID)
   dis <- mat$V2
   # update phasing information 
-  for(i in seq(1,nrow(mat),1)){
-    if(mat$V10[i]=="1|0"){
-      tp <- mat[i,]
-      tp[tp=="1|0"] <- "00|11"
-      tp[tp=="0|1"] <- "1|0"
-      tp[tp=="00|11"] <- "0|1"
-      mat[i,] <- tp
-    }
-  }
+  #for(i in seq(1,nrow(mat),1)){
+  #  if(mat$V10[i]=="1|0"){
+  #    tp <- mat[i,]
+  #    tp[tp=="1|0"] <- "00|11"
+  #    tp[tp=="0|1"] <- "1|0"
+  #    tp[tp=="00|11"] <- "0|1"
+  #    mat[i,] <- tp
+  #  }
+  #}
   mat <- mat[,c(seq(19,ncol(mat),1))]
   # initilize the haplotype of somatic SNVs as 0|1
   mat[mat=="0/0"] <- "0|0"
@@ -317,9 +317,52 @@ somaticLD <- function(mat=NULL, svm=NULL){
   }
   res <- list()
   res$svm <- svm
+
+  # adjust the phasing information based on LD refinement score
+  dt <- res$svm$test
+
+  a <- dt$p_twoLoci
+  b <- dt$p_trioLoci
+  flag_two <- which(a>0.5)
+  a[flag_two] <- (1-a[flag_two])
+  flag_trio <- which(b>0.5)
+  b[flag_trio] <-(1-b[flag_trio])
+  dt$p_twoLoci_adj <- a
+  dt$p_trioLoci_adj <- b
+  dt$p_LDrefine <- NA
+  for(i in seq(1,nrow(dt),1)){
+     if(is.na(a[i])){a[i]<-10}
+     if(is.na(b[i])){b[i]<-10}
+     dt$p_LDrefine[i] <- min(a[i],b[i])
+     if(dt$p_LDrefine[i]>1){
+      dt$p_LDrefine[i] <- NA
+     }
+  }
+  res$svm$test <- dt
   res$LDrefine_somatic <- res$svm$test 
   res$LDrefine_germline2 <- LDrefine$table2
   res$LDrefine_germline3 <- LDrefine$table3
+
+  table2 <- LDrefine$table2
+  table3 <- LDrefine$table3
+  table2$model <- "TwoLoci"
+  table3$model <- "TrioLoci"
+  plt_dt <- rbind(table2, table3)
+  plt_dt <- plt_dt[!is.na(plt_dt$tol),]
+  plt_dt$bin[plt_dt$bin>5*10^5] <- 50*10^5
+
+  p <- ggplot(plt_dt, aes(x=bin, y=Prob)) +
+  geom_point(color="cadetblue",size=6)+
+  geom_smooth(color="darksalmon") + scale_x_continuous(trans='log10') +
+  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + xlab("Physical distance (bp)") +
+  ylab("LD refinement score") +
+  theme(axis.text=element_text(size=12,angle = 45, vjust = 0.5, hjust=1),
+        axis.title=element_text(size=14)) + facet_wrap(~model) + ylim(0,0.65)
+
+  pdf(file=paste0(dir,"LDrefinement_germline.", region, ".pdf"),width=8,height=4)
+  print(p)
+  dev.off()
   return(res)
 }
 
@@ -351,7 +394,10 @@ colnames(meta) <-c("chr","pos","ref","alt","Dep","dep1","dep2","dep3","dep4",
 mutation_block <- SNV_block(summary=meta)
 svm_in <- SVM_prepare(mutation_block)
 svm_out <- SVM_train(label =svm_in,dir=outdir, region=region)
-final <- somaticLD(mat=dt, svm=svm_out)
+final <- somaticLD(mat=dt, svm=svm_out, dir=outdir, region=region)
+
+
+
 
 write.csv(final$LDrefine_somatic,   paste0(outdir,region,".putativeSNVs.csv"),quote=FALSE,row.names = FALSE)
 write.csv(final$LDrefine_germline2, paste0(outdir,region,".germlineTwoLoci_model.csv"),quote=FALSE, row.names = FALSE)
