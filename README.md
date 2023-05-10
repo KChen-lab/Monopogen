@@ -1110,7 +1110,6 @@ Lines   total/split/realigned/skipped:  1593789/42248/4781/0
 [2023-05-08 11:12:18,811] INFO     Monopogen.py Success! See instructions above.
 ```
 Finally, we can run the LD refinment step to further improve the putative somatic SNV detection as (taking ~3 mins) 
-
 ```
 python  ${path}/src/Monopogen.py  somatic  \
     -a   ${path}/apps  -r  region.lst  -t 50 \
@@ -1121,7 +1120,7 @@ After running the `LDrefinment` step, there would be three key files `chr20.puta
  
 <image src="./example/maester.chr20_LDrefinement_germline.png" width="600"> 
 
-Users can filter putative somatic SNVs based on the file `chr20.putativeSNVs.csv` with column `POS>0.5 & POS<0.99` (This is the prediction score from the SVM module. Closing to 0 has higher probability of sequencing error while closing to 1 has higher probabilites of germline SNVs) and `p_LDrefine>0.25` (This is from the LDrefinement score. Closing to 0 is germline SNVs and closing to 0.5 is more likely the putative somatic SNVs). The `NA` values in `p_LDrefine` column denotes that there are no germline SNVs tagged on putative somatic SNVs. 
+Users can filter putative somatic SNVs based on the file `chr20.putativeSNVs.csv` with column `POS>0.5 & POS<0.99` and `p_LDrefine>0.25`. The `POS` score is the prediction score from the SVM module. Closing to 0 has higher probability of sequencing error while closing to 1 has higher probabilites of germline SNVs. The `p_LDrefine` is from the LDrefinement module. Closing to 0 is germline SNVs and closing to 0.5 is more likely the putative somatic SNVs). The `NA` values in `p_LDrefine` column denotes that there are no germline SNVs tagged on putative somatic SNVs. 
 ```
 chr	pos	ref	alt	Dep	dep1	dep2	dep3	dep4	genotype	QS	VDB	RPB	MQB	BQB	MQSB	SGB	MQ0F	region	POS	NEG	p_twoLoci	p_trioLoci	p_LDrefine	p_twoLoci_adj	p_trioLoci_adj
 chr20	425837	A	G	103	3	95	0	4	.|.	0.51	0.97	0.43	0.08	0.96	0.99	-0.56	0	5	0.07	0.93	0.70	0.80	0.20	0.30	0.20
