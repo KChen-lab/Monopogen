@@ -165,25 +165,30 @@ def bamSplit(para):
 	infile = pysam.AlignmentFile(bam_filter,"rb")
 	# Note to change the read groups 
 	tp =infile.header.to_dict()
+	if len(tp['RG'])>1:
+		tp['RG']= [tp['RG'][0]]
 	tp['RG'][0]['SM'] = cell
 	tp['RG'][0]['ID'] = cell
+	cnt = 0
 	outfile =  pysam.AlignmentFile( out + "/Bam/split_bam/" + chr + "_" + cell  + ".bam", "wb", header=tp)
 	for s in infile:
 		t  = robust_get_tag(s,"CB")
 		if not t=="NotFound":
 			if t==cell:
 				outfile.write(s)
+				cnt = cnt +1 
 		else:
 			if re.search(cell, s.query_name):
 				outfile.write(s)
+				cnt = cnt + 1
 	
 	outfile.close()
 	infile.close()
 	cmd=samtools + " index " + out + "/Bam/split_bam/" + chr + "_" + cell + ".bam"
 	#runCMD(cmd,args)
 	os.system(samtools + " index " + out + "/Bam/split_bam/" + chr + "_" + cell + ".bam")
-	#bamlist.write(out + "/Bam/split_bam/" + chr+ "_" + cell + ".bam" + "\n")
-	#bamlist.close()
+
+	return(cnt)
 
 def jointCall(para):
 
@@ -213,7 +218,7 @@ def vcf2mat(para):
 	para_lst = para.strip().split(">")
 	region = para_lst[0]
 	out = para_lst[1]
-	vcf_in = VariantFile(out + "/somatic/" +  region + ".cell.gl.vcf.gz") 
+	vcf_in = pysam.VariantFile(out + "/somatic/" +  region + ".cell.gl.vcf.gz") 
 	mat_out = gzip.open(out + "/somatic/" +  region + ".gl.filter.hc.cell.mat.gz","wt")
 	meta_info = {}
 	phase_info = {}
@@ -225,6 +230,13 @@ def vcf2mat(para):
 			meta_info[id] = line
 			phase_info[id] = data[9]
 	n = len(list((vcf_in.header.samples)))
+
+
+	with open(out + "/somatic/" +  region + ".cell.txt",'wt') as fp:
+		for line in list(vcf_in.header.samples):
+			fp.write(line + "\n")
+	fp.close()
+
 	var_lst = {}
 	cnt = 0
 	for rec in vcf_in.fetch():
@@ -267,7 +279,7 @@ def vcf2mat(para):
 					a[i] = str(ref)+"/"+str(alt)
 				mat_out.write('\t'.join(a))
 				mat_out.write('\n')
-	print(cnt)
+
 	mat_out.close()
 	vcf_in.close()
     
@@ -280,5 +292,6 @@ def LDrefinement(para):
 	outdir = out+"/somatic/"
 	cellfile = out+"/somatic/"+region+".gl.filter.hc.cell.mat.gz"
 	cmd = "Rscript " + app_path + "/../src/LDrefinement.R  " + cellfile + " " + outdir + " " + region 
+	print(cmd)
 	os.system(cmd)
 
