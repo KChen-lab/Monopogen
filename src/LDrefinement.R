@@ -9,8 +9,7 @@ mat_gz <- args[1]
 outdir <- args[2]
 region <- args[3]
 
-
-
+### count SNV chuck regions that no germline SNVs included.
 SNV_block <-function(summary=NULL){
 	block <- 1
 	last <- ".|."
@@ -28,7 +27,7 @@ SNV_block <-function(summary=NULL){
 	return(summary)
 }
 
-
+### generate positive and negative labels based on position distribution 
 SVM_prepare <-function(x=NULL){
 	svm<-list()
 	region_cnt <- table(x$region)
@@ -41,6 +40,7 @@ SVM_prepare <-function(x=NULL){
 	return(svm)
 }
 
+### SVM trainning on 8 features, some features may not informative (depending on sequencing platforms) 
 SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 
 	features <-c("QS", "VDB", "SGB", "RPB", "MQB", "MQSB", "BQB", "MQ0F")
@@ -90,6 +90,7 @@ SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 	label$test$NEG <- prob$NEG
 	return(label)
 }
+
 
 twoloci <- function(mat=NULL, germIndex=NULL, somaticIndex=NULL,dis=NULL){
   
@@ -255,6 +256,7 @@ calcP <- function(twoloci = NULL, trioloci=NULL, somaticIndex = NULL){
     p3 <- weigthedP(dis=dis, match=match, table=table3)
     out$p_3[out$SomaticID==i] <- p3
   }
+
   for(i in seq(1,nrow(out),1)){
     if(!is.na(out$p_2[i]) &  !is.na(out$p_3[i])){
       out$p_final[i] <- (out$p_2[i] + out$p_3[i])/2
@@ -273,7 +275,7 @@ calcP <- function(twoloci = NULL, trioloci=NULL, somaticIndex = NULL){
   return(res)
 }
 
-somaticLD <- function(mat=NULL, svm=NULL){
+somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL){
 
   mat <- as.data.frame(mat)
   allID <- paste0(mat$V1,mat$V2,mat$V3,mat$V4)
@@ -319,6 +321,7 @@ somaticLD <- function(mat=NULL, svm=NULL){
   res$svm <- svm
 
   # adjust the phasing information based on LD refinement score
+
   dt <- res$svm$test
 
   a <- dt$p_twoLoci
@@ -327,19 +330,30 @@ somaticLD <- function(mat=NULL, svm=NULL){
   a[flag_two] <- (1-a[flag_two])
   flag_trio <- which(b>0.5)
   b[flag_trio] <-(1-b[flag_trio])
-  dt$p_twoLoci_adj <- a
-  dt$p_trioLoci_adj <- b
+
+  # adjust based on their phasing information 
+  dt$p_twoLoci <- a
+  dt$p_trioLoci <- b
   dt$p_LDrefine <- NA
   for(i in seq(1,nrow(dt),1)){
      if(is.na(a[i])){a[i]<-10}
      if(is.na(b[i])){b[i]<-10}
-     dt$p_LDrefine[i] <- min(a[i],b[i])
+     dt$p_LDrefine[i] <- (a[i]+b[i])*0.5
      if(dt$p_LDrefine[i]>1){
       dt$p_LDrefine[i] <- NA
      }
   }
+  
+
+  baf <- (dt$dep3+dt$dep4)/(dt$dep1+dt$dep2+dt$dep3+dt$dep4)
+  res$out <- data.frame("chr"=dt$chr,"pos"=dt$pos,"Ref_allele"=dt$ref,
+    "Alt_allele"=dt$alt,"Depth_total"=dt$Dep,"Depth_ref"=dt$dep1+dt$dep2,
+    "Depth_alt"=dt$dep3+dt$dep4, "SVM_pos_score"=dt$POS, "LDrefine_twoLoci_score"=dt$p_twoLoci,
+    "LDrefine_trioLoci_score"=dt$p_trioLoci, "LDrefine_merged_score"=dt$p_LDrefine,
+    "BAF_alt"=baf)
+  rownames(res$out) <- paste0(res$out$chr,":",res$out$pos,":", res$out$Ref_allele,":", res$out$Alt_allele)
   res$svm$test <- dt
-  res$LDrefine_somatic <- res$svm$test 
+  res$LDrefine_somatic <- res$out
   res$LDrefine_germline2 <- LDrefine$table2
   res$LDrefine_germline3 <- LDrefine$table3
 
@@ -359,7 +373,6 @@ panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) 
   ylab("LD refinement score") +
   theme(axis.text=element_text(size=12,angle = 45, vjust = 0.5, hjust=1),
         axis.title=element_text(size=14)) + facet_wrap(~model) + ylim(0,0.65)
-
   pdf(file=paste0(dir,"LDrefinement_germline.", region, ".pdf"),width=8,height=4)
   print(p)
   dev.off()
@@ -383,6 +396,10 @@ panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) 
 dt <- fread(mat_gz)
 dt <- data.frame(dt)
 dt$V10[is.na(dt$V10)] <- ".|."
+rownames(dt) <- paste0(dt$V1,":",dt$V2,":",dt$V3,":",dt$V4)
+
+cellName <- read.table(file=paste0(outdir,region,".cell.txt"),header=F)
+
 for(j in seq(11,18,1)){
   dt[,j] <- as.numeric(dt[,j])
 }
@@ -394,11 +411,14 @@ colnames(meta) <-c("chr","pos","ref","alt","Dep","dep1","dep2","dep3","dep4",
 mutation_block <- SNV_block(summary=meta)
 svm_in <- SVM_prepare(mutation_block)
 svm_out <- SVM_train(label =svm_in,dir=outdir, region=region)
+
 final <- somaticLD(mat=dt, svm=svm_out, dir=outdir, region=region)
 
 
-
+mut_mat <- dt[rownames(final$out),]
+colnames(mut_mat) <-c(colnames(meta),cellName[,1])
 
 write.csv(final$LDrefine_somatic,   paste0(outdir,region,".putativeSNVs.csv"),quote=FALSE,row.names = FALSE)
 write.csv(final$LDrefine_germline2, paste0(outdir,region,".germlineTwoLoci_model.csv"),quote=FALSE, row.names = FALSE)
 write.csv(final$LDrefine_germline3, paste0(outdir,region,".germlineTrioLoci_model.csv"),quote=FALSE, row.names = FALSE)
+saveRDS(mut_mat, file=paste0(outdir,region,".SNV_mat.RDS"))
