@@ -1124,7 +1124,7 @@ Users can filter putative somatic SNVs based on the key file `chr20.putativeSNVs
 
 <image src="./example/SNV_finalOut.png" width="600">
 
-Users can also extract the reads covering putative SNVs at the single cell resolution from `chr20.SNV_mat.RDS`. Starting from column 19, each column denotes one cell. In each element, `1/0` denotes there is at least one read supporting reference allele and no read supporting alternative allele.
+Users can also extract the reads covering putative SNVs at the single cell resolution from `chr20.SNV_mat.RDS`. Starting from column 19, each column denotes one cell. In each element (for example `1/0`), the number denotes whether there is read supporting reference/alternative allele. 
 ```
 R
 > dt < - readRDS(file="chr20.SNV_mat.RDS")
