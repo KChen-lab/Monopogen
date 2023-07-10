@@ -1121,10 +1121,8 @@ After running the `LDrefinment` step, there would be three key files `chr20.puta
 <image src="./example/maester.chr20_LDrefinement_germline.png" width="600"> 
 
 Users can filter putative somatic SNVs based on the file `chr20.putativeSNVs.csv` with column `SVM_pos_score>0.5` and `LDrefine_merged_score>0.25` and `BAF_alt<0.3`. The `SVM_pos_score` is the prediction score from the SVM module. Closing to 0 has higher probability of sequencing error. The `LDrefine_merged_score` is from the LDrefinement module. Closing to 0 is germline SNVs and closing to 0.5 is more likely the putative somatic SNVs. The `NA` values in `LDrefine_merged_score` column denotes that there are no informative germline SNVs tagging the putative somatic SNVs. 
-```
-<image src="./example/SNV_finalOut.png" width="600">
 
-```
+<image src="./example/SNV_finalOut.png" width="600">
  
 ## FAQs 
 * ***where to download 1KG3 reference panel (hg38)***
