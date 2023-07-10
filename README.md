@@ -1123,7 +1123,22 @@ After running the `LDrefinment` step, there would be three key files `chr20.puta
 Users can filter putative somatic SNVs based on the file `chr20.putativeSNVs.csv` with column `SVM_pos_score>0.5` and `LDrefine_merged_score>0.25` and `BAF_alt<0.3`. The `SVM_pos_score` is the prediction score from the SVM module. Closing to 0 has higher probability of sequencing error. The `LDrefine_merged_score` is from the LDrefinement module. Closing to 0 is germline SNVs and closing to 0.5 is more likely the putative somatic SNVs. The `NA` values in `LDrefine_merged_score` column denotes that there are no informative germline SNVs tagging the putative somatic SNVs. 
 
 <image src="./example/SNV_finalOut.png" width="600">
- 
+
+Users can also extract the reads covering putative SNVs at the single cell resolution from `chr20.SNV_mat.RDS`. Starting from column 19, each column denotes one cell. In each element, `1/0` denotes there is at least one read supporting reference allele and no read supporting alternative allele.
+```
+R
+> dt < - readRDS(file="chr20.SNV_mat.RDS")
+> dt[,seq(19,21,1))]
+                 ATGACCAGTCACTAGT ACCCTTGGTCTCACAA TCCTCCCCAATACCTG
+chr20:276310:A:G              0/0              0/0              0/0
+chr20:391901:A:G              0/0              0/0              0/0
+chr20:410498:T:C              1/0              0/0              0/0
+chr20:410520:A:T              1/0              0/0              0/0
+chr20:436781:A:G              0/0              0/0              0/0
+
+```
+
+
 ## FAQs 
 * ***where to download 1KG3 reference panel (hg38)***
   http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/
