@@ -149,6 +149,9 @@ def somatic(args):
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(bamSplit, joblst)
 
+		if sum(result)==0:
+			logger.error("No reads detected for cells in " + args.barcode + ". Please check 1) the input cell barcode file is matched with bam file; 2) the cell barcode name has the same format shown in bam file. For example XX-1!")
+			
 		# generate the bam file list 
 		for chr in chr_lst:
 			cell_bam = open(out + "/Bam/split_bam/cell" + chr + ".bam.lst","w")
