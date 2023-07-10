@@ -1120,22 +1120,31 @@ After running the `LDrefinment` step, there would be three key files `chr20.puta
  
 <image src="./example/maester.chr20_LDrefinement_germline.png" width="600"> 
 
-Users can filter putative somatic SNVs based on the file `chr20.putativeSNVs.csv` with column `POS>0.5 & POS<0.99` and `p_LDrefine>0.25`. The `POS` score is the prediction score from the SVM module. Closing to 0 has higher probability of sequencing error while closing to 1 has higher probabilites of germline SNVs. The `p_LDrefine` is from the LDrefinement module. Closing to 0 is germline SNVs and closing to 0.5 is more likely the putative somatic SNVs. The `NA` values in `p_LDrefine` column denotes that there are no germline SNVs tagging the putative somatic SNVs. 
+Users can filter putative somatic SNVs based on the file `chr20.putativeSNVs.csv` with column `SVM_pos_score>0.5` and `LDrefine_merged_score>0.25` and `BAF_alt<0.3`. The `SVM_pos_score` is the prediction score from the SVM module. Closing to 0 has higher probability of sequencing error. The `LDrefine_merged_score` is from the LDrefinement module. Closing to 0 is germline SNVs and closing to 0.5 is more likely the putative somatic SNVs. The `NA` values in `LDrefine_merged_score` column denotes that there are no informative germline SNVs tagging the putative somatic SNVs. 
 ```
-chr	pos	ref	alt	Dep	dep1	dep2	dep3	dep4	genotype	QS	VDB	RPB	MQB	BQB	MQSB	SGB	MQ0F	region	POS	NEG	p_twoLoci	p_trioLoci	p_LDrefine	p_twoLoci_adj	p_trioLoci_adj
-chr20	425837	A	G	103	3	95	0	4	.|.	0.51	0.97	0.43	0.08	0.96	0.99	-0.56	0	5	0.07	0.93	0.70	0.80	0.20	0.30	0.20
-chr20	427055	A	G	442	0	429	0	6	.|.	0.01	0.99	0.96	1	0.94	NA	-0.62	0	5	0.04	0.96	NA	0.37	0.37	NA	0.37
-chr20	427069	A	G	388	0	378	0	7	.|.	0.05	0.98	0.46	1	0.94	NA	-0.64	0	5	0.02	0.98	NA	0.35	0.35	NA	0.35
-chr20	436781	A	G	112	70	23	17	0	.|.	0	0.84	0	1	0.98	1	-0.69	0	6	0.04	0.96	0.47	0.33	0.33	0.47	0.33
-chr20	438622	T	G	162	7	70	0	5	.|.	0.28	0.94	0.93	1	1	1	-0.59	0	7	0.12	0.88	NA	0.67	0.33	NA	0.33
-chr20	440781	A	G	59	20	7	31	0	.|.	0	0.47	0	0.98	0.92	1	-0.69	0	7	0.80	0.20	0.38	0.50	0.38	0.38	0.50
-chr20	442668	A	G	25	13	0	11	0	.|.	0	0.55	0	1	0.93	NA	-0.68	0	7	0.63	0.37	NA	0.50	0.50	NA	0.50
-chr20	444566	T	G	10	0	5	0	5	.|.	0.01	0.53	0.86	0.86	0.43	NA	-0.59	0	8	0.96	0.04	NA	NA	NA	NA	NA
-chr20	452769	A	G	12	5	2	5	0	.|.	0	0.57	0.9	0.51	0.95	0	-0.59	0	9	0.59	0.41	1.00	1.00	0.00	0.00	0.00
-chr20	452853	T	C	83	76	0	2	2	.|.	0.01	0.95	0.52	1	0.92	1	-0.56	0	9	0.08	0.92	0.26	0.50	0.26	0.26	0.50
-chr20	452987	T	C	182	167	3	4	0	.|.	0.25	0.98	0.34	0.88	0.85	0.41	-0.56	0	9	0.02	0.98	0.60	0.24	0.24	0.40	0.24
-chr20	476423	T	C	22	1	15	0	6	.|.	0.18	0.73	0.54	0.84	1	1	-0.62	0	10	0.46	0.54	0.44	0.50	0.44	0.44	0.50
-chr20	476737	T	C	29	5	15	0	9	.|.	0.04	0.69	0.09	1	0.98	1	-0.66	0	10	0.32	0.68	0.82	1.00	0.00	0.18	0.00
+chr	pos	Ref_allele	Alt_allele	Depth_total	Depth_ref	Depth_alt	SVM_pos_score	LDrefine_twoLoci_score	LDrefine_trioLoci_score	LDrefine_merged_score	BAF_alt
+chr20	276310	A	G	22	13	9	0.522	NA	NA	NA	0.409
+chr20	391901	A	G	9	5	4	0.977	NA	NA	NA	0.444
+chr20	410498	T	C	3736	3561	4	0.025	0.370	NA	NA	0.001
+chr20	410520	A	T	4999	4844	8	0.024	0.500	NA	NA	0.002
+chr20	436781	A	G	112	93	17	0.026	0.472	0.330	0.401	0.155
+chr20	438622	T	G	162	77	5	0.086	NA	0.333	NA	0.061
+chr20	440781	A	G	59	27	31	0.786	0.372	0.500	0.436	0.534
+chr20	442668	A	G	25	13	11	0.603	NA	0.500	NA	0.458
+chr20	444566	T	G	10	5	5	0.962	NA	NA	NA	0.500
+chr20	452769	A	G	12	7	5	0.536	0.000	0.000	0.000	0.417
+chr20	452853	T	C	83	76	4	0.053	0.294	0.333	0.314	0.050
+chr20	452987	T	C	182	170	4	0.011	0.400	0.224	0.312	0.023
+chr20	476423	T	C	22	16	6	0.436	0.440	0.500	0.470	0.273
+chr20	476737	T	C	29	20	9	0.279	0.184	0.000	0.092	0.310
+chr20	499511	A	G	20	6	13	0.991	0.000	NA	NA	0.684
+chr20	505471	T	C	17	11	6	0.349	0.500	0.494	0.497	0.353
+chr20	519062	A	G	68	63	4	0.026	0.426	0.242	0.334	0.060
+chr20	523648	T	C	103	87	7	0.029	0.486	0.333	0.410	0.074
+chr20	526833	T	C	17	10	5	0.267	0.000	0.000	0.000	0.333
+chr20	857263	T	A	78	72	4	0.025	0.400	0.500	0.450	0.053
+chr20	857268	C	G	78	73	4	0.025	0.400	0.500	0.450	0.052
+
 ```
  
 ## FAQs 
