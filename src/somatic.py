@@ -207,6 +207,9 @@ def jointCall(para):
 	cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL |" + bgzip +   " -c > " + out + "/somatic/" +  jobid + ".cell.gl.vcf.gz" 		
 	print(cmd1)
 	os.system(cmd1)
+	output = os.system(cmd1)
+	if output == 0:
+		return(chr)
 
 
 def less1(num):
@@ -282,6 +285,7 @@ def vcf2mat(para):
 
 	mat_out.close()
 	vcf_in.close()
+	return(region)
     
 
 def LDrefinement(para):
@@ -293,5 +297,7 @@ def LDrefinement(para):
 	cellfile = out+"/somatic/"+region+".gl.filter.hc.cell.mat.gz"
 	cmd = "Rscript " + app_path + "/../src/LDrefinement.R  " + cellfile + " " + outdir + " " + region 
 	print(cmd)
-	os.system(cmd)
+	output = os.system(cmd)
+	if output == 0:
+		return(region)
 
