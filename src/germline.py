@@ -184,11 +184,12 @@ def BamFilter(myargs):
 	tp =infile.header.to_dict()
 			
 	#print(tp)
+	#To avoid the format issue, we update the RG flag based on sample information
 
-	if not "RG" in tp:
-		sampleID = os.path.splitext(os.path.basename(myargs["bamFile"]))[0]
-		tp1 = [{'SM':sampleID,'ID':sampleID, 'LB':"0.1", 'PL':"ILLUMINA", 'PU':sampleID}]
-		tp.update({'RG': tp1})
+	#if not "RG" in tp:
+	sampleID = os.path.splitext(os.path.basename(myargs["bamFile"]))[0]
+	tp1 = [{'SM':sampleID,'ID':sampleID, 'LB':"0.1", 'PL':"ILLUMINA", 'PU':sampleID}]
+	tp.update({'RG': tp1})
 		#print(tp)
 		#tp['RG'][0]['SM'] = 
 		#tp['RG'][0]['ID'] = os.path.splitext(os.path.basename(args.bamFile))[0]
@@ -206,7 +207,6 @@ def BamFilter(myargs):
 			outfile.write(s)
 	infile.close()
 	outfile.close()
-	print("finished")
 
 	os.system(samtools + " index " +  out + "/Bam/" + id+ "_"  + chr + ".filter.bam")
 	if cnt ==0:
@@ -223,6 +223,7 @@ def robust_get_tag(read, tag_name):
 		return "NotFound"
 
 def runCMD(cmd):
-
-	os.system(cmd)
+	output = os.system(cmd)
+	if output == 0:
+		return(region)
 	#process = subprocess.run(cmd, shell=True, stdout=open(args.logfile, 'w'), stderr=open(args.logfile,'w'))

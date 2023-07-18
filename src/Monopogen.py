@@ -102,6 +102,8 @@ def germline(args):
 		with Pool(processes=args.nthreads) as pool:
 			print(joblst)
 			result = pool.map(runCMD, joblst)
+	error_check(all = region_lst, output = result, step = "germline module")
+
 
 def somatic(args):
 	
@@ -119,6 +121,7 @@ def somatic(args):
 				region = record[0] + ":" + record[1] + "-" + record[2]
 			chr_lst.append(record[0])
 			region_lst.append(region)
+	chr_lst = list(set(chr_lst))
 
 	if args.step=="featureInfo" or args.step=="all":
 		logger.info("Get feature information from sequencing data...")
@@ -129,7 +132,7 @@ def somatic(args):
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(featureInfo, joblst)
 		
-		chr_lst = list(set(chr_lst))
+		
 		joblst = []
 		for id in chr_lst:
 			joblst.append(id+">"+args.out+">"+args.app_path)
@@ -151,7 +154,9 @@ def somatic(args):
 
 		if sum(result)==0:
 			logger.error("No reads detected for cells in " + args.barcode + ". Please check 1) the input cell barcode file is matched with bam file; 2) the cell barcode name has the same format shown in bam file. For example XX-1!")
-			
+			logger.error("Failed! See instructions above.")
+			exit(1)
+
 		# generate the bam file list 
 		for chr in chr_lst:
 			cell_bam = open(out + "/Bam/split_bam/cell" + chr + ".bam.lst","w")
@@ -170,12 +175,15 @@ def somatic(args):
 			joblst.append(id+">"+chr+">"+args.out+">"+args.app_path+">"+args.reference)
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(jointCall, joblst)
+		error_check(all = region_lst, output = result, step = "cellScan")
+
 
 		joblst = []
 		for id in region_lst:
 			joblst.append(id+">"+args.out)
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(vcf2mat, joblst)
+		error_check(all = region_lst, output = result, step = "cellScan")
 
 	if args.step=="LDrefinement" or args.step=="all":
 		logger.info("Run LD refinement ...")
@@ -185,6 +193,24 @@ def somatic(args):
 			joblst.append(id+">"+args.out+">"+args.app_path)
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(LDrefinement, joblst)
+		error_check(all = region_lst, output = result, step = "LDrefinement")
+
+
+
+def error_check(all, output, step):
+		job_fail = 0
+		
+		for id in all:
+			if id not in output:
+				logger.error("In "+ step + " step " + id + " failed!")
+				job_fail = job_fail + 1
+
+		if job_fail > 0:
+			logger.error("Failed! See instructions above.")
+			exit(1)
+
+
+
 
 
 
@@ -330,6 +356,7 @@ def main():
 	bgzip = os.path.abspath(args.app_path) + "/bgzip"
 	java =  "java"
 	beagle = os.path.abspath(args.app_path) + "/beagle.27Jul16.86a.jar"
+
 
 	args.func(args)
 

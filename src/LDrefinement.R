@@ -275,7 +275,7 @@ calcP <- function(twoloci = NULL, trioloci=NULL, somaticIndex = NULL){
   return(res)
 }
 
-somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL){
+somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=2000){
 
   mat <- as.data.frame(mat)
   allID <- paste0(mat$V1,mat$V2,mat$V3,mat$V4)
@@ -301,82 +301,99 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL){
   mat[mat=="0/0"] <- "0|0"
   mat[mat=="0/1"] <- "0|1" 
   mat[mat=="1/0"] <- "1|0"
-  twoloci <- twoloci(mat=mat, germIndex=germlineIndex, somaticIndex = somaticIndex, dis=dis)
-  trioloci <- trioloci(mat=mat, germIndex=germlineIndex, somaticIndex = somaticIndex, dis=dis)
-  LDrefine <- calcP(twoloci = twoloci, trioloci =  trioloci, somaticIndex = somaticIndex)
-  LDrefine$somaticLD$marker <-  index[LDrefine$somaticLD$SomaticID]
-  tp <- paste0(svm$test$chr,svm$test$pos,svm$test$ref, svm$test$alt)
-  svm$test$p_twoLoci <- NA
-  svm$test$p_trioLoci <- NA
-  svm$test$p_LDrefine <- NA
-  for(i in seq(1,nrow(svm$test),1)){
-    pos <- which(LDrefine$somaticLD$marker==tp[i])
-    if(length(pos)>0){
-      svm$test$p_twoLoci[i] <- LDrefine$somaticLD$p_2[pos]
-      svm$test$p_trioLoci[i] <- LDrefine$somaticLD$p_3[pos]
-      svm$test$p_LDrefine[i] <- LDrefine$somaticLD$p_final[pos]
+
+  n_tol <-nrow(mat)
+  if(n_tol > min_size){
+
+    twoloci <- twoloci(mat=mat, germIndex=germlineIndex, somaticIndex = somaticIndex, dis=dis)
+    trioloci <- trioloci(mat=mat, germIndex=germlineIndex, somaticIndex = somaticIndex, dis=dis)
+    LDrefine <- calcP(twoloci = twoloci, trioloci =  trioloci, somaticIndex = somaticIndex)
+    LDrefine$somaticLD$marker <-  index[LDrefine$somaticLD$SomaticID]
+
+
+
+
+
+
+    tp <- paste0(svm$test$chr,svm$test$pos,svm$test$ref, svm$test$alt)
+    svm$test$p_twoLoci <- NA
+    svm$test$p_trioLoci <- NA
+    svm$test$p_LDrefine <- NA
+    for(i in seq(1,nrow(svm$test),1)){
+      pos <- which(LDrefine$somaticLD$marker==tp[i])
+      if(length(pos)>0){
+        svm$test$p_twoLoci[i] <- LDrefine$somaticLD$p_2[pos]
+        svm$test$p_trioLoci[i] <- LDrefine$somaticLD$p_3[pos]
+        svm$test$p_LDrefine[i] <- LDrefine$somaticLD$p_final[pos]
+      }
     }
+    res <- list()
+    res$svm <- svm
+
+    # adjust the phasing information based on LD refinement score
+
+    dt <- res$svm$test
+
+    a <- dt$p_twoLoci
+    b <- dt$p_trioLoci
+    flag_two <- which(a>0.5)
+    a[flag_two] <- (1-a[flag_two])
+    flag_trio <- which(b>0.5)
+    b[flag_trio] <-(1-b[flag_trio])
+
+    # adjust based on their phasing information 
+    dt$p_twoLoci <- a
+    dt$p_trioLoci <- b
+    dt$p_LDrefine <- NA
+    for(i in seq(1,nrow(dt),1)){
+       if(is.na(a[i])){a[i]<-10}
+       if(is.na(b[i])){b[i]<-10}
+       dt$p_LDrefine[i] <- (a[i]+b[i])*0.5
+       if(dt$p_LDrefine[i]>1){
+        dt$p_LDrefine[i] <- NA
+       }
+    }
+    
+
+    baf <- (dt$dep3+dt$dep4)/(dt$dep1+dt$dep2+dt$dep3+dt$dep4)
+    res$out <- data.frame("chr"=dt$chr,"pos"=dt$pos,"Ref_allele"=dt$ref,
+      "Alt_allele"=dt$alt,"Depth_total"=dt$Dep,"Depth_ref"=dt$dep1+dt$dep2,
+      "Depth_alt"=dt$dep3+dt$dep4, "SVM_pos_score"=dt$POS, "LDrefine_twoLoci_score"=dt$p_twoLoci,
+      "LDrefine_trioLoci_score"=dt$p_trioLoci, "LDrefine_merged_score"=dt$p_LDrefine,
+      "BAF_alt"=baf)
+    rownames(res$out) <- paste0(res$out$chr,":",res$out$pos,":", res$out$Ref_allele,":", res$out$Alt_allele)
+    res$svm$test <- dt
+    res$LDrefine_somatic <- res$out
+    res$LDrefine_germline2 <- LDrefine$table2
+    res$LDrefine_germline3 <- LDrefine$table3
+
+    table2 <- LDrefine$table2
+    table3 <- LDrefine$table3
+    table2$model <- "TwoLoci"
+    table3$model <- "TrioLoci"
+    plt_dt <- rbind(table2, table3)
+    plt_dt <- plt_dt[!is.na(plt_dt$tol),]
+    plt_dt$bin[plt_dt$bin>5*10^5] <- 50*10^5
+
+
+
+    p <- ggplot(plt_dt, aes(x=bin, y=Prob)) +
+    geom_point(color="cadetblue",size=6)+
+    geom_smooth(color="darksalmon") + scale_x_continuous(trans='log10') +
+    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + xlab("Physical distance (bp)") +
+    ylab("LD refinement score") +
+    theme(axis.text=element_text(size=12,angle = 45, vjust = 0.5, hjust=1),
+          axis.title=element_text(size=14)) + facet_wrap(~model) + ylim(0,0.65)
+    pdf(file=paste0(dir,"LDrefinement_germline.", region, ".pdf"),width=8,height=4)
+    print(p)
+    dev.off()
+    return(res)
   }
-  res <- list()
-  res$svm <- svm
-
-  # adjust the phasing information based on LD refinement score
-
-  dt <- res$svm$test
-
-  a <- dt$p_twoLoci
-  b <- dt$p_trioLoci
-  flag_two <- which(a>0.5)
-  a[flag_two] <- (1-a[flag_two])
-  flag_trio <- which(b>0.5)
-  b[flag_trio] <-(1-b[flag_trio])
-
-  # adjust based on their phasing information 
-  dt$p_twoLoci <- a
-  dt$p_trioLoci <- b
-  dt$p_LDrefine <- NA
-  for(i in seq(1,nrow(dt),1)){
-     if(is.na(a[i])){a[i]<-10}
-     if(is.na(b[i])){b[i]<-10}
-     dt$p_LDrefine[i] <- (a[i]+b[i])*0.5
-     if(dt$p_LDrefine[i]>1){
-      dt$p_LDrefine[i] <- NA
-     }
+  else{
+      print(paste0("the No.of germline SNVs in ", region, " are too small (<", min_size, ") to perform LD refinement..."))
+      quit(status = 1, save="no")
   }
-  
-
-  baf <- (dt$dep3+dt$dep4)/(dt$dep1+dt$dep2+dt$dep3+dt$dep4)
-  res$out <- data.frame("chr"=dt$chr,"pos"=dt$pos,"Ref_allele"=dt$ref,
-    "Alt_allele"=dt$alt,"Depth_total"=dt$Dep,"Depth_ref"=dt$dep1+dt$dep2,
-    "Depth_alt"=dt$dep3+dt$dep4, "SVM_pos_score"=dt$POS, "LDrefine_twoLoci_score"=dt$p_twoLoci,
-    "LDrefine_trioLoci_score"=dt$p_trioLoci, "LDrefine_merged_score"=dt$p_LDrefine,
-    "BAF_alt"=baf)
-  rownames(res$out) <- paste0(res$out$chr,":",res$out$pos,":", res$out$Ref_allele,":", res$out$Alt_allele)
-  res$svm$test <- dt
-  res$LDrefine_somatic <- res$out
-  res$LDrefine_germline2 <- LDrefine$table2
-  res$LDrefine_germline3 <- LDrefine$table3
-
-  table2 <- LDrefine$table2
-  table3 <- LDrefine$table3
-  table2$model <- "TwoLoci"
-  table3$model <- "TrioLoci"
-  plt_dt <- rbind(table2, table3)
-  plt_dt <- plt_dt[!is.na(plt_dt$tol),]
-  plt_dt$bin[plt_dt$bin>5*10^5] <- 50*10^5
-
-  p <- ggplot(plt_dt, aes(x=bin, y=Prob)) +
-  geom_point(color="cadetblue",size=6)+
-  geom_smooth(color="darksalmon") + scale_x_continuous(trans='log10') +
-  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + xlab("Physical distance (bp)") +
-  ylab("LD refinement score") +
-  theme(axis.text=element_text(size=12,angle = 45, vjust = 0.5, hjust=1),
-        axis.title=element_text(size=14)) + facet_wrap(~model) + ylim(0,0.65)
-  pdf(file=paste0(dir,"LDrefinement_germline.", region, ".pdf"),width=8,height=4)
-  print(p)
-  dev.off()
-  return(res)
 }
 
 
