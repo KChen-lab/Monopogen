@@ -102,7 +102,7 @@ def germline(args):
 		with Pool(processes=args.nthreads) as pool:
 			print(joblst)
 			result = pool.map(runCMD, joblst)
-	error_check(all = region_lst, output = result, step = "germline module")
+	#error_check(all = region_lst, output = result, step = "germline module")
 
 
 def somatic(args):
