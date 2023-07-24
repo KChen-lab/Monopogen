@@ -202,7 +202,7 @@ def jointCall(para):
 	bcftools = app_path + "/bcftools" 
 	bgzip = app_path + "/bgzip"
 	bam_filter = out + "/Bam/split_bam/cell" + chr + ".bam.lst"
-	cmd1 = samtools + " mpileup -b " + bam_filter + " -f "  + reference + " -r " +  jobid + " -q 20 -Q 20 -t DP4 -d 10000000 -v "
+	cmd1 = samtools + " mpileup -b " + bam_filter + " -f "  + reference + " -r " +  jobid + " -q 20 -Q 20 -t DP4 -d 10000 -v "
 	cmd1 = cmd1 + " | " + bcftools + " view " + " | "  + bcftools  + " norm -m-both -f " + reference 
 	cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL |" + bgzip +   " -c > " + out + "/somatic/" +  jobid + ".cell.gl.vcf.gz" 		
 	print(cmd1)
