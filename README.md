@@ -832,7 +832,7 @@ The output could be
 ```
 ### germline calling ###
 To detect putative somatic SNVs, we need to call germline module to build the LD refinement model. The required `region.lst` could be set as 
-
+(Note, only the whole chromosome calling is allowed!)
 ```
 less region.lst
 chr20
