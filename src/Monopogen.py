@@ -78,10 +78,10 @@ def germline(args):
 			cmd1 = cmd1 + " | " + bcftools + " view " + " | "  + bcftools  + " norm -m-both -f " + args.reference 
 			cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL |" + bgzip +   " -c > " + args.out + "/germline/" +  jobid + ".gl.vcf.gz" 
 			#cmd2 = bcftools + " view " +  out + "/germline/" +  jobid + ".gl.vcf.gz" + " -i 'FORMAT/DP>1' | " + bcftools + " call -cv  | " + bgzip +    "  -c > " +  args.out + "/SCvarCall/"  +  jobid + ".gt.vcf.gz"
-			cmd3 = java + " -Xmx20g -jar " + beagle +  " gl=" +  out + "/germline/" +  jobid + ".gl.vcf.gz"  +  " ref=" +  imputation_vcf   + "  chrom=" + record[0] + " out="   +  out + "/germline/" + jobid + ".gp " + "impute=false  modelscale=2  nthreads=1  gprobs=true  niterations=0"
+			cmd3 = java + " -Xmx20g -jar " + beagle +  " gl=" +  out + "/germline/" +  jobid + ".gl.vcf.gz"  +  " ref=" +  imputation_vcf   + "  chrom=" + record[0] + " out="   +  out + "/germline/" + jobid + ".gp " + "impute=false  modelscale=2  nthreads=24  gprobs=true  niterations=0"
 			
 			cmd4 = "zless -S " +  out + "/germline/" + jobid + ".gp.vcf.gz | grep -v  0/0  > " +  out + "/germline/" + jobid + ".germline.vcf"
-			cmd5 = java + " -Xmx20g -jar " + beagle +  " gt=" +  out + "/germline/" +  jobid + ".germline.vcf"  +  " ref=" +  imputation_vcf    +  "  chrom=" + record[0]  + " out="   +  out + "/germline/" + jobid+ ".phased " + "impute=false  modelscale=2  nthreads=1  gprobs=true  niterations=0"
+			cmd5 = java + " -Xmx20g -jar " + beagle +  " gt=" +  out + "/germline/" +  jobid + ".germline.vcf"  +  " ref=" +  imputation_vcf    +  "  chrom=" + record[0]  + " out="   +  out + "/germline/" + jobid+ ".phased " + "impute=false  modelscale=2  nthreads=24  gprobs=true  niterations=0"
 			f_out = open(out + "/Script/runGermline_" +  jobid +  ".sh","w")
 			if args.step == "varScan" or args.step == "all":
 				f_out.write(cmd1 + "\n")
@@ -132,7 +132,9 @@ def somatic(args):
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(featureInfo, joblst)
 		
+	if args.step=="cellScan" or args.step=="all":
 		
+		logger.info("Get single cell level information from sequencing data...")
 		joblst = []
 		for id in chr_lst:
 			joblst.append(id+">"+args.out+">"+args.app_path)
@@ -165,9 +167,6 @@ def somatic(args):
 			cell_bam.close()
 
 
-	if args.step=="cellScan" or args.step=="all":
-		logger.info("Get single cell level information from sequencing data...")
-
 		joblst = []
 		for id in region_lst:
 			record = id.strip().split(":")
@@ -175,7 +174,7 @@ def somatic(args):
 			joblst.append(id+">"+chr+">"+args.out+">"+args.app_path+">"+args.reference)
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(jointCall, joblst)
-		error_check(all = region_lst, output = result, step = "cellScan")
+		error_check(all = region_lst, output = result, step = "cellScan:joint calling")
 
 
 		joblst = []
@@ -183,7 +182,7 @@ def somatic(args):
 			joblst.append(id+">"+args.out)
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(vcf2mat, joblst)
-		error_check(all = region_lst, output = result, step = "cellScan")
+		error_check(all = region_lst, output = result, step = "cellScan:vcf2mat")
 
 	if args.step=="LDrefinement" or args.step=="all":
 		logger.info("Run LD refinement ...")
@@ -199,7 +198,6 @@ def somatic(args):
 
 def error_check(all, output, step):
 		job_fail = 0
-		
 		for id in all:
 			if id not in output:
 				logger.error("In "+ step + " step " + id + " failed!")

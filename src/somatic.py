@@ -19,8 +19,11 @@ from multiprocessing import Pool
 
 
 
-def withSNVs(invcf):
-	pysam.tabix_index(invcf, preset="vcf", force=True)
+def withSNVs(invcf, path):
+	print(invcf)
+	#pysam.tabix_index(invcf, preset="vcf", force=TRUE)
+	print(path)
+	os.system(path + "/tabix -p vcf " + invcf)
 	vcf = VariantFile(invcf) 
 	cnt = 0
 	for rec in vcf.fetch():
@@ -58,17 +61,16 @@ def validate_user_setting_somatic(args):
 			phased_vcf = args.out + "/germline/" + jobid + ".phased.vcf.gz" 
 			assert os.path.isfile(bam_filter), "The bam list file {} cannot be found! Please run germline module".format(bam_filter)
 			assert os.path.isfile(gl_vcf), "The *.gl.vcf.gz file {} cannot be found! Please run germline module".format(gl_vcf)
-			if withSNVs(gl_vcf)==0:
-				print("The *.gl.vcf.gz file {} cannot be found! Maybe there are no markers detected in ".format(gl_vcf))
-			if withSNVs(phased_vcf)==0:
-				print("The *.phased.vcf.gz file {} cannot be found! Maybe there are no markers detected in this region?".format(phased_vcf))
+			#if withSNVs(gl_vcf, args.app_path)==0:
+			#	print("The *.gl.vcf.gz file {} cannot be found! Maybe there are no markers detected in ".format(gl_vcf))
+			#if withSNVs(phased_vcf, args.app_path)==0:
+			#	print("The *.phased.vcf.gz file {} cannot be found! Maybe there are no markers detected in this region?".format(phased_vcf))
 			assert os.path.isfile(args.barcode), "The cell barcode file {} cannot be found!".format(args.barcode)
 
 
 def getInfo_robust(rec, info):
 
 	info_dt =  rec.info.get(info)
-
 	if type(info_dt) is not type(None):
 		if not isinstance(info_dt,float):
 			info_dt = info_dt[0]
@@ -190,6 +192,7 @@ def bamSplit(para):
 
 	return(cnt)
 
+
 def jointCall(para):
 
 	para_lst = para.strip().split(">")
@@ -206,10 +209,22 @@ def jointCall(para):
 	cmd1 = cmd1 + " | " + bcftools + " view " + " | "  + bcftools  + " norm -m-both -f " + reference 
 	cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL |" + bgzip +   " -c > " + out + "/somatic/" +  jobid + ".cell.gl.vcf.gz" 		
 	print(cmd1)
-	os.system(cmd1)
 	output = os.system(cmd1)
+
+	# delete the bam files once snv calling was finished in specfic regions
+	f = open(bam_filter, "r")
+	for x in f:
+		x = x.strip()
+		os.system("rm " + x)
+		os.system("rm " + x + ".bai")		
+	f.close()
+
 	if output == 0:
-		return(chr)
+		return(jobid)
+
+
+
+
 
 
 def less1(num):
@@ -287,7 +302,6 @@ def vcf2mat(para):
 	vcf_in.close()
 	return(region)
     
-
 def LDrefinement(para):
 	para_lst = para.strip().split(">")
 	region = para_lst[0]

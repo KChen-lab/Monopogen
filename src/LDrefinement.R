@@ -275,7 +275,7 @@ calcP <- function(twoloci = NULL, trioloci=NULL, somaticIndex = NULL){
   return(res)
 }
 
-somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=2000){
+somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=50){
 
   mat <- as.data.frame(mat)
   allID <- paste0(mat$V1,mat$V2,mat$V3,mat$V4)
@@ -304,16 +304,10 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=2000)
 
   n_tol <-nrow(mat)
   if(n_tol > min_size){
-
     twoloci <- twoloci(mat=mat, germIndex=germlineIndex, somaticIndex = somaticIndex, dis=dis)
     trioloci <- trioloci(mat=mat, germIndex=germlineIndex, somaticIndex = somaticIndex, dis=dis)
     LDrefine <- calcP(twoloci = twoloci, trioloci =  trioloci, somaticIndex = somaticIndex)
     LDrefine$somaticLD$marker <-  index[LDrefine$somaticLD$SomaticID]
-
-
-
-
-
 
     tp <- paste0(svm$test$chr,svm$test$pos,svm$test$ref, svm$test$alt)
     svm$test$p_twoLoci <- NA
@@ -355,6 +349,7 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=2000)
     }
     
 
+
     baf <- (dt$dep3+dt$dep4)/(dt$dep1+dt$dep2+dt$dep3+dt$dep4)
     res$out <- data.frame("chr"=dt$chr,"pos"=dt$pos,"Ref_allele"=dt$ref,
       "Alt_allele"=dt$alt,"Depth_total"=dt$Dep,"Depth_ref"=dt$dep1+dt$dep2,
@@ -374,7 +369,6 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=2000)
     plt_dt <- rbind(table2, table3)
     plt_dt <- plt_dt[!is.na(plt_dt$tol),]
     plt_dt$bin[plt_dt$bin>5*10^5] <- 50*10^5
-
 
 
     p <- ggplot(plt_dt, aes(x=bin, y=Prob)) +
