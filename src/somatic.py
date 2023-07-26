@@ -55,6 +55,8 @@ def validate_user_setting_somatic(args):
 				jobid = record[0]
 			if(len(record)==3):
 				jobid = record[0] + ":" + record[1] + "-" + record[2]
+				logger.error("Only the whole chromsome calling is allowed!")
+				exit(1)
 			bam_filter = args.out + "/Bam/" +  record[0] +  ".filter.bam.lst"
 			gl_vcf = args.out + "/germline/" + jobid + ".gl.vcf.gz"
 			gp_vcf = args.out + "/germline/" + jobid + ".germline.vcf.gz" 
