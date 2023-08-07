@@ -123,6 +123,18 @@ def somatic(args):
 			region_lst.append(region)
 	chr_lst = list(set(chr_lst))
 
+	# sort chr IDs from 1...22
+	chr_lst_sort = []
+	for i in range(1, 23):
+		i = str(i)
+		if  i in chr_lst:
+			chr_lst_sort.append(i)
+		i_chr = "chr"+i 
+		if  i_chr in chr_lst:
+			chr_lst_sort.append(i_chr)
+	chr_lst = chr_lst_sort 
+
+
 	if args.step=="featureInfo" or args.step=="all":
 		logger.info("Get feature information from sequencing data...")
 		
@@ -141,15 +153,27 @@ def somatic(args):
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(bamExtract, joblst)
 
+		####### merge bams from different chromosomes 
+
+		bamlst = []
+		print(chr_lst)
+		for chr in chr_lst:
+			bam_filter =  out + "/Bam/" + chr + ".filter.targeted.bam"
+			bamlst.append(bam_filter)
+		print(bamlst)
+		output_bam = out + "/Bam/merge.filter.targeted.bam"
+		pysam.merge("-f","-o",output_bam,*bamlst)
+		os.system(samtools + " index " + output_bam)
+
+
 		os.system("mkdir -p " + out + "/Bam/split_bam/")
 		cell_clst = pd.read_csv(args.barcode)   
 		df = pd.DataFrame(cell_clst, columns= ['cell','id'])
 		cell_lst = df['cell'].unique()
 		joblst = []
 
-		for chr in chr_lst:
-			for cell in cell_lst:
-				para = chr + ":" + cell + ":" + args.out + ":" + args.app_path
+		for cell in cell_lst:
+				para = "merge" + ":" + cell + ":" + args.out + ":" + args.app_path
 				joblst.append(para)
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(bamSplit, joblst)
@@ -160,11 +184,10 @@ def somatic(args):
 			exit(1)
 
 		# generate the bam file list 
-		for chr in chr_lst:
-			cell_bam = open(out + "/Bam/split_bam/cell" + chr + ".bam.lst","w")
-			for cell in cell_lst:
-				cell_bam.write(out + "/Bam/split_bam/" + chr + "_" + cell + ".bam\n")
-			cell_bam.close()
+		cell_bam = open(out + "/Bam/split_bam/cell.bam.lst","w")
+		for cell in cell_lst:
+			cell_bam.write(out + "/Bam/split_bam/" + cell + ".bam\n")
+		cell_bam.close()
 
 
 		joblst = []

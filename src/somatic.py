@@ -163,10 +163,11 @@ def bamSplit(para):
 	cell = para_lst[1]
 	out = para_lst[2]
 	app_path = para_lst[3]
-	bam_filter =  out + "/Bam/" + chr + ".filter.targeted.bam"
+
 	#assert os.path.isfile(bam_filter), "*.fiter.targeted.bam file {} cannot be found!".format(bam_filter)
-	samtools = app_path + "/samtools" 	
-	infile = pysam.AlignmentFile(bam_filter,"rb")
+	samtools = app_path + "/samtools" 
+	output_bam =  out + "/Bam/merge.filter.targeted.bam" 
+	infile = pysam.AlignmentFile(output_bam,"rb")
 	# Note to change the read groups 
 	tp =infile.header.to_dict()
 	if len(tp['RG'])>1:
@@ -174,7 +175,7 @@ def bamSplit(para):
 	tp['RG'][0]['SM'] = cell
 	tp['RG'][0]['ID'] = cell
 	cnt = 0
-	outfile =  pysam.AlignmentFile( out + "/Bam/split_bam/" + chr + "_" + cell  + ".bam", "wb", header=tp)
+	outfile =  pysam.AlignmentFile( out + "/Bam/split_bam/" + cell  + ".bam", "wb", header=tp)
 	for s in infile:
 		t  = robust_get_tag(s,"CB")
 		if not t=="NotFound":
@@ -188,9 +189,9 @@ def bamSplit(para):
 	
 	outfile.close()
 	infile.close()
-	cmd=samtools + " index " + out + "/Bam/split_bam/" + chr + "_" + cell + ".bam"
+	cmd=samtools + " index " + out + "/Bam/split_bam/" + cell + ".bam"
 	#runCMD(cmd,args)
-	os.system(samtools + " index " + out + "/Bam/split_bam/" + chr + "_" + cell + ".bam")
+	os.system(samtools + " index " + out + "/Bam/split_bam/" + cell + ".bam")
 
 	return(cnt)
 
@@ -206,7 +207,7 @@ def jointCall(para):
 	samtools = app_path + "/samtools" 
 	bcftools = app_path + "/bcftools" 
 	bgzip = app_path + "/bgzip"
-	bam_filter = out + "/Bam/split_bam/cell" + chr + ".bam.lst"
+	bam_filter = out + "/Bam/split_bam/cell" + ".bam.lst"
 	cmd1 = samtools + " mpileup -b " + bam_filter + " -f "  + reference + " -r " +  jobid + " -q 20 -Q 20 -t DP4 -d 10000 -v "
 	cmd1 = cmd1 + " | " + bcftools + " view " + " | "  + bcftools  + " norm -m-both -f " + reference 
 	cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL |" + bgzip +   " -c > " + out + "/somatic/" +  jobid + ".cell.gl.vcf.gz" 		
@@ -223,10 +224,6 @@ def jointCall(para):
 
 	if output == 0:
 		return(jobid)
-
-
-
-
 
 
 def less1(num):
@@ -316,4 +313,3 @@ def LDrefinement(para):
 	output = os.system(cmd)
 	if output == 0:
 		return(region)
-
