@@ -1158,7 +1158,7 @@ chr20:436781:A:G              0/0              0/0              0/0
  
 ## Citation
 
-[Dou J, Tan Y, Kock KH, Wang J, Cheng X, Tan LM, Han KY, Hon CC, Park WY, Shin JW, Jin H. Single-nucleotide variant calling in single-cell sequencing data with Monopogen. Nature Biotechnology. 2023 Aug 17:1-0](https://www.nature.com/articles/s41587-023-01873-x)
+[Dou J, Tan Y, Kock KH, Wang J, Cheng X, Tan LM, Han KY, Hon CC, Park WY, Shin JW, Jin H, H Chen, L Ding, S Prabhakar, N Navin. K Chen. Single-nucleotide variant calling in single-cell sequencing data with Monopogen. Nature Biotechnology. 2023 Aug 17:1-0](https://www.nature.com/articles/s41587-023-01873-x)
 
 
 
