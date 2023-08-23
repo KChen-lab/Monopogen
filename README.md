@@ -841,7 +841,7 @@ Users also need to preprare for following files `CCDG_14151_B01_GRM_WGS_2020-08-
 
 ```
 ${path}/src/Monopogen.py  germline  -a ${path}/apps  -r region.lst \
- -p ./ \
+ -p ./  -t 22 \
  -g  GRCh38.chr20.fa  -m 3 -s all  -o bm
 ```
 This will take ~ 25 mins with output as 
@@ -1095,7 +1095,7 @@ Then, we need to collect single cell level read information by running the `cell
 
 ```
 python  ${path}/src/Monopogen.py  somatic  \
-    -a   ${path}/apps  -r  region.lst  -t 50 \
+    -a   ${path}/apps  -r  region.lst  -t 22  -w 10MB \
     -i  bm  -l  CB_7K.maester_scRNA.csv   -s cellScan     \
     -g   GRCh38.chr20.fa
 ```
@@ -1112,7 +1112,7 @@ Lines   total/split/realigned/skipped:  1593789/42248/4781/0
 Finally, we can run the LD refinment step to further improve the putative somatic SNV detection as (taking ~3 mins) 
 ```
 python  ${path}/src/Monopogen.py  somatic  \
-    -a   ${path}/apps  -r  region.lst  -t 50 \
+    -a   ${path}/apps  -r  region.lst  -t 22 \
     -i  bm  -l  CB_7K.maester_scRNA.csv   -s LDrefinement     \
     -g   GRCh38.chr20.fa
 ```
