@@ -105,6 +105,21 @@ def germline(args):
 	#error_check(all = region_lst, output = result, step = "germline module")
 
 
+
+def sort_chr(chr_lst):
+	# sort chr IDs from 1...22
+	chr_lst_sort = []
+	for i in range(1, 23):
+		i = str(i)
+		if  i in chr_lst:
+			chr_lst_sort.append(i)
+		i_chr = "chr"+i 
+		if  i_chr in chr_lst:
+			chr_lst_sort.append(i_chr)
+	chr_lst = chr_lst_sort 
+	return chr_lst
+
+
 def somatic(args):
 	
 	validate_user_setting_somatic(args)
@@ -123,17 +138,7 @@ def somatic(args):
 			region_lst.append(region)
 	chr_lst = list(set(chr_lst))
 
-	# sort chr IDs from 1...22
-	chr_lst_sort = []
-	for i in range(1, 23):
-		i = str(i)
-		if  i in chr_lst:
-			chr_lst_sort.append(i)
-		i_chr = "chr"+i 
-		if  i_chr in chr_lst:
-			chr_lst_sort.append(i_chr)
-	chr_lst = chr_lst_sort 
-
+	
 
 	if args.step=="featureInfo" or args.step=="all":
 		logger.info("Get feature information from sequencing data...")
@@ -147,75 +152,110 @@ def somatic(args):
 	if args.step=="cellScan" or args.step=="all":
 		
 		logger.info("Get single cell level information from sequencing data...")
-		joblst = []
-		for id in chr_lst:
-			joblst.append(id+">"+args.out+">"+args.app_path)
-		with Pool(processes=args.nthreads) as pool:
-			result = pool.map(bamExtract, joblst)
+		
+		chr_lst = sort_chr(chr_lst)
 
-		####### merge bams from different chromosomes 
+		run = 1
+		if run:
+			joblst = []
+			for id in chr_lst:
+				joblst.append(id+">"+args.out+">"+args.app_path)
+			with Pool(processes=args.nthreads) as pool:
+				result = pool.map(bamExtract, joblst)
 
-		bamlst = []
-		print(chr_lst)
-		for chr in chr_lst:
-			bam_filter =  out + "/Bam/" + chr + ".filter.targeted.bam"
-			bamlst.append(bam_filter)
-		print(bamlst)
-		output_bam = out + "/Bam/merge.filter.targeted.bam"
-		pysam.merge("-f","-o",output_bam,*bamlst)
-		os.system(samtools + " index " + output_bam)
+			####### merge bams from different chromosomes 
+			bamlst = []
+			print(chr_lst)
+			for chr in chr_lst:
+				bam_filter =  out + "/Bam/" + chr + ".filter.targeted.bam"
+				bamlst.append(bam_filter)
+			print(bamlst)
+			output_bam = out + "/Bam/merge.filter.targeted.bam"
+			pysam.merge("-f","-o",output_bam,*bamlst)
+			os.system(samtools + " index " + output_bam)
+
+		if run:
+			os.system("mkdir -p " + out + "/Bam/split_bam/")
+			cell_clst = pd.read_csv(args.barcode)   
+			df = pd.DataFrame(cell_clst, columns= ['cell','id'])
+			cell_lst = df['cell'].unique()
+			joblst = []
+
+			for cell in cell_lst:
+					para = "merge" + ":" + cell + ":" + args.out + ":" + args.app_path
+					joblst.append(para)
+
+			with Pool(processes=args.nthreads) as pool:
+				result = pool.map(bamSplit, joblst)
+
+			if sum(result)==0:
+				logger.error("No reads detected for cells in " + args.barcode + ". Please check 1) the input cell barcode file is matched with bam file; 2) the cell barcode name has the same format shown in bam file. For example XX-1!")
+				logger.error("Failed! See instructions above.")
+				exit(1)
+
+			# generate the bam file list 
+			cell_bam = open(out + "/Bam/split_bam/cell.bam.lst","w")
+			for cell in cell_lst:
+				cell_bam.write(out + "/Bam/split_bam/" + cell + ".bam\n")
+			cell_bam.close()
 
 
-		os.system("mkdir -p " + out + "/Bam/split_bam/")
-		cell_clst = pd.read_csv(args.barcode)   
-		df = pd.DataFrame(cell_clst, columns= ['cell','id'])
-		cell_lst = df['cell'].unique()
-		joblst = []
-
-		for cell in cell_lst:
-				para = "merge" + ":" + cell + ":" + args.out + ":" + args.app_path
-				joblst.append(para)
-		with Pool(processes=args.nthreads) as pool:
-			result = pool.map(bamSplit, joblst)
-
-		if sum(result)==0:
-			logger.error("No reads detected for cells in " + args.barcode + ". Please check 1) the input cell barcode file is matched with bam file; 2) the cell barcode name has the same format shown in bam file. For example XX-1!")
-			logger.error("Failed! See instructions above.")
-			exit(1)
-
-		# generate the bam file list 
-		cell_bam = open(out + "/Bam/split_bam/cell.bam.lst","w")
-		for cell in cell_lst:
-			cell_bam.write(out + "/Bam/split_bam/" + cell + ".bam\n")
-		cell_bam.close()
-
+		region_lst = []
+		if args.winSize=="10MB":
+			region_file = args.app_path + "/../resource/GRCh38.region.10MB.lst"
+		if args.winSize=="50MB":
+			region_file = args.app_path + "/../resource/GRCh38.region.50MB.lst"
+		with open(region_file) as f_in:
+			for line in f_in:
+				record = line.strip().split(",")
+				if(len(record)==1):
+				 	region = record[0]
+				if(len(record)==3):
+					region = record[0] + ":" + record[1] + "-" + record[2]
+				if record[0] in chr_lst:
+					region_lst.append(region)
 
 		joblst = []
 		for id in region_lst:
 			record = id.strip().split(":")
 			chr = record[0]
 			joblst.append(id+">"+chr+">"+args.out+">"+args.app_path+">"+args.reference)
+
+
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(jointCall, joblst)
 		error_check(all = region_lst, output = result, step = "cellScan:joint calling")
 
 
+		##### merge vcfs from multiple regions 
+	
+		for id in chr_lst:
+			tp = ""
+			for reg in region_lst:
+				if re.search(id+":", reg):
+					tp = tp + " " + args.out+"/somatic/" +  reg + ".cell.gl.vcf.gz"
+			cmd = args.app_path + "/bcftools concat -o " + args.out+"/somatic/" +  id + ".cell.gl.vcf.gz " +  tp + " -O z"
+			print(cmd)
+			output = os.system(cmd)
+
 		joblst = []
-		for id in region_lst:
+		for id in chr_lst:
 			joblst.append(id+">"+args.out)
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(vcf2mat, joblst)
-		error_check(all = region_lst, output = result, step = "cellScan:vcf2mat")
+		error_check(all = chr_lst, output = result, step = "cellScan:vcf2mat")
+
+
 
 	if args.step=="LDrefinement" or args.step=="all":
 		logger.info("Run LD refinement ...")
 
 		joblst = []
-		for id in region_lst:
+		for id in chr_lst:
 			joblst.append(id+">"+args.out+">"+args.app_path)
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(LDrefinement, joblst)
-		error_check(all = region_lst, output = result, step = "LDrefinement")
+		error_check(all = chr_lst, output = result, step = "LDrefinement")
 
 
 
@@ -229,10 +269,6 @@ def error_check(all, output, step):
 		if job_fail > 0:
 			logger.error("Failed! See instructions above.")
 			exit(1)
-
-
-
-
 
 
 
@@ -341,13 +377,16 @@ def main():
 	parser_somatic.add_argument('-i', '--input-folder', required=True,
 								help="The output folder from previous germline module")
 	parser_somatic.add_argument('-r', '--region', required= True, 
-								help="The genome region for variant calling")
+								help="The chromosome IDs for variant calling. Each chromosomes in one row.")
 	parser_somatic.add_argument('-l', '--barcode', required= True, 
 								help="The csv file including cell barcode information")
 	parser_somatic.add_argument('-a', '--app-path', required=True,
 								help="The app library paths used in the tool")
-	parser_somatic.add_argument('-t', '--nthreads', required=False, type=int, default=1,
+	parser_somatic.add_argument('-t', '--nthreads', required=False, type=int, default=22,
 								help="Number of jobs used for SNV calling") 
+	parser_somatic.add_argument('-w', '--winSize', required=False,  default="10MB",
+								choices=['10MB','50MB'],
+								help="Split the chromosome into small segments for cell level sequencing information collection. Setting 10MB will generate more jobs but be faster") 
 	parser_somatic.add_argument('-s', '--step', required=True,
 								choices=['featureInfo', 'cellScan' , 'LDrefinement', 'monovar', 'all'],
 								help="Run germline variant calling step by step")
