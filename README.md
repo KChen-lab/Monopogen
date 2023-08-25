@@ -46,7 +46,10 @@ The output of `Monopogen` will enable 1) ancestry identificaiton on single cell 
 * data.table(R package; version >=1.14.8)
 * e1071 (R package; 1.7-13)
 * ggplot2
-  
+
+**!Note**
+If you meet errors when running Monopogen, go to [FAQs](#faqs) section. 
+
 **Installation**
   
 Right now Monopogen is avaiable on github, you can install it through github 
@@ -1155,7 +1158,7 @@ chr20:436781:A:G              0/0              0/0              0/0
   You may set the read/write permission on the folder `xx/apps` as  
   
   `chmod 770 -R  /xx/apps`
-* ***[mpileup] fail to load index for xx/Bam/split_bam/chr20_xx.bam; Failed to open -: unknown file type***
+* ***[mpileup] fail to load index for xx/Bam/split_bam/chr20_xx.bam; Failed to open -: unknown file type***  
   In this step, Monopogen needs to open bam files from multiple cells. This happens because the server has limit open file limit. You can check by typing
   
   `ulimit -n `
