@@ -293,79 +293,7 @@ target samples:          1
 Window 1 [ chr20:60291-64332055 ]
 reference markers:   31534
 target markers:      31531
-
-Starting burn-in iterations
-
-Window=1 Iteration=1
-Time for building model:         2 minutes 8 seconds
-Time for sampling (singles):     24 seconds
-DAG statistics
-mean edges/level: 52     max edges/level: 123
-mean edges/node:  1.169  mean count/edge: 123
-
-Window=1 Iteration=2
-Time for building model:         2 minutes 18 seconds
-Time for sampling (singles):     26 seconds
-DAG statistics
-mean edges/level: 52     max edges/level: 124
-mean edges/node:  1.157  mean count/edge: 123
-
-Window=1 Iteration=3
-Time for building model:         2 minutes 23 seconds
-Time for sampling (singles):     25 seconds
-DAG statistics
-mean edges/level: 52     max edges/level: 125
-mean edges/node:  1.158  mean count/edge: 123
-
-Window=1 Iteration=4
-Time for building model:         2 minutes 17 seconds
-Time for sampling (singles):     24 seconds
-DAG statistics
-mean edges/level: 52     max edges/level: 129
-mean edges/node:  1.158  mean count/edge: 123
-
-Window=1 Iteration=5
-Time for building model:         2 minutes 11 seconds
-Time for sampling (singles):     25 seconds
-DAG statistics
-mean edges/level: 52     max edges/level: 126
-mean edges/node:  1.158  mean count/edge: 123
-
-Window=1 Iteration=6
-Time for building model:         2 minutes 8 seconds
-Time for sampling (singles):     37 seconds
-DAG statistics
-mean edges/level: 52     max edges/level: 124
-mean edges/node:  1.157  mean count/edge: 123
-
-Window=1 Iteration=7
-Time for building model:         2 minutes 10 seconds
-Time for sampling (singles):     35 seconds
-DAG statistics
-mean edges/level: 52     max edges/level: 122
-mean edges/node:  1.158  mean count/edge: 123
-
-Window=1 Iteration=8
-Time for building model:         2 minutes 13 seconds
-Time for sampling (singles):     37 seconds
-DAG statistics
-mean edges/level: 52     max edges/level: 124
-mean edges/node:  1.156  mean count/edge: 123
-
-Window=1 Iteration=9
-Time for building model:         2 minutes 13 seconds
-Time for sampling (singles):     35 seconds
-DAG statistics
-mean edges/level: 52     max edges/level: 128
-mean edges/node:  1.158  mean count/edge: 123
-
-Window=1 Iteration=10
-Time for building model:         2 minutes 15 seconds
-Time for sampling (singles):     36 seconds
-DAG statistics
-mean edges/level: 52     max edges/level: 120
-mean edges/node:  1.158  mean count/edge: 123
-
+...
 Number of reference markers:     31534
 Number of target markers:        31531
 Total time for building model: 22 minutes 17 seconds
@@ -407,70 +335,7 @@ Time for sampling (singles):     0 seconds
 DAG statistics
 mean edges/level: 51     max edges/level: 122
 mean edges/node:  1.206  mean count/edge: 126
-
-Window=1 Iteration=2
-Time for building model:         1 minute 31 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 50     max edges/level: 115
-mean edges/node:  1.194  mean count/edge: 128
-
-Window=1 Iteration=3
-Time for building model:         1 minute 29 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 50     max edges/level: 124
-mean edges/node:  1.194  mean count/edge: 128
-
-Window=1 Iteration=4
-Time for building model:         1 minute 30 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 50     max edges/level: 117
-mean edges/node:  1.194  mean count/edge: 128
-
-Window=1 Iteration=5
-Time for building model:         1 minute 18 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 50     max edges/level: 119
-mean edges/node:  1.193  mean count/edge: 128
-
-Window=1 Iteration=6
-Time for building model:         1 minute 20 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 50     max edges/level: 116
-mean edges/node:  1.194  mean count/edge: 128
-
-Window=1 Iteration=7
-Time for building model:         1 minute 19 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 50     max edges/level: 124
-mean edges/node:  1.192  mean count/edge: 128
-
-Window=1 Iteration=8
-Time for building model:         1 minute 20 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 50     max edges/level: 119
-mean edges/node:  1.194  mean count/edge: 128
-
-Window=1 Iteration=9
-Time for building model:         1 minute 23 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 50     max edges/level: 121
-mean edges/node:  1.192  mean count/edge: 128
-
-Window=1 Iteration=10
-Time for building model:         1 minute 21 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 50     max edges/level: 117
-mean edges/node:  1.193  mean count/edge: 128
-
+...
 Number of markers:               23755
 Total time for building model: 14 minutes 0 seconds
 Total time for sampling:       2 seconds
@@ -611,14 +476,6 @@ INFO    2023-04-26 01:45:15     LiftoverVcf
 [Wed Apr 26 01:45:15 CDT 2023] Executing as jdou1@ldragon2 on Linux 3.10.0-1160.15.2.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_312-b07; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.26.10
 INFO    2023-04-26 01:45:15     LiftoverVcf     Loading up the target reference genome.
 INFO    2023-04-26 01:45:16     LiftoverVcf     Lifting variants over and sorting (not yet writing the output file.)
-WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr3 that is not part of the target reference.
-WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr22 that is not part of the target reference.
-WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr9_gl000198_random that is not part of the target reference.
-WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chrUn_gl000241 that is not part of the target reference.
-WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr4 that is not part of the target reference.
-WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr14 that is not part of the target reference.
-WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr8 that is not part of the target reference.
-WARNING 2023-04-26 01:45:16     LiftoverVcf     Encountered a contig, chr12 that is not part of the target reference.
 INFO    2023-04-26 01:45:16     LiftoverVcf     Processed 23755 variants.
 INFO    2023-04-26 01:45:16     LiftoverVcf     184 variants failed to liftover.
 INFO    2023-04-26 01:45:16     LiftoverVcf     99 variants lifted over but had mismatching reference alleles after lift over.
@@ -651,49 +508,7 @@ Available Options
                           --peopleExcludeID [], --peopleExcludeFile []
             Site Filter : --rangeList [], --rangeFile []
       Auxilary Function : --keepDuplication, --updateID []
-Skip duplicated variant site:  [ 1      2257207 .       C       T ]
-Skip duplicated variant site:  [ 1      42276367        .       A       T ]
-Skip duplicated variant site:  [ 1      144952346       .       G       A ]
-Skip duplicated variant site:  [ 1      156706559       .       A       G ]
-Skip duplicated variant site:  [ 1      220986516       .       C       T ]
-Skip duplicated variant site:  [ 1      237281500       .       G       T ]
-Skip duplicated variant site:  [ 2      42518616        .       C       G ]
-Skip duplicated variant site:  [ 2      191267889       .       G       C ]
-Skip duplicated variant site:  [ 3      65996570        .       T       C ]
-Skip duplicated variant site:  [ 4      42593642        .       G       T ]
-Skip duplicated variant site:  [ 4      89850542        .       T       C ]
-Skip duplicated variant site:  [ 4      162791383       .       T       C ]
-Skip duplicated variant site:  [ 5      146778988       .       C       G ]
-Skip duplicated variant site:  [ 6      77761603        .       G       A ]
-Skip duplicated variant site:  [ 6      148867757       .       T       C ]
-Skip duplicated variant site:  [ 7      746451  .       A       G ]
-Skip duplicated variant site:  [ 7      2605905 .       C       G ]
-Skip duplicated variant site:  [ 7      7845898 .       T       C ]
-Skip duplicated variant site:  [ 7      16667686        .       A       T ]
-Skip duplicated variant site:  [ 7      26868032        .       A       G ]
-Skip duplicated variant site:  [ 7      39209642        .       C       G ]
-Skip duplicated variant site:  [ 7      97890297        .       C       A ]
-Skip duplicated variant site:  [ 7      129431052       .       C       A ]
-Skip duplicated variant site:  [ 7      133500313       .       A       T ]
-Skip duplicated variant site:  [ 8      1210501 .       T       G ]
-Skip duplicated variant site:  [ 8      2703064 .       A       C ]
-Skip duplicated variant site:  [ 8      19239747        .       A       G ]
-Skip duplicated variant site:  [ 8      32449785        .       C       T ]
-Skip duplicated variant site:  [ 8      107142923       .       G       C ]
-Skip duplicated variant site:  [ 8      119585345       .       G       C ]
-Skip duplicated variant site:  [ 9      95864623        .       C       A ]
-Skip duplicated variant site:  [ 10     89084826        .       C       G ]
-Skip duplicated variant site:  [ 11     746992  .       T       G ]
-Skip duplicated variant site:  [ 11     7441194 .       T       A ]
-Skip duplicated variant site:  [ 11     9904151 .       C       T ]
-Skip duplicated variant site:  [ 11     12934969        .       A       C ]
-Skip duplicated variant site:  [ 11     82934026        .       C       T ]
-Skip duplicated variant site:  [ 12     123882977       .       G       C ]
-Skip duplicated variant site:  [ 12     133493988       .       C       G ]
-Skip duplicated variant site:  [ 13     107948877       .       C       G ]
-Skip duplicated variant site:  [ 15     35071084        .       A       T ]
-Skip duplicated variant site:  [ 16     3508704 .       C       G ]
-Skip duplicated variant site:  [ 17     15420960        .       T       A ]
+...
 Skip duplicated variant site:  [ 18     56371446        .       C       G ]
 Skip duplicated variant site:  [ 18     77922913        .       A       C ]
 Skip duplicated variant site:  [ 19     1489460 .       C       T ]
@@ -809,28 +624,6 @@ The output could be
 [2023-05-07 08:37:50,307] INFO     germline.py --max_mismatch = [3]
 [2023-05-07 08:37:50,307] INFO     germline.py --nthreads = [1]
 [2023-05-07 08:37:50,336] DEBUG    Monopogen.py PreProcessing sample bm
-[2023-05-07 08:37:50,615] INFO     germline.py The contig chr1 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:50,712] INFO     germline.py The contig chr2 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:50,775] INFO     germline.py The contig chr3 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:50,835] INFO     germline.py The contig chr4 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:50,894] INFO     germline.py The contig chr5 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:50,957] INFO     germline.py The contig chr6 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,019] INFO     germline.py The contig chr7 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,079] INFO     germline.py The contig chr8 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,144] INFO     germline.py The contig chr9 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,203] INFO     germline.py The contig chr10 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,261] INFO     germline.py The contig chr11 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,318] INFO     germline.py The contig chr12 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,379] INFO     germline.py The contig chr13 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,442] INFO     germline.py The contig chr14 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,502] INFO     germline.py The contig chr15 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,558] INFO     germline.py The contig chr16 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,616] INFO     germline.py The contig chr17 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,674] INFO     germline.py The contig chr18 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,733] INFO     germline.py The contig chr19 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:37:51,797] INFO     germline.py The contig chr20 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:40:36,298] INFO     germline.py The contig chr21 does not contain the prefix 'chr' and we will add 'chr' on it
-[2023-05-07 08:40:36,362] INFO     germline.py The contig chr22 does not contain the prefix 'chr' and we will add 'chr' on it
 [2023-05-07 08:40:36,538] INFO     Monopogen.py Success! See instructions above.
 ```
 ### germline calling ###
@@ -900,70 +693,7 @@ Time for sampling (singles):     7 seconds
 DAG statistics
 mean edges/level: 49     max edges/level: 129
 mean edges/node:  1.183  mean count/edge: 131
-
-Window=1 Iteration=2
-Time for building model:         40 seconds
-Time for sampling (singles):     7 seconds
-DAG statistics
-mean edges/level: 48     max edges/level: 124
-mean edges/node:  1.167  mean count/edge: 133
-
-Window=1 Iteration=3
-Time for building model:         37 seconds
-Time for sampling (singles):     7 seconds
-DAG statistics
-mean edges/level: 49     max edges/level: 125
-mean edges/node:  1.164  mean count/edge: 131
-
-Window=1 Iteration=4
-Time for building model:         39 seconds
-Time for sampling (singles):     7 seconds
-DAG statistics
-mean edges/level: 48     max edges/level: 122
-mean edges/node:  1.166  mean count/edge: 133
-
-Window=1 Iteration=5
-Time for building model:         39 seconds
-Time for sampling (singles):     7 seconds
-DAG statistics
-mean edges/level: 48     max edges/level: 119
-mean edges/node:  1.167  mean count/edge: 133
-
-Window=1 Iteration=6
-Time for building model:         44 seconds
-Time for sampling (singles):     11 seconds
-DAG statistics
-mean edges/level: 48     max edges/level: 121
-mean edges/node:  1.166  mean count/edge: 133
-
-Window=1 Iteration=7
-Time for building model:         37 seconds
-Time for sampling (singles):     11 seconds
-DAG statistics
-mean edges/level: 48     max edges/level: 132
-mean edges/node:  1.167  mean count/edge: 133
-
-Window=1 Iteration=8
-Time for building model:         39 seconds
-Time for sampling (singles):     11 seconds
-DAG statistics
-mean edges/level: 48     max edges/level: 125
-mean edges/node:  1.168  mean count/edge: 133
-
-Window=1 Iteration=9
-Time for building model:         35 seconds
-Time for sampling (singles):     10 seconds
-DAG statistics
-mean edges/level: 48     max edges/level: 133
-mean edges/node:  1.165  mean count/edge: 133
-
-Window=1 Iteration=10
-Time for building model:         40 seconds
-Time for sampling (singles):     11 seconds
-DAG statistics
-mean edges/level: 48     max edges/level: 134
-mean edges/node:  1.167  mean count/edge: 133
-
+...
 Number of markers:               10486
 Total time for building model: 6 minutes 31 seconds
 Total time for sampling:       1 minute 30 seconds
@@ -1004,70 +734,7 @@ Time for sampling (singles):     0 seconds
 DAG statistics
 mean edges/level: 48     max edges/level: 123
 mean edges/node:  1.203  mean count/edge: 133
-
-Window=1 Iteration=2
-Time for building model:         31 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 48     max edges/level: 129
-mean edges/node:  1.183  mean count/edge: 133
-
-Window=1 Iteration=3
-Time for building model:         29 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 47     max edges/level: 123
-mean edges/node:  1.184  mean count/edge: 136
-
-Window=1 Iteration=4
-Time for building model:         32 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 47     max edges/level: 119
-mean edges/node:  1.185  mean count/edge: 136
-
-Window=1 Iteration=5
-Time for building model:         30 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 48     max edges/level: 123
-mean edges/node:  1.183  mean count/edge: 133
-
-Window=1 Iteration=6
-Time for building model:         30 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 47     max edges/level: 128
-mean edges/node:  1.184  mean count/edge: 136
-
-Window=1 Iteration=7
-Time for building model:         29 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 47     max edges/level: 125
-mean edges/node:  1.184  mean count/edge: 136
-
-Window=1 Iteration=8
-Time for building model:         33 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 47     max edges/level: 123
-mean edges/node:  1.185  mean count/edge: 136
-
-Window=1 Iteration=9
-Time for building model:         28 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 48     max edges/level: 127
-mean edges/node:  1.183  mean count/edge: 133
-
-Window=1 Iteration=10
-Time for building model:         33 seconds
-Time for sampling (singles):     0 seconds
-DAG statistics
-mean edges/level: 47     max edges/level: 118
-mean edges/node:  1.186  mean count/edge: 136
-
+...
 Number of markers:                9130
 Total time for building model: 5 minutes 3 seconds
 Total time for sampling:       1 second
