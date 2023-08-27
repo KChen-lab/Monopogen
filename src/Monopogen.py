@@ -384,7 +384,7 @@ def main():
 								help="The app library paths used in the tool")
 	parser_somatic.add_argument('-t', '--nthreads', required=False, type=int, default=22,
 								help="Number of jobs used for SNV calling") 
-	parser_somatic.add_argument('-w', '--winSize', required=False,  default="10MB",
+	parser_somatic.add_argument('-w', '--winSize', required=False,  default="50MB",
 								choices=['10MB','50MB'],
 								help="Split the chromosome into small segments for cell level sequencing information collection. Setting 10MB will generate more jobs but be faster") 
 	parser_somatic.add_argument('-s', '--step', required=True,
