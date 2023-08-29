@@ -830,7 +830,8 @@ chr20:436781:A:G              0/0              0/0              0/0
   
   `ulimit -n `
 
-  If the number is smaller than the cells in your study, please change the maximum of the open files
+  If the number is smaller than the cells in your study, please change the maximum of the open files.
+  If the file number opened is still large, you can set smaller value on the option `-t` in the `cellScan` step (such as 5). In such case, only 5 regions were processed simultaneously.
  
 ## Citation
 
