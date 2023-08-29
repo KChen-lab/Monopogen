@@ -155,7 +155,7 @@ def somatic(args):
 		
 		chr_lst = sort_chr(chr_lst)
 
-		run = 0
+		run = 1
 		if run:
 			joblst = []
 			for id in chr_lst:
