@@ -179,9 +179,10 @@ def somatic(args):
 			cell_clst = pd.read_csv(args.barcode)   
 			df = pd.DataFrame(cell_clst, columns= ['cell','id'])
 			df = df.sort_values(by=['id'])
-			dis = np.cumsum(df['id'])/np.sum(df['id'])
-			N = sum(dis>(1-args_keep))
-			df = df.iloc[-(N):]
+			if args.keep < 1:
+				dis = np.cumsum(df['id'])/np.sum(df['id'])
+				N = sum(dis>(1-args.keep))
+				df = df.iloc[-(N):]
 			cell_lst = df['cell'].unique()
 			joblst = []
 
