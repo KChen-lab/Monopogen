@@ -155,7 +155,7 @@ def somatic(args):
 		
 		chr_lst = sort_chr(chr_lst)
 
-		run = 1
+		run = 0
 		if run:
 			joblst = []
 			for id in chr_lst:
@@ -178,6 +178,10 @@ def somatic(args):
 			os.system("mkdir -p " + out + "/Bam/split_bam/")
 			cell_clst = pd.read_csv(args.barcode)   
 			df = pd.DataFrame(cell_clst, columns= ['cell','id'])
+			df = df.sort_values(by=['id'])
+			dis = np.cumsum(df['id'])/np.sum(df['id'])
+			N = sum(dis>(1-args_keep))
+			df = df.iloc[-(N):]
 			cell_lst = df['cell'].unique()
 			joblst = []
 
@@ -380,6 +384,8 @@ def main():
 								help="The chromosome IDs for variant calling. Each chromosomes in one row.")
 	parser_somatic.add_argument('-l', '--barcode', required= True, 
 								help="The csv file including cell barcode information")
+	parser_somatic.add_argument('-k', '--keep', required= False, default=0.8,
+								help="The proportion of reads kept for somatic calling. The cell will be sorted based on reads detected and cells with fewer reads will be removed.")
 	parser_somatic.add_argument('-a', '--app-path', required=True,
 								help="The app library paths used in the tool")
 	parser_somatic.add_argument('-t', '--nthreads', required=False, type=int, default=22,
