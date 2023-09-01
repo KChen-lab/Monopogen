@@ -107,7 +107,7 @@ def validate_user_setting_germline(args):
 
 
 def check_dependencies(args):
-	programs_to_check = ("vcftools", "bgzip",  "bcftools", "beagle.08Feb22.fa4.jar", "beagle.27Jul16.86a.jar","samtools","picard.jar", "java")
+	programs_to_check = ("vcftools", "bgzip",  "bcftools", "beagle.27Jul16.86a.jar","samtools", "java")
 
 	for prog in programs_to_check:
 		out = os.popen("command -v {}".format(args.app_path + "/" + prog)).read()
