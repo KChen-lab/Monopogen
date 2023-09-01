@@ -48,7 +48,7 @@ The output of `Monopogen` will enable 1) ancestry identificaiton on single cell 
 * ggplot2
 
 **!Note**
-We have put the binary compatibility tools including samtools, bcftools, beagle in the app folder. We fixed the version of such tools because the output formats vary a lot with different versions. If you are not able to run them, you can compile them in you system. We only test on these tools on following versions: 
+We have put the binary compatibility tools including samtools, bcftools, beagle in the app folder. We fixed the version because the output formats vary a lot with different versions. If you are not able to run them, you can compile them in you system. We only test on these tools on following versions: 
 
 * samtools Version: 1.2 (using htslib 1.2.1)
 * bcftools Version: 1.8 (using htslib 1.8)
