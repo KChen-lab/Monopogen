@@ -48,6 +48,7 @@ SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 	label$pos[label$pos=="None"] <- NA
 	# using median values to replace the missing values 
 	train_x_pos <- impute(as.matrix(data.matrix(label$pos[,features])), what="median")
+	train_x_pos[is.na(train_x_pos)] <- 0
 
 	# using the minior value of QS 
 	vec <- train_x_pos[,colnames(train_x_pos)=="QS"]
@@ -57,6 +58,7 @@ SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 	label$neg <- as.data.frame(label$neg)
 	label$neg[label$neg=="None"] <- NA
 	train_x_neg <- impute(as.matrix(data.matrix(label$neg[,features])), what="median")
+	train_x_neg[is.na(train_x_neg)] <- 0
 	vec <- train_x_neg[,colnames(train_x_neg)=="QS"]
 	vec[vec>0.5] <- 1- vec[vec>0.5]
 	train_x_neg[,1] <- vec
@@ -64,6 +66,7 @@ SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 	label$test <- as.data.frame(label$test)
 	label$test[label$test=="None"] <- NA
 	test_x <- impute(as.matrix(data.matrix(label$test[,features])), what="median")
+	test_x[is.na(test_x)] <- 0
 	vec <- test_x[,colnames(test_x)=="QS"]
 	vec[vec>0.5] <- 1- vec[vec>0.5]
 	test_x[,1] <- vec
