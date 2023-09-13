@@ -31,7 +31,8 @@ SNV_block <-function(summary=NULL){
 SVM_prepare <-function(x=NULL){
 	svm<-list()
 	region_cnt <- table(x$region)
-	filter <- names(region_cnt)[region_cnt>=4]
+	### SNV hot-spot regions (including multi-alleles) ###
+	filter <- names(region_cnt)[region_cnt>=2]
 	neg <- x[(x$region%in% filter & x$genotype==".|."),]
 	pos <- x[!x$genotype==".|.",]
 	svm$neg <- neg 
