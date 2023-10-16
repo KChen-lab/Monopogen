@@ -213,7 +213,7 @@ less bam.lst
 ```
 The output is 
 ```
-19D013.snRNA.chr20.bam
+19D013,19D013.snRNA.chr20.bam
 ```
 ```
 less region.lst
