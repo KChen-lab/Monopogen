@@ -22,7 +22,7 @@
 [//]: # (END automated TOC section, any edits will be overwritten on next source refresh)
 
 ## Introduction
-**Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges, scDNA-seq, etc. 
+**Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technologies, scDNA-seq, etc. 
 
 <image src="./example/Fig1.png" width="600"> 
   
@@ -498,7 +498,7 @@ INFO    2023-04-26 01:45:16     LiftoverVcf     Writing out sorted records to fi
 [Wed Apr 26 01:45:16 CDT 2023] picard.vcf.LiftoverVcf done. Elapsed time: 0.02 minutes.
 Runtime.totalMemory()=2058354688
 ```
-***Given SNVs from chr20 only are not enough to identify individual ancestry, we provided the VCF files [19D013.phased.GRCh37.vcf.gz](https://drive.google.com/file/d/1ckSChCh4iWdicqBWRp0uq0trW2BgWD4w/view?usp=share_link) by mering all 22 chromosomes.*** Users can run other chromosome using the same way as we did . Then we can run `TRACE` to project `19D013` on HGDP panel 
+***Given SNVs from chr20 only are not enough to identify individual ancestry, we provided the VCF files [19D013.phased.GRCh37.vcf.gz](https://drive.google.com/file/d/1ckSChCh4iWdicqBWRp0uq0trW2BgWD4w/view?usp=share_link) by merging all 22 chromosomes.*** Users can run other chromosome using the same way as we did. Then we can run `TRACE` to project `19D013` on HGDP panel 
 ```
 zless -S ./retina/germline/19D013.phased.GRCh37.vcf.gz  | awk '{gsub(/\chr/, "")}1'  > 19D013.trace.vcf
 /rsrch1/bcb/kchen_group/ytan1/LASER-2.04/vcf2geno/vcf2geno --inVcf 19D013.trace.vcf  --out 19D013.trace
