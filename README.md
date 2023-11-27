@@ -22,16 +22,16 @@
 [//]: # (END automated TOC section, any edits will be overwritten on next source refresh)
 
 ## Introduction
-**Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges, scDNA-seq etc. 
+**Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technoloiges, scDNA-seq, etc. 
 
 <image src="./example/Fig1.png" width="600"> 
   
 It is composed of three modules: 
-* **Data preprocess**. This module removes reads with high alignment mismatches from single cell sequencing and also makes data formats compatiable with Monopongen.
-* **Germline SNV calling**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel(such as 1KG3, TopMed) to improve both SNV calling accuracy and detection sensitivity. 
-* **Putative somatic SNV calling**. We extended the machinery of LD refinement from human population level to cell population level. We statistically phase the observed alleles with adjacent germline alleles to estimate the degree of LD, taking into consideration widespread sparseness and allelic dropout in single-cell sequencing data, and calculated a probabilistic score as an indicator of somatic SNVs.  The putative somatic SNVs are further genotyped at cell type/cluster level from `Monovar` developed in [Ken chen's lab](https://github.com/KChen-lab/MonoVar).
+* **Data preprocessing**. This module removes reads with high alignment mismatches from single cell sequencing and also makes data formats compatible with Monopogen.
+* **Germline SNV calling**. Given the sparsity of single cell sequencing data, we leverage linkage disequilibrium (LD) from external reference panel (such as 1KG3, TopMed) to improve both SNV calling accuracy and detection sensitivity. 
+* **Putative somatic SNV calling**. We extend the machinery of LD refinement from human population level to cell population level. We statistically phase the observed alleles with adjacent germline alleles to estimate the degree of LD, taking into consideration widespread sparseness and allelic dropout in single-cell sequencing data, and calculate a probabilistic score as an indicator of somatic SNVs. The putative somatic SNVs are further genotyped at cell type/cluster level from `Monovar` developed in [Ken chen's lab](https://github.com/KChen-lab/MonoVar).
 
-The output of `Monopogen` will enable 1) ancestry identificaiton on single cell samples; 2) genome-wide association study on the celluar level if sample size is sufficient, and 3) putative somatic SNV investigation.
+The output of `Monopogen` will enable 1) ancestry identification on single cell samples; 2) genome-wide association study at the cellular level if sample size is sufficient, and 3) putative somatic SNV investigation.
 
 ## Installation
 **Dependencies**
@@ -48,7 +48,8 @@ The output of `Monopogen` will enable 1) ancestry identificaiton on single cell 
 * ggplot2
 
 **!Note**
-We have put the binary compatibility tools including samtools, bcftools, beagle in the app folder. We fixed the version because the output formats vary a lot with different versions. If you are not able to run them, you can compile them in you system. We only test on these tools on following versions: 
+
+We have put the binary compatibility tools including `samtools`, `bcftools`, `beagle` in the app folder. We fixed the version because the output formats vary a lot with different versions. If you are not able to run them, you can compile them in you system. We only test these tools using the following versions: 
 
 * samtools Version: 1.2 (using htslib 1.2.1)
 * bcftools Version: 1.8 (using htslib 1.8)
@@ -56,11 +57,11 @@ We have put the binary compatibility tools including samtools, bcftools, beagle 
 * tabix Version: 1.9
 * bgzip Version: 1.9
   
-If you meet other errors when running Monopogen, go to [FAQs](#faqs) section. 
+If you meet other errors when running Monopogen, go to the [FAQs](#faqs) section. 
 
 **Installation**
   
-Right now Monopogen is avaiable on github, you can install it through github 
+Right now Monopogen is available through github, you can install it through github 
 
 `git clone https://github.com/KChen-lab/Monopogen.git`  
 `cd Monopogen`  
@@ -68,7 +69,7 @@ Right now Monopogen is avaiable on github, you can install it through github
 
 ## Quick Start 
 
-For quick start of Monopogen, we provide an example dataset provided the `example/` folder, which includes:
+For quick start of Monopogen, we provide an example dataset in the `example/` folder, which includes:
 * `A.bam (.bai)`  
   The bam file storing read alignment for sample A.
 * `B.bam (.bai)`  
@@ -76,7 +77,7 @@ For quick start of Monopogen, we provide an example dataset provided the `exampl
 * `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz`  
   The reference panel with over 3,000 samples in 1000 Genome database. Only SNVs located in chr20: 0-2Mb were extracted in this vcf file. 
 * `chr20_2Mb.hg38.fa (.fai)`  
-  The genome reference used for read aligments. Only seuqences in chr20:0-2Mb were extracted in this fasta file.
+  The genome reference used for read aligments. Only sequences in chr20:0-2Mb were extracted in this fasta file.
 There are three test scripts in the `test/` folder `test/runPreprocess.sh`, `test/runGermline.sh`, `test/runSomatic.sh` for quick start of `Monopogen`
 
 ### Data preprocess ###
@@ -98,7 +99,7 @@ optional arguments:
                         The bam file for the study sample, the bam file should
                         be sorted. If there are multiple samples, each row
                         with each sample (default: None)
-  -o OUT, --out OUT     The output director (default: None)
+  -o OUT, --out OUT     The output directory (default: None)
   -a APP_PATH, --app-path APP_PATH
                         The app library paths used in the tool (default: None)
   -m MAX_MISMATCH, --max-mismatch MAX_MISMATCH
@@ -147,7 +148,7 @@ optional arguments:
   -t NTHREADS, --nthreads NTHREADS
                         Number of threads used for SNVs calling (default: 1)
  ```
-You need to prepare the genome region file list for option `-r` with an example shown in `test/region.lst`. We also included an optimal genome region file in `${path}/resource/GRCh38.region.lst` for the whole genome SNV calling. Each region is in one row. Run the test script test/runGermline.sh as following:
+You need to prepare the genome region file list for option `-r` with an example shown in `test/region.lst`. We also included an optimal genome region file in `${path}/resource/GRCh38.region.lst` for the whole genome SNV calling. Each region is in one row. Run the test script `test/runGermline.sh` as following:
   
 ```
 python  ${path}/src/Monopogen.py  germline  \
@@ -204,9 +205,9 @@ python  ${path}/src/Monopogen.py  germline  \
 The `-norun` module will generate jobs from different regions and you can submit them to HPC based on your own preference. The generated job files will be in `out/Script/`
 
 ## Germline SNV calling from snRNA-seq
-We demonstrate the utilization of Monopogen on germline SNV calling, ancestry identification on snRNA samples from human retina atlas. The 4 retina samples shown in Monopogen methodological paper are `19D013`, `19D014`, `19D015`, `19D016`. Thhe fastq files of these samples can be downloaded with from SRA database [SRR23617370](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501863), [SRR23617337](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501879), [SRR23617320](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441051) and [SRR23617310](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441045). Here we used `19D013` as an example (analysis on other samples is the same). 
+We demonstrate the utilization of Monopogen on germline SNV calling and ancestry identification on snRNA samples from human retina atlas. The 4 retina samples shown in Monopogen methodological paper are `19D013`, `19D014`, `19D015`, `19D016`. Thhe fastq files of these samples can be downloaded with from SRA database [SRR23617370](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501863), [SRR23617337](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?term=SRX19501879), [SRR23617320](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441051) and [SRR23617310](https://0-www-ncbi-nlm-nih-gov.brum.beds.ac.uk/sra?LinkName=biosample_sra&from_uid=33441045). Here we used `19D013` as an example (analysis on other samples is the same). 
 ### variant calling
-For convenience, we skipped the read alignment step and shared the alignmed bam file (Only reads from chr20 were extracted) in [19D013.snRNA.chr20.bam](https://drive.google.com/file/d/18-vdGY9hxbGP-Mm06IBpCCF-NZI9ltAU/view?usp=share_link) and  [19D013.snRNA.chr20.bam.bai](https://drive.google.com/file/d/1HEozx6gmX2Z05R8nElEFOBUhnqayMgAi/view?usp=share_link). Users also need to prepare for the GRCh38 reference (with `chr` as prefix in the sequence ID) used for read alignment and [1KG3 imputation panel from 1KG3](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/). We can prepare for the `bam.lst` and `region.lst` as following
+For convenience, we skipped the read alignment step and shared the alignmed bam file (Only reads from chr20 were extracted) in [19D013.snRNA.chr20.bam](https://drive.google.com/file/d/18-vdGY9hxbGP-Mm06IBpCCF-NZI9ltAU/view?usp=share_link) and  [19D013.snRNA.chr20.bam.bai](https://drive.google.com/file/d/1HEozx6gmX2Z05R8nElEFOBUhnqayMgAi/view?usp=share_link). Users also need to prepare for the GRCh38 reference (with `chr` as prefix in the sequence ID) used for read alignment and [1KG3 imputation panel from 1KG3](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/). We can prepare for the `bam.lst` and `region.lst` as following:
 
 ```
 less bam.lst 
@@ -417,7 +418,7 @@ Found 85853 sites only in second file.
 After filtering, kept 23755 out of a possible 23755 Sites
 Run Time = 0.00 seconds
 ```
-`Monopogen` can detect `21.3% (23290/(23290+85853))` germline SNVs although the singel cell data is quite sparisty. Remarkably, the false positive rate is lower than `2% (464/(464+23290))`. The genotype concordance could be further examined based on the overlapped 23290 SNVs by looking at the output of `19D013.diff.discordance_matrix`. 
+`Monopogen` can detect `21.3% (23290/(23290+85853))` germline SNVs although the single cell data is quite sparse. Remarkably, the false positive rate is lower than `2% (464/(464+23290))`. The genotype concordance can be further examined based on the overlappign 23,290 SNVs by looking at the output of `19D013.diff.discordance_matrix`. 
 
 ```
 less 19D013.diff.discordance_matrix
@@ -427,10 +428,10 @@ N_0/1_file2     0       13628   723     0
 N_1/1_file2     0       60      8869    0
 N_./._file2     0       0       0       0
 ```
-The genotyping concordance is calculated as `97% ((60+723)/(60+723+13628+8869))`. The overall genotyping accuracy could be `95% (0.97*(1-0.02))`
+The genotyping concordance is calculated as `97% ((60+723)/(60+723+13628+8869))`. The overall genotyping accuracy is be `95% (0.97*(1-0.02))`
 
 ### ancestry identification
-Here we demonstrate how we can identify ancestry background on snRNA sample `19D013` based on the output of `Monopogen`. Users can use [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software to project `19D013` on HGDP reference panel. The HGDP genotyping panel was already included in the [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software. Before that, we need to liftover Monopogen output from GRCh38 to GRCh37 to match the HGDP genotyping coordinates. The fasta file of GRCh37 on chr20 could be downloaded as [GRCh37.chr20.fa](https://drive.google.com/file/d/194eSsL4xRLQwwL_3VcWsNxMziSM8SyMB/view?usp=share_link). 
+Here we demonstrate how we can identify ancestry background on snRNA sample `19D013` based on the output of `Monopogen`. Users can use [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software to project `19D013` on HGDP reference panel. The HGDP genotyping panel was already included in the [LASER/TRACE](http://csg.sph.umich.edu/chaolong/LASER/) software. Before that, we need to liftover Monopogen output from GRCh38 to GRCh37 to match the HGDP genotyping coordinates. The fasta file of GRCh37 on chr20 can be downloaded as [GRCh37.chr20.fa](https://drive.google.com/file/d/194eSsL4xRLQwwL_3VcWsNxMziSM8SyMB/view?usp=share_link). 
 
 ```
 chain="${path}/resource/hg38ToHg19.over.chain.gz"
@@ -604,7 +605,7 @@ The PCA projection plot will be generated as `19D013_onHGDP.pdf`
 
 
 ## Somatic SNV calling from scRNA-seq ##
-We demonstrate how the LD refinement model implemented in Monopogen can improve somatic SNV detection from scRNA-seq profiles without matched bulk WGS data available. We used the benchmarking dataset of bone marrow single cell samples from [Miller et al.,](https://www.nature.com/articles/s41587-022-01210-8). The raw fastq files could be downloaded from SRA database with [SRR15598778](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598778), [SRR15598779](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598779), [SRR15598780](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598780), [SRR15598781](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598781), and [SRR15598782](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598782). For convenience, we shared with the the downloaded bam file from chromosome 20 [chr20.master_scRNA.bam](https://drive.google.com/file/d/1nS2rjrab-QSiq-FhpTWOtJesCE9iS_0k/view?usp=share_link). 
+We demonstrate how the LD refinement model implemented in Monopogen can improve somatic SNV detection from scRNA-seq profiles without matched bulk WGS data available. We used the benchmarking dataset of bone marrow single cell samples from [Miller et al.,](https://www.nature.com/articles/s41587-022-01210-8). The raw fastq files can be downloaded from SRA database with [SRR15598778](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598778), [SRR15598779](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598779), [SRR15598780](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598780), [SRR15598781](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598781), and [SRR15598782](https://www.ncbi.nlm.nih.gov/sra/?term=SRR15598782). For convenience, we shared with the the downloaded bam file from chromosome 20 [chr20.master_scRNA.bam](https://drive.google.com/file/d/1nS2rjrab-QSiq-FhpTWOtJesCE9iS_0k/view?usp=share_link). 
 
 ### preprocess ###
 To remove reads with high alignment mismatches, we first run the preprocess step by setting the bam file list `bam.lst` as 
@@ -635,13 +636,13 @@ The output could be
 [2023-05-07 08:40:36,538] INFO     Monopogen.py Success! See instructions above.
 ```
 ### germline calling ###
-To detect putative somatic SNVs, we need to call germline module to build the LD refinement model. The required `region.lst` could be set as 
+To detect putative somatic SNVs, we need to call germline module to build the LD refinement model. The required `region.lst` can be set as 
 (Note, only the whole chromosome calling is allowed!)
 ```
 less region.lst
 chr20
 ```
-Users also need to preprare for following files `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz` from [1KG3 imputation panel from 1KG3](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/) and `GRCh38.chr20.fa`. 
+Users also need to prepare the following files `CCDG_14151_B01_GRM_WGS_2020-08-05_chr20.filtered.shapeit2-duohmm-phased.vcf.gz` from [1KG3 imputation panel from 1KG3](http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/) and `GRCh38.chr20.fa`. 
 
 ```
 ${path}/src/Monopogen.py  germline  -a ${path}/apps  -r region.lst \
@@ -754,7 +755,7 @@ beagle.27Jul16.86a.jar (version 4.1) finished
 
 ```
 ### ld refinement on putative somatic SNVs ###
-One advantage of Monopogen is to extend the machinery of LD refinement from human population level to cell population level. Users need to prepare for the cell barcode file [CB_7K.maester_scRNA.csv](https://drive.google.com/file/d/1LhNYpU194kaBevW5nd2ORX7qO3pigQOH/view?usp=share_link). The cell barcode file includes two column: 1) cell barcode; 2 number of reads detected in each cell. This could be from cell ranger/Seurat. You can select top cells (1K~10K) with high reads detected. There are three steps `featureInfo`, `cellScan`, and `LDrefinement` to call putative somatic SNVs. Here we show the step one by one. 
+One advantage of Monopogen is to extend the machinery of LD refinement from human population level to cell population level. Users need to prepare the cell barcode file [CB_7K.maester_scRNA.csv](https://drive.google.com/file/d/1LhNYpU194kaBevW5nd2ORX7qO3pigQOH/view?usp=share_link). The cell barcode file includes two columns: 1) cell barcode; 2) number of reads detected in each cell. This could be generated using `cell ranger`/`Seurat`. You can select top cells (1K~10K) with high reads detected. There are three steps `featureInfo`, `cellScan`, and `LDrefinement` to call putative somatic SNVs. Here we show the step one by one. 
 
 To extract the feature information from sequencing data, we need to run (this step will take ~63 mins)
 ```
@@ -794,11 +795,11 @@ python  ${path}/src/Monopogen.py  somatic  \
     -i  bm  -l  CB_7K.maester_scRNA.csv   -s LDrefinement     \
     -g   GRCh38.chr20.fa
 ```
-After running the `LDrefinment` step, there would be two files `chr20.germlineTwoLoci_model.csv` and`chr20.germlineTrioLoci_model.csv` in the output directory `bm/somatic`. These two enable us to examine the rationale of the LD model in sparse data at the cell population level. Users can examine this by looking at output figure `LDrefinement_germline.chr20.pdf` 
+After running the `LDrefinment` step, there would be two files `chr20.germlineTwoLoci_model.csv` and `chr20.germlineTrioLoci_model.csv` in the output directory `bm/somatic`. These two files enable us to examine the rationale of the LD model in sparse data at the cell population level. Users can examine this by looking at output figure `LDrefinement_germline.chr20.pdf`. 
  
 <image src="./example/maester.chr20_LDrefinement_germline.png" width="600"> 
 
-Users can filter putative somatic SNVs based on the key file `chr20.putativeSNVs.csv` with column `SVM_pos_score>0.5` and `LDrefine_merged_score>0.25` and `BAF_alt<0.3`. The `SVM_pos_score` is the prediction score from the SVM module. Closing to 0 has higher probability of sequencing error. The `LDrefine_merged_score` is from the LDrefinement module. Closing to 0 is germline SNVs and closing to 0.5 is more likely the putative somatic SNVs. The `NA` values in `LDrefine_merged_score` column denotes that there are no informative germline SNVs tagging the putative somatic SNVs. 
+Users can filter putative somatic SNVs based on the key file `chr20.putativeSNVs.csv` with column `SVM_pos_score>0.5` and `LDrefine_merged_score>0.25` and `BAF_alt<0.3`. The `SVM_pos_score` is the prediction score from the SVM module. Values close to 0 have a higher probability of sequencing error. The `LDrefine_merged_score` is from the LDrefinement module. Values close to 0 are germline SNVs and close to 0.5 are more likely to be putative somatic SNVs. The `NA` values in `LDrefine_merged_score` column denotes that there are no informative germline SNVs tagging the putative somatic SNVs. 
 
 <image src="./example/SNV_finalOut.png" width="600">
 
@@ -838,7 +839,7 @@ chr20:436781:A:G              0/0              0/0              0/0
   
   `ulimit -n `
 
-  If the number is smaller than the cells in your study, please change the maximum of the open files.
+  If the number is smaller than the cells in your study, please change the maximum number of open files.
   If the file number opened is still large, you can set smaller value on the option `-t` in the `cellScan` step (such as 5). In such case, only 5 regions were processed simultaneously.
  
 ## Citation
