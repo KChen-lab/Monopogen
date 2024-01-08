@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-The main interface of monopgen
+The main interface of monopogen
 """
 
 import argparse
@@ -293,7 +293,7 @@ def preProcess(args):
 				record = line.strip().split(",")
 				sample.append(record[0])
 				#logger.debug("Checking sample {}".format(record[0]))
-				assert len(record)==2, "Every line has to have exactly 2 comma-delimited columns! Line with sample name {} does not satisify this requiremnt!".format(record[0])
+				assert len(record)==2, "Every line has to have exactly 2 comma-delimited columns! Line with sample name {} does not satisfy this requiremnt!".format(record[0])
 				assert os.path.isfile(record[1]), "Bam file {} cannot be found!".format(record[1])
 				assert os.path.isfile(record[1]+".bai"), "Bam file {} has not been indexed!".format(record[1])
 				#assert os.path.isabs(record[1]), "Please use absolute path for bam file {}!".format(record[1])
@@ -342,7 +342,7 @@ def main():
 	parser_preProcess.add_argument('-b', '--bamFile', required=True,
 								help="The bam file for the study sample, the bam file should be sorted. If there are multiple samples, each row with each sample") 
 	parser_preProcess.add_argument('-o', '--out', required= False,
-								help="The output director")
+								help="The output directory")
 	parser_preProcess.add_argument('-a', '--app-path', required=True,
 								help="The app library paths used in the tool")
 	parser_preProcess.add_argument('-m', '--max-mismatch', required=False, type=int, default=3,
@@ -361,7 +361,7 @@ def main():
 								choices=['varScan', 'varImpute' , 'varPhasing', 'all'],
 								help="Run germline variant calling step by step")
 	parser_germline.add_argument('-o', '--out', required= False,
-								help="The output director")
+								help="The output directory")
 	parser_germline.add_argument('-g', '--reference', required= True, 
 								help="The human genome reference used for alignment")
 	parser_germline.add_argument('-p', '--imputation-panel', required= True, 
