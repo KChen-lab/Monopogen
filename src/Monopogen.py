@@ -22,13 +22,14 @@ from somatic import *
 import multiprocessing as mp
 from multiprocessing import Pool
 
-
+# Library paths
 LIB_PATH = os.path.abspath(
 	os.path.join(os.path.dirname(os.path.realpath(__file__)), "pipelines/lib"))
 
 if LIB_PATH not in sys.path:
 	sys.path.insert(0, LIB_PATH)
 
+# Paths to the pipeline and configuration files - is this necessary?
 PIPELINE_BASEDIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 CFG_DIR = os.path.join(PIPELINE_BASEDIR, "cfg")
 
@@ -44,26 +45,42 @@ handler.setFormatter(logging.Formatter(
 	'[{asctime}] {levelname:8s} {filename} {message}', style='{'))
 logger.addHandler(handler)
 
-
-
-
+# germline variant calling
 def germline(args):
+	if args.verbose:
+		print(f"Performing germline variant calling...")
 	logger.info("Performing germline variant calling...")
 	print_parameters_given(args)
 
+	if args.verbose:
+		print(f"> Checking existence of essenstial resource files...")
 	logger.info("Checking existence of essenstial resource files...")
 	validate_user_setting_germline(args)
 
+	if args.verbose:
+		print(f"> Checking dependencies...")
 	logger.info("Checking dependencies...")
 	check_dependencies(args)
-	out = args.out
-	os.system("mkdir -p " + out )
 	
-	os.system("mkdir -p " + out +  "/germline")
-	os.system("mkdir -p " + out +  "/Script")
-
+	# Create necessary directories
+	if args.verbose:
+		print(f"\n> Checking the existence of the necessary output directories. If they do not exist, they will be created.")
+	if args.out:
+		os.makedirs(args.out, exist_ok=True)
+		if args.verbose:
+			print(f"  - Created output directory: {args.out}")
+		os.makedirs(os.path.join(args.out, 'germline'), exist_ok=True)
+		if args.verbose:
+			print(f"  - Created directory to store files from [germline variant calling]: {os.path.join(args.out, 'germline')}")
+		os.makedirs(os.path.join(args.out, 'Script'), exist_ok=True)
+		if args.verbose:
+			print(f"  - Created directory to store Scripts necessary for [germline variant calling]: {os.path.join(args.out, 'Script')}")
+	else:
+		print("Output directory not specified!")
 
 	# check whether region files were set correctly 
+	if args.verbose:
+		print(f"> Checking the existence of the region file.")
 	joblst = []
 	with open(args.region) as f_in:
 		for line in f_in:
@@ -74,9 +91,52 @@ def germline(args):
 				jobid = record[0] + ":" + record[1] + "-" + record[2]
 			bam_filter = args.out + "/Bam/" +  record[0] +  ".filter.bam.lst"
 			imputation_vcf = args.imputation_panel + "CCDG_14151_B01_GRM_WGS_2020-08-05_" + record[0] + ".filtered.shapeit2-duohmm-phased.vcf.gz"
-			cmd1 = samtools + " mpileup -b " + bam_filter + " -f "  + args.reference  + " -r " +  jobid + " -q 20 -Q 20 -t DP -d 10000000 -v "
-			cmd1 = cmd1 + " | " + bcftools + " view " + " | "  + bcftools  + " norm -m-both -f " + args.reference 
-			cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL |" + bgzip +   " -c > " + args.out + "/germline/" +  jobid + ".gl.vcf.gz" 
+			
+			# ORIGINAL COMMANDS with OLD version of samtools
+			# cmd1 = samtools + " mpileup -b " + bam_filter + " -f "  + args.reference  + " -r " +  jobid + " -q 20 -Q 20 -t DP -d 10000000 -v "
+			# cmd1 = cmd1 + " | " + bcftools + " view " + " | "  + bcftools  + " norm -m-both -f " + args.reference 
+			# cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL | " + bgzip +   " -c > " + args.out + "/germline/" +  jobid + ".gl.vcf.gz" 
+
+			# here is the command for germline variant calling
+			# /usr/local/bin/samtools mpileup \
+			# 	-b monopogen/Bam/chr20.filter.bam.lst \
+			# 	-f /Users/slaan3/PLINK/references/refgenie_genomes/alias/hg38/fasta/default/hg38.fa \
+			# 	-r chr20 -q 20 -Q 20 -t DP -d 10000000 -v | \
+			# 	/usr/local/bin/bcftools view  | \
+			# 	/usr/local/bin/bcftools norm -m-both \
+			# 	-f /Users/slaan3/PLINK/references/refgenie_genomes/alias/hg38/fasta/default/hg38.fa | \
+			# 	grep -v "<X>" | \
+			# 	grep -v INDEL | \
+			# 	/usr/local/bin/bgzip -c > monopogen/germline/chr20.gl.vcf.gz
+
+			# here is what the new command should look like:
+			# bcftools mpileup -b monopogen/Bam/chr20.filter.bam.lst -f /Users/slaan3/PLINK/references/refgenie_genomes/alias/hg38/fasta/default/hg38.fa -r chr20 -q 20 -Q 20 --annotate FORMAT/DP | bcftools view | bcftools norm -m-both | grep -v "<X>" | grep -v INDEL | bgzip -c > monopogen/germline/chr20.gl.vcf.gz
+
+			# NEW COMMANDS with bcftools
+			# https://samtools.github.io/bcftools/bcftools.html	
+			# https://www.biostars.org/p/425139/
+			# https://www.biostars.org/p/418738/
+			# mpileup a single region
+			# -b list of input BAM files
+			# -f reference sequence
+			# -r region to include
+			# -q base quality
+			# -Q mapping quality
+			# --annotate FORMAT/DP
+			# view to filter the output
+			# norm to normalize the output
+			# grep to remove unwanted lines
+			# bgzip to compress the output
+			# -c to write to stdout
+			# > to redirect to a file
+			# this can also be done using bcftools view -Oz -o output.vcf.gz
+			cmd1 = bcftools + " mpileup -b " + bam_filter + " -f "  + args.reference  + " -r " +  jobid + " -q 20 -Q 20 --annotate FORMAT/DP "
+			cmd1 = cmd1 + " | " + bcftools + " view " + " | "  + bcftools  + " norm -m-both -f " + args.reference
+			# bgzip version; works, but I believe the below command is better
+			# cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL | " + bgzip +   " -c > " + args.out + "/germline/" +  jobid + ".gl.vcf.gz" 
+			# bcftools version
+			cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL | " + bcftools +   " view -Oz -o " + args.out + "/germline/" +  jobid + ".gl.vcf.gz" 
+			
 			#cmd2 = bcftools + " view " +  out + "/germline/" +  jobid + ".gl.vcf.gz" + " -i 'FORMAT/DP>1' | " + bcftools + " call -cv  | " + bgzip +    "  -c > " +  args.out + "/SCvarCall/"  +  jobid + ".gt.vcf.gz"
 			cmd3 = java + " -Xmx20g -jar " + beagle +  " gl=" +  out + "/germline/" +  jobid + ".gl.vcf.gz"  +  " ref=" +  imputation_vcf   + "  chrom=" + record[0] + " out="   +  out + "/germline/" + jobid + ".gp " + "impute=false  modelscale=2  nthreads=24  gprobs=true  niterations=0"
 			
@@ -104,8 +164,7 @@ def germline(args):
 			result = pool.map(runCMD, joblst)
 	#error_check(all = region_lst, output = result, step = "germline module")
 
-
-
+# sort chr IDs from 1...22
 def sort_chr(chr_lst):
 	# sort chr IDs from 1...22
 	chr_lst_sort = []
@@ -119,11 +178,21 @@ def sort_chr(chr_lst):
 	chr_lst = chr_lst_sort 
 	return chr_lst
 
-
+# somatic variant calling
 def somatic(args):
-	
 	validate_user_setting_somatic(args)
-	os.system("mkdir -p " + args.out +  "/somatic")
+	# Create necessary directories
+	if args.verbose:
+		print(f"\n> Checking the existence of the necessary output directories. If they do not exist, they will be created.")
+	if args.out:
+		os.makedirs(args.out, exist_ok=True)
+		if args.verbose:
+			print(f"  - Created output directory: {args.out}")
+		os.makedirs(os.path.join(args.out, 'somatic'), exist_ok=True)
+		if args.verbose:
+			print(f"  - Created directory to store files from [somatic mutation/variant calling]: {os.path.join(args.out, 'somatic')}")
+	else:
+		print("Output directory not specified!")
 
 	chr_lst = []
 	region_lst = []
@@ -137,8 +206,6 @@ def somatic(args):
 			chr_lst.append(record[0])
 			region_lst.append(region)
 	chr_lst = list(set(chr_lst))
-
-	
 
 	if args.step=="featureInfo" or args.step=="all":
 		logger.info("Get feature information from sequencing data...")
@@ -276,23 +343,36 @@ def error_check(all, output, step):
 			logger.error("Failed! See instructions above.")
 			exit(1)
 
-
-
+# preProcess
 def preProcess(args):
+	if args.verbose:
+		print(f"Performing data preprocess before variant calling...")
 	logger.info("Performing data preprocess before variant calling...")
 	print_parameters_given(args)
 
 	assert os.path.isfile(args.bamFile), "The bam file {} cannot be found!".format(args.bamFile)
-	out = args.out
-	os.system("mkdir -p " + out )
-	os.system("mkdir -p " + out +  "/Bam")
+
+	# Create necessary directories
+	if args.verbose:
+		print(f"\n> Checking the existence of the necessary output directories. If they do not exist, they will be created.")
+	if args.out:
+		os.makedirs(args.out, exist_ok=True)
+		if args.verbose:
+			print(f"  - Created output directory: {args.out}")
+		os.makedirs(os.path.join(args.out, 'Bam'), exist_ok=True)
+		if args.verbose:
+			print(f"  - Created directory to store filtered [.bam]-files: {os.path.join(args.out, 'Bam')}")
+	else:
+		print("Output directory not specified!")
 
 	sample=[]
 	with open(args.bamFile) as f_in:
 			for line in f_in:
 				record = line.strip().split(",")
 				sample.append(record[0])
-				#logger.debug("Checking sample {}".format(record[0]))
+				if args.verbose:
+					print(f"> Checking sample {record[0]}")
+				logger.debug("Checking sample {}".format(record[0]))
 				assert len(record)==2, "Every line has to have exactly 2 comma-delimited columns! Line with sample name {} does not satisify this requiremnt!".format(record[0])
 				assert os.path.isfile(record[1]), "Bam file {} cannot be found!".format(record[1])
 				assert os.path.isfile(record[1]+".bai"), "Bam file {} has not been indexed!".format(record[1])
@@ -302,6 +382,8 @@ def preProcess(args):
 	with open(args.bamFile) as f_in:
 			for line in f_in:
 				record = line.strip().split(",")
+				if args.verbose:
+					print(f"> PreProcessing sample {record[0]}")
 				logger.debug("PreProcessing sample {}".format(record[0]))
 				for chr in range(1, 23):
 					para_single  =  dict(chr = "chr" + str(chr), 
@@ -315,13 +397,17 @@ def preProcess(args):
 	# output the bam file list 
 
 	# generate postProcess bam files 
+	if args.verbose:
+		print(f"> Creating the bam file list for each chromosome.")
 	for chr in range(1, 23):
+		if args.verbose:
+			print(f"   - processing chromsome {chr}")
 		bamlist = open(args.out + "/Bam/chr" +  str(chr) +  ".filter.bam.lst","w")
 		for s in sample:
 			bamlist.write(args.out+"/Bam/"+s+"_chr"+str(chr)+".filter.bam\n")
 		bamlist.close()
 		
-
+# main function
 def main():
 	parser = argparse.ArgumentParser(
 		description="""Monopogen: SNV calling from single cell sequencing
@@ -336,6 +422,7 @@ def main():
 	# every subcommand needs user config file
 	common_parser = argparse.ArgumentParser(add_help=False)
 
+	# common arguments for preProcess
 	parser_preProcess = subparsers.add_parser('preProcess', parents=[common_parser],
 		help='Preprocess of bam files including removing reads with high alignment mismatches',
 		formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -349,9 +436,11 @@ def main():
 								help="The maximal alignment mismatch allowed in one reads for variant calling")
 	parser_preProcess.add_argument('-t', '--nthreads', required=False, type=int, default=1,
 								help="Number of threads used for SNVs calling")
+	parser_preProcess.add_argument('-v', '--verbose', action='store_true',
+								help="Increase output verbosity")
 	parser_preProcess.set_defaults(func=preProcess)
 
-
+	# common arguments for germline
 	parser_germline = subparsers.add_parser('germline', parents=[common_parser],
 		help='Germline variant discovery, genotype calling from single cell data',
 		formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -375,8 +464,11 @@ def main():
 	parser_germline.add_argument('-n', '--norun', required=False, default="FALSE", 
 								choices=['TRUE','FALSE'],
 								help="Generate the job scripts only. The jobs will not be run.")
+	parser_germline.add_argument('-v', '--verbose', action='store_true',
+								help="Increase output verbosity")
 	parser_germline.set_defaults(func=germline)
 
+	# common arguments for somatic
 	parser_somatic = subparsers.add_parser('somatic', parents=[common_parser],
 		help='Somatic variant calling from single cell sequencing',
 		formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -400,6 +492,8 @@ def main():
 								help="Run germline variant calling step by step")
 	parser_somatic.add_argument('-g', '--reference', required= True, 
 								help="The human genome reference used for alignment")
+	parser_somatic.add_argument('-v', '--verbose', action='store_true',
+								help="Increase output verbosity")
 	parser_somatic.set_defaults(func=somatic)
 
 	args = parser.parse_args()
@@ -412,25 +506,56 @@ def main():
 		exit(1)
 
 	# execute subcommand-specific function
-
-	
 	if args.subcommand == "somatic":
 		args.out = args.input_folder
 
+	# set paths for tools
 	global out, samtools, bcftools, bgzip, java, beagle 
 	out = os.path.abspath(args.out)
-	samtools  = os.path.abspath(args.app_path) + "/samtools" 
-	bcftools = os.path.abspath(args.app_path) + "/bcftools"
-	bgzip = os.path.abspath(args.app_path) + "/bgzip"
-	java =  "java"
+	
+	# Execute the shell command to find the location of samtools, bcftools, bgzip, and java
+	# if args.verbose:
+	print(f"Checking the existence of the necessary tools.")
+	try:
+		location_samtools = subprocess.check_output(['which', 'samtools']).strip().decode('utf-8')
+		# If you're on Windows, you may need to use where command instead of which.
+		# location = subprocess.check_output(['where', 'samtools']).strip().decode('utf-8')
+		samtools = os.path.abspath(location_samtools)
+		# if args.verbose:
+		print(f"> samtools location:", samtools)
+	except subprocess.CalledProcessError:
+		print("ERROR: [samtools] not found.")
+
+	try:
+		location_bcftools = subprocess.check_output(['which', 'bcftools']).strip().decode('utf-8')
+		bcftools = os.path.abspath(location_bcftools)
+		# if args.verbose:
+		print(f"> bcftools location:", bcftools)
+	except subprocess.CalledProcessError:
+		print("ERROR: [bcftools] not found.")
+
+	try:
+		location_bgzip = subprocess.check_output(['which', 'bgzip']).strip().decode('utf-8')
+		bgzip = os.path.abspath(location_bgzip)
+		# if args.verbose:
+		print(f"> bgzip location:", bgzip)
+	except subprocess.CalledProcessError:
+		print("ERROR: [bgzip] not found.")
+
+	try:
+		location_java = subprocess.check_output(['which', 'java']).strip().decode('utf-8')
+		java = os.path.abspath(location_java)
+		# if args.verbose:
+		print(f"> java location:", java)
+	except subprocess.CalledProcessError:
+		print("ERROR: [java] not found.")
+	
+	# beagle
 	beagle = os.path.abspath(args.app_path) + "/beagle.27Jul16.86a.jar"
 
-
 	args.func(args)
-
 	logger.info("Success! See instructions above.")
-
-
+	# exit(0)
 
 if __name__ == "__main__":
 	main()

@@ -17,13 +17,14 @@ from pysam import VariantFile
 import multiprocessing as mp
 from multiprocessing import Pool
 
-
+# Library paths
 LIB_PATH = os.path.abspath(
 	os.path.join(os.path.dirname(os.path.realpath(__file__)), "pipelines/lib"))
 
 if LIB_PATH not in sys.path:
 	sys.path.insert(0, LIB_PATH)
 
+# Pipeline paths and configurations - is this necessary?
 PIPELINE_BASEDIR = os.path.dirname(os.path.realpath(sys.argv[0]))
 CFG_DIR = os.path.join(PIPELINE_BASEDIR, "cfg")
 
@@ -39,14 +40,14 @@ handler.setFormatter(logging.Formatter(
 	'[{asctime}] {levelname:8s} {filename} {message}', style='{'))
 logger.addHandler(handler)
 
-
+# function to provide parameters given
 def print_parameters_given(args):
 	logger.info("Parameters in effect:")
 	for arg in vars(args):
 		if arg=="func": continue
 		logger.info("--{} = [{}]".format(arg, vars(args)[arg]))
 
-
+# function to check the existence of sample list file
 def validate_sample_list_file(args):
 	if args.check_hard_clipped:
 		out=os.popen("command -v bioawk").read().strip()
@@ -85,7 +86,7 @@ def validate_sample_list_file(args):
             
 		raise sys.exc_info()[0]
 
-
+# function to check the existence of reference genome
 def validate_user_setting_germline(args):
 	#assert os.path.isfile(args.bamFile), "The bam list file {} cannot be found!".format(args.bamFile)
 	assert os.path.isfile(args.reference), "The genome reference fasta file {} cannot be found!".format(args.reference)
@@ -105,23 +106,27 @@ def validate_user_setting_germline(args):
 			record = line.strip().split(",")
 			assert len(record)==3 or len(record)==1, "Every line has to have exactly 3 comma-delimited columns chr1,1,100000 or chr1 (on the whole chromosome)! Line with region {} does not satisify this requiremnt!".format(line)
 
-
+# function to check the existence of tools
 def check_dependencies(args):
-	programs_to_check = ("vcftools", "bgzip",  "bcftools", "beagle.27Jul16.86a.jar","samtools", "java")
+	# check whether each program is available
+    programs_to_check = ["beagle.27Jul16.86a.jar"]
+    system_programs_to_check = ["vcftools", "bcftools", "samtools", "bgzip", "java"]
 
-	for prog in programs_to_check:
-		out = os.popen("command -v {}".format(args.app_path + "/" + prog)).read()
-		assert out != "", "Program {} cannot be found!".format(prog)
+    print(f"Check existence of the proper tools ({programs_to_check} & {system_programs_to_check})...")
+    # check whether each program is available
+    for prog in programs_to_check:
+        if args.verbose:
+            print(f"> checking existence of [{prog}]")
+        prog_path = os.path.join(args.app_path, prog)
+        assert os.path.exists(prog_path), f"Program {prog} cannot be found at {prog_path}!"
 
-#	python_pkgs_to_check = ("drmaa",)
+    for prog_system in system_programs_to_check:
+        if args.verbose:
+            print(f"> checking existence of [{prog_system}]")
+        out_system = os.popen(f"command -v {prog_system}").read()
+        assert out_system.strip() != "", f"Program {prog_system} cannot be found!"
 
-#	for pkg in python_pkgs_to_check:
-#		out_pipe = os.popen('python -c "import {}"'.format(pkg))
-
-#		assert out_pipe.close() is None, "Python module {} has not been installed!".format(pkg)
-
-
-
+# function to align the bam file
 def addChr(in_bam, samtools):
 	# edit the sequence names for your output header
 	prefix = 'chr'
@@ -151,11 +156,10 @@ def addChr(in_bam, samtools):
 	input_bam.close()
 	outf.close()
 	os.system(samtools + " index " +  out_bam)
-	os.system(" mv " + out_bam + " " + in_bam)
-	os.system(" mv " + out_bam + ".bai  " + in_bam + ".bai")
+	os.system(" mv -v " + out_bam + " " + in_bam)
+	os.system(" mv -v " + out_bam + ".bai  " + in_bam + ".bai")
 
-
-
+# function to filter the bam file
 def BamFilter(myargs):
 	bamFile = myargs.get("bamFile")
 	search_chr = myargs.get("chr")
@@ -166,7 +170,8 @@ def BamFilter(myargs):
 	max_mismatch = myargs.get("max_mismatch")
 	out = myargs.get("out")
 
-	os.system("mkdir -p " + out +  "/Bam")
+	# check whether the output directory exists - is this necessary, as it is already checked in the Monopogen.py?
+	os.system("mkdir -p -v " + out +  "/Bam")
 	infile = pysam.AlignmentFile(bamFile,"rb")
 	contig_names = infile.references
 	cnt=0 
