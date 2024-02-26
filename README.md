@@ -804,7 +804,7 @@ Users need to perform hard filtering based on the file `chr20.putativeSNVs.csv` 
 * `SVM_pos_score>0.5`. The `SVM_pos_score` is the prediction score from the SVM module. Closing to 0 has higher probability of sequencing error. 
 * `LDrefine_merged_score>0.25`. The `LDrefine_merged_score` is from the LDrefinement module. Closing to 0 is germline SNVs and closing to 0.5 is more likely the putative somatic SNVs. The `NA` values in `LDrefine_merged_score` column denotes that there are no informative germline SNVs tagging the putative somatic SNVs. 
 * `BAF_alt<0.5`, `Dep_ref>2`, and `Dep_alt>2`. The `BAF_alt` is frequency of alternative allele, `Dep_ref` denotes the number of cells with only reference allele detected and `Dep_alt` for alternative allele.
-* remove germline SNVs overlapped in genomeAD database.    
+* remove germline SNVs overlapped in genomeAD database.  
 
 
 <image src="./example/SNV_finalOut.png" width="600">
