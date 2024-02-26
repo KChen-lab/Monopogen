@@ -762,10 +762,10 @@ beagle.27Jul16.86a.jar (version 4.1) finished
 ### ld refinement on putative somatic SNVs ###
 One advantage of Monopogen is to extend the machinery of LD refinement from human population level to cell population level. Users need to prepare for the cell barcode file [CB_7K.maester_scRNA.csv](https://drive.google.com/file/d/1LhNYpU194kaBevW5nd2ORX7qO3pigQOH/view?usp=share_link). The cell barcode file includes two column: 1) cell barcode; 2 number of reads detected in each cell. This could be from cell ranger/Seurat. You can select top cells (1K~10K) with high reads detected. There are three steps `featureInfo`, `cellScan`, and `LDrefinement` to call putative somatic SNVs. Here we show the step one by one. 
 
-To extract the feature information from sequencing data, we need to run (this step will take ~63 mins)
+To extract the feature information from sequencing data, we need to run (this step will take ~20s)
 ```
 python  ${path}/src/Monopogen.py  somatic  \
-    -a   ${path}/apps  -r  region.lst  -t 50 \
+    -a   ${path}/apps  -r  region.lst  -t 1 \
     -i  bm  -l  CB_7K.maester_scRNA.csv   -s featureInfo     \
     -g   GRCh38.chr20.fa
 
