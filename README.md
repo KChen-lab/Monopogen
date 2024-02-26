@@ -762,7 +762,7 @@ beagle.27Jul16.86a.jar (version 4.1) finished
 ### ld refinement on putative somatic SNVs ###
 One advantage of Monopogen is to extend the machinery of LD refinement from human population level to cell population level. Users need to prepare for the cell barcode file [CB_7K.maester_scRNA.csv](https://drive.google.com/file/d/1LhNYpU194kaBevW5nd2ORX7qO3pigQOH/view?usp=share_link). The cell barcode file includes two column: 1) cell barcode; 2 number of reads detected in each cell. This could be from cell ranger/Seurat. You can select top cells (1K~10K) with high reads detected. There are three steps `featureInfo`, `cellScan`, and `LDrefinement` to call putative somatic SNVs. Here we show the step one by one. 
 
-To extract the feature information from sequencing data, we need to run (this step will take ~20s)
+To extract the feature information from sequencing data, we need to run (this step will take ~20s). Note, the option `-t` enables users to run mulitple chromosome simultaneously. Set `-t=1` if you are working on only one chromosome.
 ```
 python  ${path}/src/Monopogen.py  somatic  \
     -a   ${path}/apps  -r  region.lst  -t 1 \
@@ -772,14 +772,14 @@ python  ${path}/src/Monopogen.py  somatic  \
 ```
 The output would be
 ```
-[2023-05-07 23:53:50,211] INFO     Monopogen.py Get feature information from sequencing data...
-[2023-05-08 00:50:14,484] INFO     Monopogen.py Success! See instructions above.
+[2024-02-26 15:16:27,792] INFO     Monopogen.py Get feature information from sequencing data...
+[2024-02-26 15:16:50,498] INFO     Monopogen.py Success! See instructions above.
 ```
 Then, we need to collect single cell level read information by running the `cellScan` module as 
 
 ```
 python  ${path}/src/Monopogen.py  somatic  \
-    -a   ${path}/apps  -r  region.lst  -t 22  -w 10MB \
+    -a   ${path}/apps  -r  region.lst  -t 1  \
     -i  bm  -l  CB_7K.maester_scRNA.csv   -s cellScan     \
     -g   GRCh38.chr20.fa
 ```
@@ -796,7 +796,7 @@ Lines   total/split/realigned/skipped:  1593789/42248/4781/0
 Finally, we can run the LD refinment step to further improve the putative somatic SNV detection as (taking ~3 mins) 
 ```
 python  ${path}/src/Monopogen.py  somatic  \
-    -a   ${path}/apps  -r  region.lst  -t 22 \
+    -a   ${path}/apps  -r  region.lst  -t 1 \
     -i  bm  -l  CB_7K.maester_scRNA.csv   -s LDrefinement     \
     -g   GRCh38.chr20.fa
 ```
