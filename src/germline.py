@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 import gzip
 from pysam import VariantFile
+from bamProcess import * 
 import multiprocessing as mp
 from multiprocessing import Pool
 
@@ -107,7 +108,7 @@ def validate_user_setting_germline(args):
 
 
 def check_dependencies(args):
-	programs_to_check = ("vcftools", "bgzip",  "bcftools", "beagle.27Jul16.86a.jar","samtools", "java")
+	programs_to_check = ("vcftools", "bgzip",  "bcftools", "beagle.08Feb22.fa4.jar", "beagle.27Jul16.86a.jar","samtools","picard.jar", "java")
 
 	for prog in programs_to_check:
 		out = os.popen("command -v {}".format(args.app_path + "/" + prog)).read()
@@ -185,7 +186,6 @@ def BamFilter(myargs):
 			
 	#print(tp)
 	#To avoid the format issue, we update the RG flag based on sample information
-
 	#if not "RG" in tp:
 	sampleID = os.path.splitext(os.path.basename(myargs["bamFile"]))[0]
 	tp1 = [{'SM':sampleID,'ID':sampleID, 'LB':"0.1", 'PL':"ILLUMINA", 'PU':sampleID}]
