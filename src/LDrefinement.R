@@ -31,8 +31,7 @@ SNV_block <-function(summary=NULL){
 SVM_prepare <-function(x=NULL){
 	svm<-list()
 	region_cnt <- table(x$region)
-	### SNV hot-spot regions (including multi-alleles) ###
-	filter <- names(region_cnt)[region_cnt>=2]
+	filter <- names(region_cnt)[region_cnt>=4]
 	neg <- x[(x$region%in% filter & x$genotype==".|."),]
 	pos <- x[!x$genotype==".|.",]
 	svm$neg <- neg 
@@ -49,7 +48,6 @@ SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 	label$pos[label$pos=="None"] <- NA
 	# using median values to replace the missing values 
 	train_x_pos <- impute(as.matrix(data.matrix(label$pos[,features])), what="median")
-	train_x_pos[is.na(train_x_pos)] <- 0
 
 	# using the minior value of QS 
 	vec <- train_x_pos[,colnames(train_x_pos)=="QS"]
@@ -59,7 +57,6 @@ SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 	label$neg <- as.data.frame(label$neg)
 	label$neg[label$neg=="None"] <- NA
 	train_x_neg <- impute(as.matrix(data.matrix(label$neg[,features])), what="median")
-	train_x_neg[is.na(train_x_neg)] <- 0
 	vec <- train_x_neg[,colnames(train_x_neg)=="QS"]
 	vec[vec>0.5] <- 1- vec[vec>0.5]
 	train_x_neg[,1] <- vec
@@ -67,7 +64,6 @@ SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 	label$test <- as.data.frame(label$test)
 	label$test[label$test=="None"] <- NA
 	test_x <- impute(as.matrix(data.matrix(label$test[,features])), what="median")
-	test_x[is.na(test_x)] <- 0
 	vec <- test_x[,colnames(test_x)=="QS"]
 	vec[vec>0.5] <- 1- vec[vec>0.5]
 	test_x[,1] <- vec
@@ -83,10 +79,12 @@ SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 	  print(p)
 	}
 	dev.off()
-    
+  
+
 	model <- svm(as.matrix(rbind(train_x_pos, train_x_neg)), 
 				 as.factor(c(train_y_pos,train_y_neg)), 
 				 probability=TRUE)
+  print("Done")
 	pred <- predict(model, as.matrix(test_x), probability=TRUE)
 	prob <- attr(pred, "probabilities")
 	prob <-as.data.frame(prob)
@@ -410,10 +408,11 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=50){
 
 dt <- fread(mat_gz)
 dt <- data.frame(dt)
-dt$V10[is.na(dt$V10)] <- ".|."
+dt$V10[dt$V10=="nan"] <- ".|."
 rownames(dt) <- paste0(dt$V1,":",dt$V2,":",dt$V3,":",dt$V4)
 
-cellName <- read.table(file=paste0(outdir,region,".cell.txt"),header=F)
+cellName <- read.csv(file=paste0(outdir,region,".cell_snv.cellID.filter.csv"),header=T)
+cellName <- cellName[,2]
 
 for(j in seq(11,18,1)){
   dt[,j] <- as.numeric(dt[,j])
@@ -421,7 +420,6 @@ for(j in seq(11,18,1)){
 meta <- dt[,1:18]
 colnames(meta) <-c("chr","pos","ref","alt","Dep","dep1","dep2","dep3","dep4",
 	"genotype","QS","VDB","RPB","MQB","BQB","MQSB","SGB","MQ0F")
-
 
 mutation_block <- SNV_block(summary=meta)
 svm_in <- SVM_prepare(mutation_block)
@@ -431,7 +429,25 @@ final <- somaticLD(mat=dt, svm=svm_out, dir=outdir, region=region)
 
 
 mut_mat <- dt[rownames(final$out),]
-colnames(mut_mat) <-c(colnames(meta),cellName[,1])
+colnames(mut_mat) <-c(colnames(meta),cellName)
+
+
+#### re-assign the sequencing depth for each allele
+
+for(i in seq(1, nrow(mut_mat),1)){
+  N_wild <- 0 
+  N_mut <- 0 
+  vec <- mut_mat[i,seq(19, ncol(mut_mat),1)]
+  sta <- unname(unlist(vec))
+  sta <- table(c(sta,"0/1","1/0","1/1"))
+  sta <- sta - 1 
+  N_alt <- sta["0/1"] + sta["1/1"]
+  N_ref <- sta["1/0"] + sta["1/1"]
+  LDrefine_somatic[i,6] <- N_ref 
+  LDrefine_somatic[i,7] <- N_alt
+  LDrefine_somatic[i,8] <- N_ref + N_alt
+  LDrefine_somatic[i,12] <- N_alt/(N_ref+N_alt)
+}
 
 write.csv(final$LDrefine_somatic,   paste0(outdir,region,".putativeSNVs.csv"),quote=FALSE,row.names = FALSE)
 write.csv(final$LDrefine_germline2, paste0(outdir,region,".germlineTwoLoci_model.csv"),quote=FALSE, row.names = FALSE)
