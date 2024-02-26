@@ -800,14 +800,15 @@ After running the `LDrefinment` step, there would be two files `chr20.germlineTw
 <image src="./example/maester.chr20_LDrefinement_germline.png" width="600"> 
 
 
-Users need to perform hard filtering based on the file `chr20.putativeSNVs.csv` as following: 
+Users need to perform hard filtering based on the file `chr20.putativeSNVs.csv` as following
+
+<image src="./example/SNV_finalOut.png" width="600">
+
 * `SVM_pos_score>0.5`. The `SVM_pos_score` is the prediction score from the SVM module. Closing to 0 has higher probability of sequencing error. 
 * `LDrefine_merged_score>0.25`. The `LDrefine_merged_score` is from the LDrefinement module. Closing to 0 is germline SNVs and closing to 0.5 is more likely the putative somatic SNVs. The `NA` values in `LDrefine_merged_score` column denotes that there are no informative germline SNVs tagging the putative somatic SNVs. 
 * `BAF_alt<0.5`, `Dep_ref>2`, and `Dep_alt>2`. The `BAF_alt` is frequency of alternative allele, `Dep_ref` denotes the number of cells with only reference allele detected and `Dep_alt` for alternative allele.
 * remove germline SNVs overlapped in genomeAD database.  
 
-
-<image src="./example/SNV_finalOut.png" width="600">
 
 Users can also extract the reads covering putative SNVs at the single cell resolution from `chr20.SNV_mat.RDS`. Starting from column 19, each column denotes one cell. In each element (for example `1/0`), the number denotes whether there is read supporting reference/alternative allele. 
 ```
