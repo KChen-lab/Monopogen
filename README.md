@@ -783,15 +783,12 @@ python  ${path}/src/Monopogen.py  somatic  \
     -i  bm  -l  CB_7K.maester_scRNA.csv   -s cellScan     \
     -g   GRCh38.chr20.fa
 ```
-This process would take ~3.5 h to be finished 
+This process would take ~15 mins to be finished 
 ```
-[2023-05-08 07:48:27,720] INFO     Monopogen.py Get single cell level information from sequencing data...
-/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps/samtools mpileup -b bm/Bam/split_bam/cellchr20.bam.lst -f GRCh38.chr20.fa -r chr20 -q 20 -Q 20 -t DP4 -d 10000000 -v  | /rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps/bcftools view  | /rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps/bcftools norm -m-both -f GRCh38.chr20.fa | grep -v "<X>" | grep -v INDEL |/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps/bgzip -c > bm/somatic/chr20.cell.gl.vcf.gz
-[mpileup] 12529 samples in 12529 input files
-(mpileup) Max depth is above 1M. Potential memory hog!
-Lines   total/split/realigned/skipped:  1593789/42248/4781/0
-[E::idx_find_and_load] Could not retrieve index file for 'bm/somatic/chr20.cell.gl.vcf.gz'
-[2023-05-08 11:12:18,811] INFO     Monopogen.py Success! See instructions above.
+[2024-02-26 15:16:50,920] INFO     Monopogen.py Collect single cell level inom sequencing data...
+scanning read 1000000
+scanning read 2000000
+[2024-02-26 15:16:50,498] INFO     Monopogen.py Success! See instructions above.
 ```
 Finally, we can run the LD refinment step to further improve the putative somatic SNV detection as (taking ~3 mins) 
 ```
