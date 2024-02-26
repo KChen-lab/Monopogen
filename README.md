@@ -819,6 +819,12 @@ chr20:436781:A:G              0/0              0/0              0/0
 
 
 ## FAQs 
+* ***Is Monopogen call SNVs from mitochondria genome?***
+  No. Monopogen needs the LD from 1KG3 as input. Also, Monopogen does not work on mouse genome.
+
+* ***How to use the multi-threading function -t in Monopogen***
+  With the putative somatic SNV calling, user can set `-t` as the number of chromosomes listed in `region` file
+  
 * ***where to download 1KG3 reference panel (hg38)***
   http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/
   
@@ -841,6 +847,8 @@ chr20:436781:A:G              0/0              0/0              0/0
 
   If the number is smaller than the cells in your study, please change the maximum of the open files.
   If the file number opened is still large, you can set smaller value on the option `-t` in the `cellScan` step (such as 5). In such case, only 5 regions were processed simultaneously.
+
+  
  
 ## Citation
 
