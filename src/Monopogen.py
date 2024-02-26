@@ -148,7 +148,7 @@ def somatic(args):
 
 		with Pool(processes=args.nthreads) as pool:
 			result = pool.map(featureInfo, joblst)
-		error_check(all = chr_lst, output = result, step = "LDrefinement")
+		error_check(all = chr_lst, output = result, step = "featureInfo")
 		
 	if args.step=="cellScan" or args.step=="all":
 		

@@ -84,7 +84,6 @@ SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 	model <- svm(as.matrix(rbind(train_x_pos, train_x_neg)), 
 				 as.factor(c(train_y_pos,train_y_neg)), 
 				 probability=TRUE)
-  print("Done")
 	pred <- predict(model, as.matrix(test_x), probability=TRUE)
 	prob <- attr(pred, "probabilities")
 	prob <-as.data.frame(prob)
@@ -433,7 +432,7 @@ colnames(mut_mat) <-c(colnames(meta),cellName)
 
 
 #### re-assign the sequencing depth for each allele
-
+LDrefine_somatic <- final$LDrefine_somatic
 for(i in seq(1, nrow(mut_mat),1)){
   N_wild <- 0 
   N_mut <- 0 
@@ -445,9 +444,10 @@ for(i in seq(1, nrow(mut_mat),1)){
   N_ref <- sta["1/0"] + sta["1/1"]
   LDrefine_somatic[i,6] <- N_ref 
   LDrefine_somatic[i,7] <- N_alt
-  LDrefine_somatic[i,8] <- N_ref + N_alt
+  LDrefine_somatic[i,5] <- N_ref + N_alt
   LDrefine_somatic[i,12] <- N_alt/(N_ref+N_alt)
 }
+final$LDrefine_somatic <- LDrefine_somatic 
 
 write.csv(final$LDrefine_somatic,   paste0(outdir,region,".putativeSNVs.csv"),quote=FALSE,row.names = FALSE)
 write.csv(final$LDrefine_germline2, paste0(outdir,region,".germlineTwoLoci_model.csv"),quote=FALSE, row.names = FALSE)

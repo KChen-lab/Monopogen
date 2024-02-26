@@ -96,7 +96,7 @@ def bamExtract(para):
 		f_out.write(cmd1 + "\n")
 		f_out.write(samtools + " index " +  outbam + "\n")
 	cmd="bash " + out+"/Script/bamExtract_" + chr + ".sh"
-	print(cmd)
+	#print(cmd)
 	os.system(cmd)
 
 def featureInfo(para):
@@ -155,6 +155,7 @@ def featureInfo(para):
 
 	
 	bamExtract(para)
+	return(region)
 
 
 def getBamName(chr, out):
@@ -275,9 +276,9 @@ def rev_compl(st):
 def bam2mat(para):
 
 	para_lst = para.strip().split(">")
-	print(para_lst)
+	#print(para_lst)
 
-	# bam2gz(para);
+	bam2gz(para);
 
 	#### gz to matrix ### 
 	mat_infile = para_lst[1] + "/somatic/" + para_lst[0] + ".cell_snv.mat.gz"
@@ -348,6 +349,7 @@ def bam2mat(para):
 		if flag:
 			mat_out.write(info+"\t" +'\t'.join(phase_info))
 			mat_out.write('\n')
+	return(para_lst[0])
 
 
 
