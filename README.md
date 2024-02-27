@@ -204,7 +204,7 @@ python  ${path}/src/Monopogen.py  germline  \
     -g  ../example/chr20_2Mb.hg38.fa   -s all  -o out
     --norun TRUE
 ```
-The germline outputs for the demo data could be seen in `test/chr20.gl.vcf.gz`, `test/chr20.gp.vcf.gz` and `test/chr20.phased.vcf.gz` 
+The germline outputs for the demo data could be seen in `test/chr20.gl.vcf.gz`, `test/chr20.gp.vcf.gz` and `test/chr20.phased.vcf.gz`.
 The `-norun` module will generate jobs from different regions and you can submit them to HPC based on your own preference. The generated job files will be in `out/Script/`
 
 ## Germline SNV calling from snRNA-seq
