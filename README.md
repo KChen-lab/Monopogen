@@ -161,8 +161,7 @@ python  ${path}/src/Monopogen.py  germline  \
     -g  ../example/chr20_2Mb.hg38.fa   -s all  -o out
 
 ```
-The `germline` module will generate the phased VCF files with name `*.phased.vcf.gz` in the folder `out/germline`. If there are multiple samples in the bam file list from `-b` option in `preProcess` module, the phased VCF files will contain genotypes from multiple samples. The output of phased genotypes are as following:
-  
+The `germline` module will generate the phased VCF files with name `*.phased.vcf.gz` in the folder `out/germline`. If there are multiple samples in the bam file list from `-b` option in `preProcess` module, the phased VCF files will contain genotypes from multiple samples. The output of phased genotypes are as following: 
 ```
 ##fileformat=VCFv4.2
 ##filedate=20240227
@@ -205,6 +204,7 @@ python  ${path}/src/Monopogen.py  germline  \
     -g  ../example/chr20_2Mb.hg38.fa   -s all  -o out
     --norun TRUE
 ```
+The germline outputs for the demo data could be seen in `test/chr20.gl.vcf.gz`, `test/chr20.gp.vcf.gz` and `test/chr20.phased.vcf.gz` 
 The `-norun` module will generate jobs from different regions and you can submit them to HPC based on your own preference. The generated job files will be in `out/Script/`
 
 ## Germline SNV calling from snRNA-seq
