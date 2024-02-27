@@ -86,6 +86,11 @@ def germline(args):
 			if(len(record)==3):
 				jobid = record[0] + ":" + record[1] + "-" + record[2]
 			bam_filter = args.out + "/Bam/" +  record[0] +  ".filter.bam.lst"
+			N_sample = 0 
+			with open(bam_filter) as p:
+				for s in p:
+					N_sample = N_sample + 1
+
 			imputation_vcf = args.imputation_panel + "CCDG_14151_B01_GRM_WGS_2020-08-05_" + record[0] + ".filtered.shapeit2-duohmm-phased.vcf.gz"
 			cmd1 = samtools + " mpileup -b" + bam_filter + " -f "  + args.reference  + " -r " +  jobid + " -q 20 -Q 20 -t DP -d 10000000 -v "
 			cmd1 = cmd1 + " | " + bcftools + " view " + " | "  + bcftools  + " norm -m-both -f " + args.reference 
@@ -93,8 +98,8 @@ def germline(args):
 			#cmd2 = bcftools + " view " +  out + "/germline/" +  jobid + ".gl.vcf.gz" + " -i 'FORMAT/DP>1' | " + bcftools + " call -cv  | " + bgzip +    "  -c > " +  args.out + "/SCvarCall/"  +  jobid + ".gt.vcf.gz"
 			cmd3 = java + " -Xmx20g -jar " + beagle +  " gl=" +  out + "/germline/" +  jobid + ".gl.vcf.gz"  +  " ref=" +  imputation_vcf   + "  chrom=" + record[0] + " out="   +  out + "/germline/" + jobid + ".gp " + "impute=false  modelscale=2  nthreads=24  gprobs=true  niterations=0"
 			
-			cmd4 = "zless -S " +  out + "/germline/" + jobid + ".gp.vcf.gz | grep -v  0/0  > " +  out + "/germline/" + jobid + ".germline.vcf"
 			cmd5 = java + " -Xmx20g -jar " + beagle +  " gt=" +  out + "/germline/" +  jobid + ".germline.vcf"  +  " ref=" +  imputation_vcf    +  "  chrom=" + record[0]  + " out="   +  out + "/germline/" + jobid+ ".phased " + "impute=false  modelscale=2  nthreads=24  gprobs=true  niterations=0"
+			cmd5 = cmd5 + "\n" + "rm " +  out + "/germline/" +  jobid + ".germline.vcf" 
 			f_out = open(out + "/Script/runGermline_" +  jobid +  ".sh","w")
 			if args.step == "varScan" or args.step == "all":
 				f_out.write(cmd1 + "\n")
@@ -103,6 +108,10 @@ def germline(args):
 			if args.step == "varImpute" or args.step == "all":
 				#if NSNV>100:
 					f_out.write(cmd3 + "\n")
+					if N_sample == 1:
+						cmd4 = "zless -S " +  out + "/germline/" + jobid + ".gp.vcf.gz | grep -v  0/0  > " +  out + "/germline/" + jobid + ".germline.vcf"
+					elif N_sample > 1: 
+						cmd4 = "zless -S " +  out + "/germline/" + jobid + ".gp.vcf.gz   > " +  out + "/germline/" + jobid + ".germline.vcf"
 					f_out.write(cmd4 + "\n")
 			if args.step == "varPhasing" or args.step == "all":
 				#if NSNV>100:
