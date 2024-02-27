@@ -165,35 +165,34 @@ The `germline` module will generate the phased VCF files with name `*.phased.vcf
   
 ```
 ##fileformat=VCFv4.2
-##filedate=20230422
+##filedate=20240227
 ##source="beagle.27Jul16.86a.jar (version 4.1)"
 ##INFO=<ID=AF,Number=A,Type=Float,Description="Estimated ALT Allele Frequencies">
-##INFO=<ID=AR2,Number=1,Type=Float,Description="Allelic R-Squared: estimated squared correlation betwe
-##INFO=<ID=DR2,Number=1,Type=Float,Description="Dosage R-Squared: estimated squared correlation betwee
+##INFO=<ID=AR2,Number=1,Type=Float,Description="Allelic R-Squared: estimated squared correlation
+##INFO=<ID=DR2,Number=1,Type=Float,Description="Dosage R-Squared: estimated squared correlation
 ##INFO=<ID=IMP,Number=0,Type=Flag,Description="Imputed marker">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 ##FORMAT=<ID=DS,Number=A,Type=Float,Description="estimated ALT dose [P(RA) + P(AA)]">
 ##FORMAT=<ID=GP,Number=G,Type=Float,Description="Estimated Genotype Probability">
-#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  19D013_European_F_78    19D014_European_M_84
-chr20   68303   .       T       C       .       PASS    .       GT      1|0     1|1
-chr20   88108   .       T       C       .       PASS    .       GT      1|1     0|1
+#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  A       B
+chr20   60291   .       G       T       .       PASS    .       GT      0|1     0|0
+chr20   63117   .       T       C       .       PASS    .       GT      0|0     1|0
+chr20   64506   .       C       T       .       PASS    .       GT      0|0     0|0
+chr20   68303   .       T       C       .       PASS    .       GT      0|1     1|1
+chr20   75250   .       C       T       .       PASS    .       GT      0|1     0|0
+chr20   88108   .       T       C       .       PASS    .       GT      1|1     1|0
+chr20   101433  .       A       C       .       PASS    .       GT      0|0     0|1
+chr20   101498  .       A       G       .       PASS    .       GT      0|0     1|1
 chr20   127687  .       A       C       .       PASS    .       GT      1|1     1|1
-chr20   153835  .       T       C       .       PASS    .       GT      1|0     1|1
+chr20   140857  .       C       A       .       PASS    .       GT      0|0     0|1
+chr20   153835  .       T       C       .       PASS    .       GT      0|1     1|1
 chr20   154002  .       C       T       .       PASS    .       GT      1|1     1|1
 chr20   159104  .       T       C       .       PASS    .       GT      1|1     1|1
+chr20   165212  .       C       A       .       PASS    .       GT      0|0     1|1
 chr20   167839  .       T       C       .       PASS    .       GT      1|1     1|1
-chr20   198814  .       A       T       .       PASS    .       GT      1|0     1|1
-chr20   231710  .       T       G       .       PASS    .       GT      1|1     1|1
-chr20   237210  .       T       C       .       PASS    .       GT      1|1     1|1
-chr20   247326  .       G       A       .       PASS    .       GT      1|1     1|0
-chr20   248854  .       T       C       .       PASS    .       GT      1|1     1|0
-chr20   255081  .       G       A       .       PASS    .       GT      1|1     1|0
-chr20   274893  .       G       C       .       PASS    .       GT      0|1     1|1
-chr20   275122  .       G       T       .       PASS    .       GT      0|1     1|1
-chr20   275241  .       G       A       .       PASS    .       GT      0|1     1|0
-chr20   275361  .       C       T       .       PASS    .       GT      0|1     1|0
-chr20   275932  .       A       G       .       PASS    .       GT      0|1     1|0
-chr20   276086  .       T       A       .       PASS    .       GT      0|1     1|0
+chr20   175269  .       T       C       .       PASS    .       GT      1|1     0|0
+chr20   186086  .       G       A       .       PASS    .       GT      1|1     0|0
+chr20   186183  .       G       A       .       PASS    .       GT      1|1     0|0
 
 ```
 ### Run on the HPC ###
