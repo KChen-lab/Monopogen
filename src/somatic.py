@@ -268,7 +268,7 @@ def robust_get_tag(read, tag_name):
 		return "NotFound"
 
 def rev_compl(st):
-    nn = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+    nn = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N'}
     return "".join(nn[n.upper()] for n in reversed(st))
 
 
