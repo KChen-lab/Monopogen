@@ -27,7 +27,7 @@
 [//]: # (END automated TOC section, any edits will be overwritten on next source refresh)
 
 ## Introduction
-**Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', single ATAC-seq technoloiges, scDNA-seq etc. 
+**Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://www.mdanderson.org/research/departments-labs-institutes/labs/ken-chen-laboratory.html) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', single ATAC-seq technoloiges, scDNA-seq etc. 
 
 <image src="./example/Fig1.png" width="600"> 
   
