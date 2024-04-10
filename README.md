@@ -1,4 +1,9 @@
 # Monopogen: SNV calling from single cell sequencing data
+## News
+* 2/26/2024: Version 1.5.0 released.  
+  * In the cell-scan step, we implemented a motif-based search on wild/mutated alleles for all cells from the bam file directly. The single-cell level bam file splitting and joint calling modules were removed.  
+  * Recommended hard-filterings on putative somatic SNVs from Monopogen were added.
+
 ## Table of Contents
 
 [//]: # (BEGIN automated TOC section, any edits will be overwritten on next source refresh)
@@ -22,7 +27,7 @@
 [//]: # (END automated TOC section, any edits will be overwritten on next source refresh)
 
 ## Introduction
-**Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://sites.google.com/view/kchenlab/Home) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', smartseq, single ATAC-seq technologies, scDNA-seq, etc. 
+**Monopogen** is an analysis package for SNV calling from single-cell sequencing, developed and maintained by [Ken chen's lab](https://www.mdanderson.org/research/departments-labs-institutes/labs/ken-chen-laboratory.html) in MDACC. `Monopogen` works on sequencing datasets generated from single cell RNA 10x 5', 10x 3', single ATAC-seq technologies, scDNA-seq etc. 
 
 <image src="./example/Fig1.png" width="600"> 
   
@@ -157,39 +162,37 @@ python  ${path}/src/Monopogen.py  germline  \
     -g  ../example/chr20_2Mb.hg38.fa   -s all  -o out
 
 ```
-The `germline` module will generate the phased VCF files with name `*.phased.vcf.gz` in the folder `out/germline`. If there are multiple samples in the bam file list from `-b` option in `preProcess` module, the phased VCF files will contain genotypes from multiple samples. The output of phased genotypes are as following:
-  
+The `germline` module will generate the phased VCF files with name `*.phased.vcf.gz` in the folder `out/germline`. If there are multiple samples in the bam file list from `-b` option in `preProcess` module, the phased VCF files will contain genotypes from multiple samples. The output of phased genotypes are as following: 
 ```
 ##fileformat=VCFv4.2
-##filedate=20230422
+##filedate=20240227
 ##source="beagle.27Jul16.86a.jar (version 4.1)"
 ##INFO=<ID=AF,Number=A,Type=Float,Description="Estimated ALT Allele Frequencies">
-##INFO=<ID=AR2,Number=1,Type=Float,Description="Allelic R-Squared: estimated squared correlation betwe
-##INFO=<ID=DR2,Number=1,Type=Float,Description="Dosage R-Squared: estimated squared correlation betwee
+##INFO=<ID=AR2,Number=1,Type=Float,Description="Allelic R-Squared: estimated squared correlation
+##INFO=<ID=DR2,Number=1,Type=Float,Description="Dosage R-Squared: estimated squared correlation
 ##INFO=<ID=IMP,Number=0,Type=Flag,Description="Imputed marker">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 ##FORMAT=<ID=DS,Number=A,Type=Float,Description="estimated ALT dose [P(RA) + P(AA)]">
 ##FORMAT=<ID=GP,Number=G,Type=Float,Description="Estimated Genotype Probability">
-#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  19D013_European_F_78    19D014_European_M_84
-chr20   68303   .       T       C       .       PASS    .       GT      1|0     1|1
-chr20   88108   .       T       C       .       PASS    .       GT      1|1     0|1
+#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  A       B
+chr20   60291   .       G       T       .       PASS    .       GT      0|1     0|0
+chr20   63117   .       T       C       .       PASS    .       GT      0|0     1|0
+chr20   64506   .       C       T       .       PASS    .       GT      0|0     0|0
+chr20   68303   .       T       C       .       PASS    .       GT      0|1     1|1
+chr20   75250   .       C       T       .       PASS    .       GT      0|1     0|0
+chr20   88108   .       T       C       .       PASS    .       GT      1|1     1|0
+chr20   101433  .       A       C       .       PASS    .       GT      0|0     0|1
+chr20   101498  .       A       G       .       PASS    .       GT      0|0     1|1
 chr20   127687  .       A       C       .       PASS    .       GT      1|1     1|1
-chr20   153835  .       T       C       .       PASS    .       GT      1|0     1|1
+chr20   140857  .       C       A       .       PASS    .       GT      0|0     0|1
+chr20   153835  .       T       C       .       PASS    .       GT      0|1     1|1
 chr20   154002  .       C       T       .       PASS    .       GT      1|1     1|1
 chr20   159104  .       T       C       .       PASS    .       GT      1|1     1|1
+chr20   165212  .       C       A       .       PASS    .       GT      0|0     1|1
 chr20   167839  .       T       C       .       PASS    .       GT      1|1     1|1
-chr20   198814  .       A       T       .       PASS    .       GT      1|0     1|1
-chr20   231710  .       T       G       .       PASS    .       GT      1|1     1|1
-chr20   237210  .       T       C       .       PASS    .       GT      1|1     1|1
-chr20   247326  .       G       A       .       PASS    .       GT      1|1     1|0
-chr20   248854  .       T       C       .       PASS    .       GT      1|1     1|0
-chr20   255081  .       G       A       .       PASS    .       GT      1|1     1|0
-chr20   274893  .       G       C       .       PASS    .       GT      0|1     1|1
-chr20   275122  .       G       T       .       PASS    .       GT      0|1     1|1
-chr20   275241  .       G       A       .       PASS    .       GT      0|1     1|0
-chr20   275361  .       C       T       .       PASS    .       GT      0|1     1|0
-chr20   275932  .       A       G       .       PASS    .       GT      0|1     1|0
-chr20   276086  .       T       A       .       PASS    .       GT      0|1     1|0
+chr20   175269  .       T       C       .       PASS    .       GT      1|1     0|0
+chr20   186086  .       G       A       .       PASS    .       GT      1|1     0|0
+chr20   186183  .       G       A       .       PASS    .       GT      1|1     0|0
 
 ```
 ### Run on the HPC ###
@@ -202,6 +205,7 @@ python  ${path}/src/Monopogen.py  germline  \
     -g  ../example/chr20_2Mb.hg38.fa   -s all  -o out
     --norun TRUE
 ```
+The germline outputs for the demo data could be seen in `test/chr20.gl.vcf.gz`, `test/chr20.gp.vcf.gz` and `test/chr20.phased.vcf.gz`.
 The `-norun` module will generate jobs from different regions and you can submit them to HPC based on your own preference. The generated job files will be in `out/Script/`
 
 ## Germline SNV calling from snRNA-seq
@@ -387,10 +391,11 @@ chr20   231710  .       T       G       .       PASS    .       GT      1|1
 
 ```
 ### genotyping accuracy evaluation
-We can validate the genotyping accuracy and sensitvity (recall) by comparing Monopogen outputs with matched WGS-based genotypes. Users can download the WGS-based genotypes from chr22 only [19D013.wgs.chr20.vcf](https://drive.google.com/file/d/1u55oZgNiwzj5PXeIHCn4NF9dAQlb9uwk/view?usp=share_link). We use [vcftools](https://vcftools.sourceforge.net/) to compare genotypes of Monopogen to the gold standard. 
+We can validate the genotyping accuracy and sensitvity (recall) by comparing Monopogen outputs with matched WGS-based genotypes. Users can download the WGS-based genotypes from chr22 only [19D013.wgs.chr20.vcf](https://drive.google.com/file/d/1u55oZgNiwzj5PXeIHCn4NF9dAQlb9uwk/view?usp=share_link). We use [vcftools](https://vcftools.sourceforge.net/) to compare genotypes of Monopogen to the gold standard. Before evaluation, you need to remove the homozygous included in the phasing results.
 
 ```
-vcftools --gzvcf  ./retina/germline/chr20.phased.vcf.gz    --diff  19D013.wgs.chr20.vcf   --diff-discordance-matrix --out  19D013  --chr chr20
+zless ./retina/germline/chr20.phased.vcf.gz | grep -v "0|0" | bgzip -c > ./retina/germline/chr20.phased.het.vcf.gz 
+vcftools --gzvcf  ./retina/germline/chr20.phased.het.vcf.gz    --diff  19D013.wgs.chr20.vcf   --diff-discordance-matrix --out  19D013  --chr chr20
 ```
  
 The output is 
@@ -757,41 +762,38 @@ beagle.27Jul16.86a.jar (version 4.1) finished
 ### ld refinement on putative somatic SNVs ###
 One advantage of Monopogen is to extend the machinery of LD refinement from human population level to cell population level. Users need to prepare the cell barcode file [CB_7K.maester_scRNA.csv](https://drive.google.com/file/d/1LhNYpU194kaBevW5nd2ORX7qO3pigQOH/view?usp=share_link). The cell barcode file includes two columns: 1) cell barcode; 2) number of reads detected in each cell. This could be generated using `cell ranger`/`Seurat`. You can select top cells (1K~10K) with high reads detected. There are three steps `featureInfo`, `cellScan`, and `LDrefinement` to call putative somatic SNVs. Here we show the step one by one. 
 
-To extract the feature information from sequencing data, we need to run (this step will take ~63 mins)
+To extract the feature information from sequencing data, we need to run (this step will take ~22s). Note, the option `-t` enables users to run mulitple chromosomes simultaneously. Set `-t=1` if you are working on only one chromosome.
 ```
 python  ${path}/src/Monopogen.py  somatic  \
-    -a   ${path}/apps  -r  region.lst  -t 50 \
+    -a   ${path}/apps  -r  region.lst  -t 1 \
     -i  bm  -l  CB_7K.maester_scRNA.csv   -s featureInfo     \
     -g   GRCh38.chr20.fa
 
 ```
 The output would be
 ```
-[2023-05-07 23:53:50,211] INFO     Monopogen.py Get feature information from sequencing data...
-[2023-05-08 00:50:14,484] INFO     Monopogen.py Success! See instructions above.
+[2024-03-04 09:55:20,598] INFO     Monopogen.py Get feature information from sequencing data...
+[2024-03-04 09:55:42,232] INFO     Monopogen.py Success! See instructions above.
 ```
 Then, we need to collect single cell level read information by running the `cellScan` module as 
 
 ```
 python  ${path}/src/Monopogen.py  somatic  \
-    -a   ${path}/apps  -r  region.lst  -t 22  -w 10MB \
+    -a   ${path}/apps  -r  region.lst  -t 1  \
     -i  bm  -l  CB_7K.maester_scRNA.csv   -s cellScan     \
     -g   GRCh38.chr20.fa
 ```
-This process would take ~3.5 h to be finished 
+This process would take ~15 mins to be finished 
 ```
-[2023-05-08 07:48:27,720] INFO     Monopogen.py Get single cell level information from sequencing data...
-/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps/samtools mpileup -b bm/Bam/split_bam/cellchr20.bam.lst -f GRCh38.chr20.fa -r chr20 -q 20 -Q 20 -t DP4 -d 10000000 -v  | /rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps/bcftools view  | /rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps/bcftools norm -m-both -f GRCh38.chr20.fa | grep -v "<X>" | grep -v INDEL |/rsrch3/scratch/bcb/jdou1/scAncestry/Monopogen/apps/bgzip -c > bm/somatic/chr20.cell.gl.vcf.gz
-[mpileup] 12529 samples in 12529 input files
-(mpileup) Max depth is above 1M. Potential memory hog!
-Lines   total/split/realigned/skipped:  1593789/42248/4781/0
-[E::idx_find_and_load] Could not retrieve index file for 'bm/somatic/chr20.cell.gl.vcf.gz'
-[2023-05-08 11:12:18,811] INFO     Monopogen.py Success! See instructions above.
+[2024-03-04 09:55:42,651] INFO     Monopogen.py Collect single cell level information from sequencing data...
+scanning read 1000000
+scanning read 2000000
+[2024-03-04 10:10:17,343] INFO     Monopogen.py Success! See instructions above.
 ```
 Finally, we can run the LD refinment step to further improve the putative somatic SNV detection as (taking ~3 mins) 
 ```
 python  ${path}/src/Monopogen.py  somatic  \
-    -a   ${path}/apps  -r  region.lst  -t 22 \
+    -a   ${path}/apps  -r  region.lst  -t 1 \
     -i  bm  -l  CB_7K.maester_scRNA.csv   -s LDrefinement     \
     -g   GRCh38.chr20.fa
 ```
@@ -799,9 +801,16 @@ After running the `LDrefinment` step, there would be two files `chr20.germlineTw
  
 <image src="./example/maester.chr20_LDrefinement_germline.png" width="600"> 
 
-Users can filter putative somatic SNVs based on the key file `chr20.putativeSNVs.csv` with column `SVM_pos_score>0.5` and `LDrefine_merged_score>0.25` and `BAF_alt<0.3`. The `SVM_pos_score` is the prediction score from the SVM module. Values close to 0 have a higher probability of sequencing error. The `LDrefine_merged_score` is from the LDrefinement module. Values close to 0 are germline SNVs and close to 0.5 are more likely to be putative somatic SNVs. The `NA` values in `LDrefine_merged_score` column denotes that there are no informative germline SNVs tagging the putative somatic SNVs. 
+
+Users need to perform hard filtering based on the file `chr20.putativeSNVs.csv` as following
 
 <image src="./example/SNV_finalOut.png" width="600">
+
+* `SVM_pos_score>0.5`. The `SVM_pos_score` is the prediction score from the SVM module. Closing to 0 has higher probability of sequencing error. 
+* `LDrefine_merged_score>0.25`. The `LDrefine_merged_score` is from the LDrefinement module. Closing to 0 is germline SNVs and closing to 0.5 is more likely the putative somatic SNVs. The `NA` values in `LDrefine_merged_score` column denotes that there are no informative germline SNVs tagging the putative somatic SNVs. 
+* `0.1<BAF_alt<0.5`, `Dep_ref>2`, and `Dep_alt>2`. The `BAF_alt` is frequency of alternative allele, `Dep_ref` denotes the number of cells with only reference allele detected and `Dep_alt` for alternative allele.
+* remove germline SNVs overlapped in genomeAD database.  
+
 
 Users can also extract the reads covering putative SNVs at the single cell resolution from `chr20.SNV_mat.RDS`. Starting from column 19, each column denotes one cell. In each element (for example `1/0`), the number denotes whether there is read supporting reference/alternative allele. 
 ```
@@ -819,6 +828,12 @@ chr20:436781:A:G              0/0              0/0              0/0
 
 
 ## FAQs 
+* ***Is Monopogen call SNVs from mitochondria genome?***  
+  No. Monopogen needs the LD from 1KG3 as input. Also, Monopogen does not work on mouse genome.
+
+* ***How to use the multi-threading function -t in Monopogen***  
+  With the putative somatic SNV calling, user can set `-t` as the number of chromosomes listed in `region` file
+  
 * ***where to download 1KG3 reference panel (hg38)***
   http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000G_2504_high_coverage/working/20201028_3202_phased/
   
@@ -834,13 +849,11 @@ chr20:436781:A:G              0/0              0/0              0/0
   You may set the read/write permission on the folder `xx/apps` as  
   
   `chmod 770 -R  /xx/apps`
-* ***[mpileup] fail to load index for xx/Bam/split_bam/chr20_xx.bam; Failed to open -: unknown file type***  
-  In this step, Monopogen needs to open bam files from multiple cells. This happens because the server has limit open file limit. You can check by typing
-  
-  `ulimit -n `
+
 
   If the number is smaller than the cells in your study, please change the maximum number of open files.
   If the file number opened is still large, you can set smaller value on the option `-t` in the `cellScan` step (such as 5). In such case, only 5 regions were processed simultaneously.
+
  
 ## Citation
 
