@@ -21,6 +21,7 @@
   * [preprocess](#preprocess)
   * [germline calling](#germline-calling)
   * [ld refinement on putative somatic SNVs](#ld-refinement-on-putative-somatic-SNVs)
+* [Putative SNV filtering based on cell type information](#Putative-SNV-filtering-based-on-cell-type-information)
 * [FAQs](#faqs)
 * [Citation](#citation)
 
@@ -824,6 +825,11 @@ chr20:410520:A:T              1/0              0/0              0/0
 chr20:436781:A:G              0/0              0/0              0/0
 
 ```
+
+### Putative SNV filtering based on cell type information ### 
+More details could be see in vignettes 
+
+* [Putative SNV filtering based on cell type information](https://htmlpreview.github.io/?[https://github.com/KChen-lab/Monopogen/blob/main/example/Monopogen_scRNA.html])
 
 
 ## FAQs 
