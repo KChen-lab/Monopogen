@@ -1,0 +1,143 @@
+---
+title: "Putative Somatic mutation analysis from Monopogen Output"
+author: "jinzhuang dou@ Kenchen'lab in MDACC"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+This guide will demonstrate the usage of monopogen output to investigate the clonal lineage. Note, those are only from the putative somatic SNVs in chr20. Users need to merge outputs from 22 chromosomes to obtain the full SNVs list.  
+
+
+#### Step1: Load the output from Monopogen 
+
+For the SNV by cell matrix generated from Monopogen, starting from the 19th column, each column denotes on cell with ref/alt format. 0/1: only alternative allele detected; 1/0: only reference allele detected; 1/1: both reference and alternative allele detected
+```{r, message=FALSE, warning=FALSE, results="markup"}
+library(Seurat)
+library(ggpubr)
+meta<- read.csv(file="./chr20.putativeSNVs.csv")
+head(meta)
+mat <- readRDS(file="./chr20.SNV_mat.RDS")
+
+```
+
+#### Step2: SNV filtering
+
+We only keep putative SNVs with at least 5 wild and 5 mutated alleles supported across all cells
+
+```{r,  message = TRUE, warning=FALSE, results='markup'} 
+meta_filter <-meta[meta$Depth_ref>5 & meta$Depth_alt>5, ]
+```
+We then further remove SNVs with at allele frequency of alternative allele larger than 0.5 (they are mostly germline SNVs)
+
+```{r,  message = TRUE, warning=FALSE, results='markup'} 
+meta_filter <-meta_filter[meta_filter$BAF_alt<0.5, ]
+```
+We next keep SNVs with LDrefinement score >0.25 to further remove putative germline SNVs 
+
+```{r,  message = TRUE, warning=FALSE, results='markup'} 
+meta_filter <-meta_filter[meta_filter$LDrefine_merged_score>0.25 & !is.na(meta_filter$LDrefine_merged_score), ]
+snv_pass <- paste0(meta_filter$chr,":", meta_filter$pos, ":", meta_filter$Ref_allele,":", meta_filter$Alt_allele)
+mat <- mat[snv_pass,seq(19,ncol(mat),1)]
+colnames(mat) <- paste0(colnames(mat),"-1")
+```
+
+#### Step3: Load the seurat object from the RNA data and include the mutation profile in the object
+
+The seurat object (with cell type annotated) could be downloaded from https://drive.google.com/file/d/14Fzeit9H05pGsVEeOKRdqy7HlFFYd6aT/view?usp=drive_link
+
+```{r,  message = TRUE, warning=FALSE, results='markup'} 
+
+rna_seurat <- readRDS(file="./BPDCN712_Seurat_Final.rds")
+
+overlap <- intersect(colnames(mat),colnames(rna_seurat))
+obj <- subset(rna_seurat,cells=overlap)
+mat <- mat[,colnames(obj)]
+mat[mat=="0/0"] <- 0
+mat[mat=="1/0"] <- (-1)
+mat[mat=="0/1"] <- 1
+obj[["Geno"]] <- CreateAssayObject(counts = mat)
+
+```
+
+#### Step4: Investigate the mutation distribution among cell types/clusters
+
+```{r pressure, echo=TRUE}
+enrich_p <- function(sta=NULL){
+  if(nrow(sta)==2){
+    tol <- rowSums(sta)
+    celltype_tol <- colSums(sta)
+    rd <-c()
+    for(j in seq(1,ncol(sta),1)){
+      if(sum(sta[,j])>2){
+        data <-rbind(sta[,j], tol-sta[,j])
+        res <-  fisher.test(data) 
+        rd <-rbind(rd, c(colnames(sta)[j] , res$p.value))
+      }
+    }
+    rd <- data.frame("celltype"=as.character(rd[,1]),"pval"=as.numeric(rd[,2]))
+  }
+  else{
+    return(NULL)
+  }
+}
+
+res <- c() 
+for(i in seq(1,nrow(mat),1)){
+   snv_profile <- data.frame("SNV"=as.vector(obj[["Geno"]][i,]), "Celltype"=obj@meta.data$CellType)
+   sta <- table(snv_profile)
+   sta <- sta[c("-1","1"),]
+   out <- enrich_p(sta=sta)
+   if(!is.null(out)){
+     min_pval <- as.vector(out[out$pval==min(out$pval),])
+     res <- rbind(res, c(rownames(mat)[i], as.character(min_pval[1,1]), min_pval[1,2]))
+   }
+}
+res <- data.frame("SNV"=res[,1], "celltype"=res[,2],"pval"=as.numeric(res[,3]))
+res <- res[order(res$pval),]
+head(res)
+```
+
+
+####  Show the mutation profiles from first example chr20:3933453:T:C 
+```{r check informative SNVs1, fig.width=10, fig.height=5}
+SNV_ex <- "chr20:3933453:T:C"
+obj@meta.data$Mutec <- as.vector( obj[["Geno"]][SNV_ex,])
+cell_ref <- colnames(obj)[obj@meta.data$Mutec%in%c(-1)]
+cell_alt <- colnames(obj)[obj@meta.data$Mutec%in%c(1)]
+p1 <- DimPlot(obj,group.by = "CellType", pt.size=2, label=T) + NoLegend()
+p2 <- DimPlot(obj ,cells.highlight = list("Ref"= cell_ref, "Alt"= cell_alt),  cols.highlight = c( "blue",  "red"), cols="gray", pt.size=2, sizes.highlight = 2, main=SNV_ex)
+p <- ggarrange(p1,p2)
+p
+```
+
+#### Show the mutation profiles from the second example chr20:18143827:T:C
+
+```{r check informative SNVs2, fig.width=10, fig.height=5}
+SNV_ex <- "chr20:18143827:T:C"
+obj@meta.data$Mutec <- as.vector( obj[["Geno"]][SNV_ex,])
+cell_ref <- colnames(obj)[obj@meta.data$Mutec%in%c(-1)]
+cell_alt <- colnames(obj)[obj@meta.data$Mutec%in%c(1)]
+p1 <- DimPlot(obj,group.by = "CellType", pt.size=2, label=T) + NoLegend()
+p2 <- DimPlot(obj ,cells.highlight = list("Ref"= cell_ref, "Alt"= cell_alt),  cols.highlight = c( "blue",  "red"), cols="gray", pt.size=2, sizes.highlight = 2, main=SNV_ex)
+p <- ggarrange(p1,p2)
+p
+```
+
+#### Show the mutation profiles from the third example chr20:13609374:A:G
+
+```{r check informative SNVs3, fig.width=10, fig.height=5}
+SNV_ex <- "chr20:13609374:A:G"
+obj@meta.data$Mutec <- as.vector( obj[["Geno"]][SNV_ex,])
+cell_ref <- colnames(obj)[obj@meta.data$Mutec%in%c(-1)]
+cell_alt <- colnames(obj)[obj@meta.data$Mutec%in%c(1)]
+p1 <- DimPlot(obj,group.by = "CellType", pt.size=2, label=T) + NoLegend()
+p2 <- DimPlot(obj ,cells.highlight = list("Ref"= cell_ref, "Alt"= cell_alt),  cols.highlight = c( "blue",  "red"), cols="gray", pt.size=2, sizes.highlight = 2, main=SNV_ex)
+p <- ggarrange(p1,p2)
+p
+```
+
+Given the lack of ground truth for putative somatic SNVs validtion, users can select putative somatic SNVs based on additional evidences.
+
+
