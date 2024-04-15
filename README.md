@@ -829,7 +829,7 @@ chr20:436781:A:G              0/0              0/0              0/0
 ```
 
 ### Putative SNV filtering based on cell type information ### 
-More details could be see in vignettes 
+More details could be see in following vignette
 
 * [Putative SNV filtering based on cell type information](https://htmlpreview.github.io/?https://github.com/KChen-lab/Monopogen/blob/main/example/Monopogen_scRNA.html)
 
