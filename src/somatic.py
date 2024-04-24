@@ -429,7 +429,7 @@ def bam2gz(para):
 		for s in infile:
 
 			cell_barcode  = robust_get_tag(s,"CB")
-			if cell_barcode=="NotFound":
+			if cell_barcode=="NotFound" and s.query_name.find("_")!=-1:
 				### no cell barcode file detected.
 				### check whether the barcode added in the query name 	
 				cell_barcode = s.query_name.strip().split("_")[1]
