@@ -3,7 +3,7 @@
 * 4/12/2024: Version 1.6.0 released.  
   * We added the guide on putative SNV filtering based on cell type information derived from single cell RNA/ATAC-seq modalites. 
 * 2/26/2024: Version 1.5.0 released.  
-  * In the cell-scan step, we implemented a motif-based search on wild/mutated alleles for all cells from the bam file directly. The single-cell level bam file splitting and joint calling modules were removed.  
+  * In the cell-scan step, we implemented a motif-based search on wild/mutated alleles for all cells from the bam file directly. The single-cell level bam file splitting and joint calling modules were removed. This new version achieves over 10-fold speed up than the old version due to avoid the bam splitting. It could take less than 60 mins to collect the wild/mutated allele profiles of 10K cells over 20K loci.
   * Recommended hard-filterings on putative somatic SNVs from Monopogen were added.
 
 ## Table of Contents
