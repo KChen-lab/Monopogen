@@ -76,6 +76,9 @@ Right now Monopogen is avaiable on github, you can install it through github
 
 ## Quick Start 
 
+Note the quick start exmaple only works for germline module. If you want to test somatic module, please go the section 
+* [Somatic SNV calling from scRNA-seq](#somatic-snv-calling-from-scrna-seq)
+
 For quick start of Monopogen, we provide an example dataset provided the `example/` folder, which includes:
 * `A.bam (.bai)`  
   The bam file storing read alignment for sample A.
