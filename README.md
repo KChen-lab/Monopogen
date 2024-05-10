@@ -806,7 +806,6 @@ After running the `LDrefinment` step, there would be two files `chr20.germlineTw
  
 <image src="./example/maester.chr20_LDrefinement_germline.png" width="600"> 
 
-
 Users need to perform hard filtering based on the file `chr20.putativeSNVs.csv` as following
 
 <image src="./example/SNV_finalOut.png" width="600">
