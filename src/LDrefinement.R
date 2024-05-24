@@ -43,9 +43,19 @@ SVM_prepare <-function(x=NULL){
 ### SVM trainning on 8 features, some features may not informative (depending on sequencing platforms) 
 SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 
-	features <-c("QS", "VDB", "SGB", "RPB", "MQB", "MQSB", "BQB", "MQ0F")
-	label$pos <- as.data.frame(label$pos)
-	label$pos[label$pos=="None"] <- NA
+        features_all <-c("QS", "VDB", "SGB", "RPB", "MQB", "MQSB", "BQB", "MQ0F")
+        label$pos <- as.data.frame(label$pos)
+        label$pos[label$pos=="None"] <- NA
+ 
+        # remove features that are totally missed.
+        features<-c()
+        for(f in features_all){
+                if(all(is.na(label$pos[,f]))){;}
+                else{
+                        features <-c(features,f)
+                }
+        }
+ 
 	# using median values to replace the missing values 
 	train_x_pos <- impute(as.matrix(data.matrix(label$pos[,features])), what="median")
 
