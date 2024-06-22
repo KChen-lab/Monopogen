@@ -30,32 +30,34 @@ SNV_block <-function(summary=NULL){
 ### generate positive and negative labels based on position distribution 
 SVM_prepare <-function(x=NULL){
 	svm<-list()
+  cutoff <- 10 
 	region_cnt <- table(x$region)
-	filter <- names(region_cnt)[region_cnt>=4]
-	neg <- x[(x$region%in% filter & x$genotype==".|."),]
-	pos <- x[!x$genotype==".|.",]
+	filter <- names(region_cnt)[region_cnt>=3]
+  neg_index <- which((x$region%in% filter & x$genotype==".|." & x$dep3<=cutoff))
+	neg <- x[neg_index,]
+  pos_index <- which(!x$genotype==".|.")
+	pos <- x[pos_index,]
 	svm$neg <- neg 
 	svm$pos <- pos
-	svm$test <- x[(!x$region%in%filter) & x$genotype==".|.",]
+	svm$test <- x[-c(pos_index,neg_index),]
 	return(svm)
 }
 
 ### SVM trainning on 8 features, some features may not informative (depending on sequencing platforms) 
 SVM_train <- function(label=NULL, dir=NULL, region=NULL){
 
-        features_all <-c("QS", "VDB", "SGB", "RPB", "MQB", "MQSB", "BQB", "MQ0F")
-        label$pos <- as.data.frame(label$pos)
-        label$pos[label$pos=="None"] <- NA
- 
-        # remove features that are totally missed.
-        features<-c()
-        for(f in features_all){
-                if(all(is.na(label$pos[,f]))){;}
-                else{
-                        features <-c(features,f)
-                }
-        }
- 
+	features_all <-c("QS", "VDB", "SGB", "RPB", "MQB", "MQSB", "BQB", "MQ0F")
+	label$pos <- as.data.frame(label$pos)
+	label$pos[label$pos=="None"] <- NA
+
+	# remove features that are totally missed. 
+	features<-c()
+	for(f in features_all){
+		if(all(is.na(label$pos[,f]))){;}
+		else{
+			features <-c(features,f)
+		}
+	}	
 	# using median values to replace the missing values 
 	train_x_pos <- impute(as.matrix(data.matrix(label$pos[,features])), what="median")
 
@@ -415,6 +417,9 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=50){
 # outdir <- "/rsrch1/bcb/kchen_group/jdou/Monopogen/dev/"
 # region <- "test"
 
+#mat_gz <- "/rsrch6/home/hema_bio-Malignan/tmbi/jin_sharing/e04_atac_new/somatic/chr22.gl.filter.hc.cell.mat.gz"
+#cellName <-"/rsrch6/home/hema_bio-Malignan/tmbi/jin_sharing/e04_atac_new/somatic/chr22.cell_snv.cellID.filter.csv" 
+
 dt <- fread(mat_gz)
 dt <- data.frame(dt)
 dt$V10[dt$V10=="nan"] <- ".|."
@@ -430,6 +435,76 @@ meta <- dt[,1:18]
 colnames(meta) <-c("chr","pos","ref","alt","Dep","dep1","dep2","dep3","dep4",
 	"genotype","QS","VDB","RPB","MQB","BQB","MQSB","SGB","MQ0F")
 
+
+LDrefine_somatic <- meta 
+mut_mat <- dt 
+LDrefine_somatic <- as.data.frame(LDrefine_somatic)
+LDrefine_somatic$dep_ref_new <-0
+LDrefine_somatic$dep_alt_new <-0
+for(i in seq(1, nrow(mut_mat),1)){
+  N_wild <- 0 
+  N_mut <- 0 
+  vec <- mut_mat[i,seq(19, ncol(mut_mat),1)]
+  sta <- unname(unlist(vec))
+  if(mut_mat[i,10]=="1|0"){
+      sta <- table(c(sta,"1|0","0|1","1|1"))
+      sta <- sta - 1 
+      N_ref <- sta["0|1"] + sta["1|1"]
+      N_alt <- sta["1|0"] + sta["1|1"]
+  }
+
+  if(mut_mat[i,10]=="0|1"){
+      sta <- table(c(sta,"1|0","0|1","1|1"))
+      sta <- sta - 1 
+      N_ref <- sta["1|0"] + sta["1|1"]
+      N_alt <- sta["0|1"] + sta["1|1"]
+  }
+  if(mut_mat[i,10]==".|."){
+      sta <- table(c(sta,"0/1","1/0","1/1"))
+      sta <- sta - 1 
+      N_alt <- sta["0/1"] + sta["1/1"]
+      N_ref <- sta["1/0"] + sta["1/1"]
+  }
+  LDrefine_somatic$dep_ref_new[i] <- N_ref 
+  LDrefine_somatic$dep_alt_new[i] <- N_alt
+}
+
+LDrefine_somatic$dep_ref_samtools <- LDrefine_somatic$dep1 + LDrefine_somatic$dep2 
+LDrefine_somatic$dep_alt_samtools <- LDrefine_somatic$dep3 + LDrefine_somatic$dep4
+
+
+write.csv(LDrefine_somatic,   paste0(outdir,region,".allSNVs.csv"),quote=FALSE,row.names = FALSE)
+
+
+### for multi-allele locus, only keep the germline variants. 
+
+pos_multiAllele <- which(LDrefine_somatic$pos%in% names(which(table(LDrefine_somatic$pos)>1)))
+
+multiAllele <-  LDrefine_somatic[pos_multiAllele,]
+biAllele_pass <- rownames(LDrefine_somatic)[!rownames(LDrefine_somatic)%in%rownames(multiAllele)]
+multiAllele_pass <- rownames(multiAllele[which(multiAllele$genotype!=".|."),])
+LDrefine_somatic_pass <- LDrefine_somatic[rownames(LDrefine_somatic)%in%c(biAllele_pass, multiAllele_pass ),]
+
+rm2 <- names(which(table(LDrefine_somatic_pass[,c("pos")])>1))
+LDrefine_somatic_pass  <- LDrefine_somatic_pass[!LDrefine_somatic_pass$pos%in%rm2,]
+
+#### we remove loci showing sequencing depth discordance between samtools and motif-based searching 
+cutoff <- 10  # this cut-off generally works well 
+rm3 <- LDrefine_somatic_pass[abs(LDrefine_somatic_pass$dep_alt_new-LDrefine_somatic_pass$dep_alt_samtools)>cutoff,]
+rm3 <- rownames(rm3[rm3$genotype==".|.",])
+LDrefine_somatic_pass <- LDrefine_somatic_pass[!rownames(LDrefine_somatic_pass)%in%rm3,]
+
+
+### remove all novel loci with alternative sequencing depth lower than 10 
+#LDrefine_somatic_pass <- LDrefine_somatic_pass[LDrefine_somatic_pass$dep_alt_new>=cutoff, ]
+
+meta <- meta[rownames(meta)%in%rownames(LDrefine_somatic_pass),]
+dt <- dt[rownames(dt)%in%rownames(LDrefine_somatic_pass), ]
+meta$dep2 <- 0 
+meta$dep4 <- 0 
+meta$dep1 <- LDrefine_somatic_pass[rownames(meta),c("dep_ref_new")]
+meta$dep3 <- LDrefine_somatic_pass[rownames(meta),c("dep_alt_new")]
+
 mutation_block <- SNV_block(summary=meta)
 svm_in <- SVM_prepare(mutation_block)
 svm_out <- SVM_train(label =svm_in,dir=outdir, region=region)
@@ -440,24 +515,12 @@ final <- somaticLD(mat=dt, svm=svm_out, dir=outdir, region=region)
 mut_mat <- dt[rownames(final$out),]
 colnames(mut_mat) <-c(colnames(meta),cellName)
 
+tp <- LDrefine_somatic_pass[rownames(final$LDrefine_somatic),]
+final$LDrefine_somatic$Depth_ref <- tp$dep_ref_new
+final$LDrefine_somatic$Depth_alt <- tp$dep_alt_new 
+final$LDrefine_somatic$Depth_total <- tp$dep_ref_new + tp$dep_alt_new 
+final$LDrefine_somatic$BAF_alt <- tp$dep_alt_new/(tp$dep_ref_new + tp$dep_alt_new + 1)
 
-#### re-assign the sequencing depth for each allele
-LDrefine_somatic <- final$LDrefine_somatic
-for(i in seq(1, nrow(mut_mat),1)){
-  N_wild <- 0 
-  N_mut <- 0 
-  vec <- mut_mat[i,seq(19, ncol(mut_mat),1)]
-  sta <- unname(unlist(vec))
-  sta <- table(c(sta,"0/1","1/0","1/1"))
-  sta <- sta - 1 
-  N_alt <- sta["0/1"] + sta["1/1"]
-  N_ref <- sta["1/0"] + sta["1/1"]
-  LDrefine_somatic[i,6] <- N_ref 
-  LDrefine_somatic[i,7] <- N_alt
-  LDrefine_somatic[i,5] <- N_ref + N_alt
-  LDrefine_somatic[i,12] <- N_alt/(N_ref+N_alt)
-}
-final$LDrefine_somatic <- LDrefine_somatic 
 
 write.csv(final$LDrefine_somatic,   paste0(outdir,region,".putativeSNVs.csv"),quote=FALSE,row.names = FALSE)
 write.csv(final$LDrefine_germline2, paste0(outdir,region,".germlineTwoLoci_model.csv"),quote=FALSE, row.names = FALSE)
