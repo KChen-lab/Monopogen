@@ -423,8 +423,25 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=50){
 dt <- fread(mat_gz)
 dt <- data.frame(dt)
 dt$V10[dt$V10=="nan"] <- ".|."
+print(nrow(dt))
+
+### remove INDELs
+lst <-c()
+for(i in seq(1,nrow(dt),1)){
+  ref_len <- nchar(dt[i,3])
+  alt_len <- nchar(dt[i,4])
+  if(ref_len==1 & alt_len==1){
+      lst <-c(lst,i)
+  }
+}
+dt <- dt[lst,]
+print(nrow(dt))
+
+
+
 rownames(dt) <- paste0(dt$V1,":",dt$V2,":",dt$V3,":",dt$V4)
 
+print(paste0(outdir,region,".cell_snv.cellID.filter.csv"))
 cellName <- read.csv(file=paste0(outdir,region,".cell_snv.cellID.filter.csv"),header=T)
 cellName <- cellName[,2]
 
@@ -473,7 +490,7 @@ LDrefine_somatic$dep_ref_samtools <- LDrefine_somatic$dep1 + LDrefine_somatic$de
 LDrefine_somatic$dep_alt_samtools <- LDrefine_somatic$dep3 + LDrefine_somatic$dep4
 
 
-write.csv(LDrefine_somatic,   paste0(outdir,region,".allSNVs.csv"),quote=FALSE,row.names = FALSE)
+write.csv(LDrefine_somatic, file=paste0(outdir,region,".allSNVs.csv"),quote=FALSE,row.names = FALSE)
 
 
 ### for multi-allele locus, only keep the germline variants. 
@@ -522,7 +539,7 @@ final$LDrefine_somatic$Depth_total <- tp$dep_ref_new + tp$dep_alt_new
 final$LDrefine_somatic$BAF_alt <- tp$dep_alt_new/(tp$dep_ref_new + tp$dep_alt_new + 1)
 
 
-write.csv(final$LDrefine_somatic,   paste0(outdir,region,".putativeSNVs.csv"),quote=FALSE,row.names = FALSE)
-write.csv(final$LDrefine_germline2, paste0(outdir,region,".germlineTwoLoci_model.csv"),quote=FALSE, row.names = FALSE)
-write.csv(final$LDrefine_germline3, paste0(outdir,region,".germlineTrioLoci_model.csv"),quote=FALSE, row.names = FALSE)
+write.csv(final$LDrefine_somatic,   file=paste0(outdir,region,".putativeSNVs.csv"),quote=FALSE,row.names = FALSE)
+write.csv(final$LDrefine_germline2, file=paste0(outdir,region,".germlineTwoLoci_model.csv"),quote=FALSE, row.names = FALSE)
+write.csv(final$LDrefine_germline3, file=paste0(outdir,region,".germlineTrioLoci_model.csv"),quote=FALSE, row.names = FALSE)
 saveRDS(mut_mat, file=paste0(outdir,region,".SNV_mat.RDS"))
