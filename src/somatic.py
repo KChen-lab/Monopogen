@@ -142,7 +142,9 @@ def featureInfo(para):
 		gl_vcf_dp4.write(a)
 
 		# include all variants from germline 
-		if (info_I16[0] + info_I16[1]>=4 and info_I16[2] + info_I16[3]>=4 or (id in info_GT)):
+		ref_depth = info_I16[0] + info_I16[1]
+		alt_depth = info_I16[2] + info_I16[3]		
+		if ((ref_depth>=4 and alt_depth>=4 and alt_depth/(alt_depth+ref_depth)>=0.01) or (id in info_GT)):
 			b = "{}\t{}\t{}\n".format(rec.chrom, rec.pos-1, rec.pos)
 			gl_vcf_filter_bed.write(b)
 			b = "{}\t{}\n".format(rec.chrom, rec.pos)
