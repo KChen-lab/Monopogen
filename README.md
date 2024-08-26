@@ -859,7 +859,7 @@ More details could be see in following vignette
   
   `chmod 770 -R  /xx/apps`
   
-* ***Always see fewer markers in chr3 ***  
+* ***Always see fewer markers in chr3***  
   You may examine whether the reference in chr3:16902879 is B or T. Need to replace base B with T if it happens. 
 
   
