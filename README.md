@@ -858,6 +858,9 @@ More details could be see in following vignette
   You may set the read/write permission on the folder `xx/apps` as  
   
   `chmod 770 -R  /xx/apps`
+  
+* ***Always see fewer markers in chr3 ***  
+  You may examine whether the reference in chr3:16902879 is B or T. Need to replace base B with T if it happens. 
 
   
  
