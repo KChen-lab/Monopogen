@@ -93,6 +93,7 @@ def germline(args):
 
 			imputation_vcf = args.imputation_panel + "CCDG_14151_B01_GRM_WGS_2020-08-05_" + record[0] + ".filtered.shapeit2-duohmm-phased.vcf.gz"
 			cmd1 = samtools + " mpileup -b" + bam_filter + " -f "  + args.reference  + " -r " +  jobid + " -q 20 -Q 20 -t DP -d 10000000 -v "
+			
 			cmd1 = cmd1 + " | " + bcftools + " view " + " | " + bcftools +  ' filter -e \'REF !~ "^[ATGC]$"\'  | '  + bcftools  + " norm -m-both -f " + args.reference 			cmd1 = cmd1 + " | grep -v \"<X>\" | grep -v INDEL |" + bgzip +   " -c > " + args.out + "/germline/" +  jobid + ".gl.vcf.gz" 
 			#cmd2 = bcftools + " view " +  out + "/germline/" +  jobid + ".gl.vcf.gz" + " -i 'FORMAT/DP>1' | " + bcftools + " call -cv  | " + bgzip +    "  -c > " +  args.out + "/SCvarCall/"  +  jobid + ".gt.vcf.gz"
 			cmd3 = java + " -Xmx20g -jar " + beagle +  " gl=" +  out + "/germline/" +  jobid + ".gl.vcf.gz"  +  " ref=" +  imputation_vcf   + "  chrom=" + record[0] + " out="   +  out + "/germline/" + jobid + ".gp " + "impute=false  modelscale=2  nthreads=24  gprobs=true  niterations=0"
