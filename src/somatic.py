@@ -87,8 +87,6 @@ def bamExtract(para):
 	out = os.path.abspath(out)
 	inbam = getBamName(chr, out)
 	outbam =  out + "/Bam/" + chr + ".filter.targeted.bam"
-	# remember to update bed file   ls -lrt
-
 	#os.system("cat " +  out + "/somatic/" + chr + "*.gl.vcf.filter.hc.bed > " + out + "/somatic/" + chr + ".bed")
 	chr_bed = out + "/somatic/" + chr + ".gl.vcf.filter.hc.bed"
 	cmd1 = samtools + " view " + " -b  -L " + chr_bed + " " + inbam + " -o " + outbam
@@ -100,6 +98,8 @@ def bamExtract(para):
 	os.system(cmd)
 
 def featureInfo(para):
+
+
 
 	para_lst = para.strip().split(">")
 	region = para_lst[0]
@@ -119,6 +119,13 @@ def featureInfo(para):
 	gl_vcf_filter_dp4 = open(out + "/somatic/" +  region + ".gl.vcf.filter.DP4","w")
 	gl_vcf_filter_bed = open(out + "/somatic/" +  region + ".gl.vcf.filter.hc.bed","w")
 	gl_vcf_filter_txt = open(out + "/somatic/" +  region + ".gl.vcf.filter.hc.pos","w")
+
+
+
+	module="ase"
+	germline_cutoff=2
+	if module=="ase":
+		germline_cutoff=4
 
 	depth_filter_novelSNV = 10
 	for rec in gl_vcf_in.fetch():
@@ -143,8 +150,10 @@ def featureInfo(para):
 
 		# include all variants from germline 
 		ref_depth = info_I16[0] + info_I16[1]
-		alt_depth = info_I16[2] + info_I16[3]		
-		if ((ref_depth>=4 and alt_depth>=4 and alt_depth/(alt_depth+ref_depth)>=0.01) or (id in info_GT)):
+		alt_depth = info_I16[2] + info_I16[3]
+		## keep locus with high sequencing reads supported for wild and alternative alleles 
+		## set germline cutoff as 2 since we need more germline for LD refinement 
+		if ((ref_depth >=4 and alt_depth>=4 and alt_depth/(alt_depth+ref_depth)>0.001) or ((id in info_GT) and ref_depth>=germline_cutoff and alt_depth>=germline_cutoff)):
 			b = "{}\t{}\t{}\n".format(rec.chrom, rec.pos-1, rec.pos)
 			gl_vcf_filter_bed.write(b)
 			b = "{}\t{}\n".format(rec.chrom, rec.pos)
@@ -271,9 +280,30 @@ def robust_get_tag(read, tag_name):
 
 def rev_compl(st):
     nn = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N'}
-    return "".join(nn.get(n.upper,'N') for n in reversed(st))
+    return "".join(nn.get(n.upper, 'N') for n in reversed(st))
+    #return "".join(nn[n.upper()] for n in reversed(st))
 
 
+
+
+def decode(allele):
+	info=""
+	# coding mode Ref_depth/Alt_depth
+	vec = allele.split('/')
+	if len(vec)==1:
+		cnt = vec[0].split(':')
+		if cnt[0]=="0":
+			info=str(cnt[1])+"/0"
+		if cnt[0]=="1":
+			info="0/"+str(cnt[1])
+	if len(vec)==2:
+		cnt_1 = vec[0].split(':')
+		cnt_2 = vec[1].split(':')
+		if cnt_1[0]=="0":
+			info = str(cnt_1[1]) + "/" + str(cnt_2[1])
+		if cnt_1[0]=="1":
+			info = str(cnt_2[1]) + "/" + str(cnt_1[1])
+	return(info)
 
 def bam2mat(para):
 
@@ -294,9 +324,19 @@ def bam2mat(para):
 	mat_out = gzip.open(para_lst[1] + "/somatic/" +  para_lst[0] + ".gl.filter.hc.cell.mat.gz","wt")
 
 
+
 	mat.columns = ['snvIndex','cellIndex','allele'] 
-	mat=mat.groupby(by=['snvIndex','cellIndex'], as_index=False).first()
-	mat=mat.pivot(index='snvIndex', columns='cellIndex', values='allele')
+	mat['cnt']=1
+	mat_sum=mat.groupby(by=['snvIndex','cellIndex','allele'], as_index=False).sum()
+
+	mat_sum['flag'] = mat_sum['allele'].astype(str)  + ":" + mat_sum['cnt'].astype(str) 
+	mat_sum = mat_sum.drop(columns=['allele','cnt'])
+
+	mat_merge=mat_sum.groupby(by=['snvIndex','cellIndex'])['flag'].agg(lambda x: '/'.join(x)).reset_index()
+	mat_merge = pd.DataFrame(mat_merge)
+	mat_merge =mat_merge.pivot_table(index='snvIndex', columns='cellIndex', values='flag', aggfunc='first', fill_value='')
+	mat = mat_merge
+
 	meta_info = pd.read_csv(meta_info, sep="\t", header=None) 
 	meta_info.columns=["chr","pos","ref_allele","alt_allele","Dep","dep1","dep2","dep3","dep4","genotype","QS","VDB","RPB","MQB","BQB","MQSB","SGB","MQ0F"]
 
@@ -310,47 +350,18 @@ def bam2mat(para):
 		info = meta_info.iloc[index].astype(str)
 		geno = info["genotype"]
 		info = "\t".join(info)
-		
 		flag = 0
-		if geno=="0|1":
-			phase_info = ["0|0"]*n_cell
-			tp = mat.loc[index]
-			pos = tp.dropna().index
-			for value in pos:
-					allele = tp.loc[value]
-					index_vec = tp.index.get_loc(value)
-					if allele==1:
-						phase_info[index_vec]="0|1"
-					elif allele==0:
-						phase_info[index_vec]="1|0"
-			flag = 1
-		elif geno=="1|0":
-			phase_info = ["0|0"]*n_cell
-			tp = mat.loc[index]
-			pos = tp.dropna().index
-			for value in pos:
-					allele = tp.loc[value]
-					index_vec = tp.index.get_loc(value)
-					if allele==1:
-						phase_info[index_vec]="1|0"
-					elif allele==0:
-						phase_info[index_vec]="0|1"
-			flag = 1 
-		elif geno=="nan":
-			phase_info = ["0/0"]*n_cell
-			tp = mat.loc[index]
-			pos = tp.dropna().index
-			for value in pos:
-					allele = tp.loc[value]
-					index_vec = tp.index.get_loc(value)
-					if allele==1:
-						phase_info[index_vec]="0/1"
-					elif allele==0:
-						phase_info[index_vec]="1/0"
-			flag = 1 
-		if flag:
-			mat_out.write(info+"\t" +'\t'.join(phase_info))
-			mat_out.write('\n')
+		phase_info = ["0/0"]*n_cell
+		tp = mat.loc[index]
+		pos = tp.dropna().index
+		for value in pos:
+				allele = tp.loc[value]
+				index_vec = tp.index.get_loc(value)
+				if allele != "":
+					phase_info[index_vec]=decode(allele)
+		mat_out.write(info+"\t" +'\t'.join(phase_info))
+		mat_out.write('\n')
+
 	return(para_lst[0])
 
 
@@ -400,13 +411,14 @@ def bam2gz(para):
 				seq = ref_fa.fetch(chrom, pos-4, pos+3)
 				seq_rev_compl = rev_compl(seq)
 				id = str(chrom)+":"+str(pos) + ":" + ref + ":" + alts[0]
-				mydict = dict(id=index, chr = chrom, pos = pos, motif_pos= seq, ref_allele = ref, alt_allele=alts[0])			
+				ref_depth = line[5] + line[6]
+				alt_depth = line[7] + line[8]
+				mydict = dict(id=index, chr = chrom, pos = pos, motif_pos= seq, ref_allele = ref, alt_allele=alts[0], ref_depth=ref_depth, alt_depth=alt_depth)			
 				snv_info[index]=mydict  
 				index = index + 1
 				snv_tol = snv_tol + 1
 				tp.append(id)
 
-		
 
 		#print(snv_info_out)
 		## output cell snv meta information 
@@ -431,7 +443,8 @@ def bam2gz(para):
 		for s in infile:
 
 			cell_barcode  = robust_get_tag(s,"CB")
-			if cell_barcode=="NotFound" and s.query_name.find("_")!=-1:
+			#if cell_barcode=="NotFound" and s.query_name.find("_")!=-1:
+			if s.query_name.find("_")!=-1:
 				### no cell barcode file detected.
 				### check whether the barcode added in the query name 	
 				cell_barcode = s.query_name.strip().split("_")[1]
@@ -457,21 +470,16 @@ def bam2gz(para):
 			read_noAllele = 0
 			read_len = len(align_seq)
 
-
 			### get the SNVs locating in [align_start, align_start + read_len] ### 
 			if read_tol%1000000 == 0:
 				print("scanning read " + str(read_tol)) 
-
 			lock = 0 
 			snv_cover = ""
 
-
 			for i in range(lower_index,snv_tol-1,1):
-
 				snv_pos = snv_info[i]["pos"]
 				wild_allele = snv_info[i]["ref_allele"]
 				alt_allele = snv_info[i]["alt_allele"]
-
 				if snv_pos >= align_start:
 					if lock==0: 
 						lower_index = i 
@@ -485,10 +493,13 @@ def bam2gz(para):
 						if re.search(motif_pos, align_seq):
 							read_wild = read_wild + 1 
 							fp.write(str(i)+"\t"+str(cell_barcode_index)+"\t0\n")
+							#print(str(i)+"\t"+str(cell_barcode_index)+"\t0\n")
 						elif re.search(motif_neg, align_seq):
 							read_mutated = read_mutated + 1
 							fp.write(str(i)+"\t"+str(cell_barcode_index)+"\t1\n")
+							#print(str(i)+"\t"+str(cell_barcode_index)+"\t1\n")
 						else:
+							### the SNVs locating in the flank region of reads (shorter than the motif length)
 							delta = snv_pos - align_start	
 							if read_len - delta < motif_len:
 								motif_pos_part = motif_pos[0:motif_len+1]
@@ -497,10 +508,12 @@ def bam2gz(para):
 								
 								if re.search(motif_pos_part, seq_part):
 									read_wild = read_wild + 1 	
-									fp.write(str(i)+"\t"+str(cell_barcode_index)+"\t0\n")		
+									fp.write(str(i)+"\t"+str(cell_barcode_index)+"\t0\n")	
+									#print(str(i)+"\t"+str(cell_barcode_index)+"\t0\n")	
 								elif re.search(motif_neg_part, seq_part):	
 									read_mutated = read_mutated + 1
 									fp.write(str(i)+"\t"+str(cell_barcode_index)+"\t1\n")
+									#print(str(i)+"\t"+str(cell_barcode_index)+"\t1\n")
 
 							elif delta <= motif_len: 
 								motif_pos_part = motif_pos[motif_len:len(motif_pos)]
@@ -509,10 +522,12 @@ def bam2gz(para):
 
 								if re.search(motif_pos_part, seq_part):
 									read_wild = read_wild + 1 
-									fp.write(str(i)+"\t"+str(cell_barcode_index)+"\t0\n")	
+									fp.write(str(i)+"\t"+str(cell_barcode_index)+"\t0\n")
+									#print(str(i)+"\t"+str(cell_barcode_index)+"\t0\n")	
 								elif re.search(motif_neg_part, seq_part):
 									read_mutated = read_mutated + 1
 									fp.write(str(i)+"\t"+str(cell_barcode_index)+"\t1\n")
+									#print(str(i)+"\t"+str(cell_barcode_index)+"\t1\n")
 							else:
 								#fp.write(str(snv_info[i])+"\n")
 								#fp.write(str(align_chr) + ":" + str(align_start) + ":" + align_seq+"\n") 
@@ -526,13 +541,10 @@ def bam2gz(para):
 				read_wild_tol = read_wild_tol + 1 
 			if read_mutated > 0 and read_wild>0: 
 				overlap = overlap + 1
-
 			if read_mutated > 0: 
 				read_mutated_tol = read_mutated_tol + 1 
 			if read_noAllele > 0: 
 				read_noAllele_tol = read_noAllele_tol + 1
-
-
 		infile.close()
 		fp.close()	
 		print(str(read_tol) + ":" + str(read_cover_tol) + ":" + str(read_wild_tol) + ":" + str(read_mutated_tol) + ":" + str(overlap) + ":" + str(read_noAllele_tol))

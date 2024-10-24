@@ -3,6 +3,7 @@ args = commandArgs(trailingOnly=TRUE)
 library(data.table)
 library(e1071)
 library(ggplot2)
+library(reshape2)
 options(warn=-1)
 
 mat_gz <- args[1]
@@ -153,8 +154,9 @@ twoloci <- function(mat=NULL, germIndex=NULL, somaticIndex=NULL,dis=NULL){
   return(res)
 }
 
+
+
 trioloci <- function(mat=NULL, germIndex=NULL, somaticIndex=NULL,dis=NULL){
-  
   #germIndex <- germlineIndex
   #somaticIndex <- somaticIndex
   somatic_dis_trioloci <-c()
@@ -299,22 +301,7 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=50){
   germlineIndex <- which(index%in%posID)
   somaticIndex <- which(index%in%testID)
   dis <- mat$V2
-  # update phasing information 
-  #for(i in seq(1,nrow(mat),1)){
-  #  if(mat$V10[i]=="1|0"){
-  #    tp <- mat[i,]
-  #    tp[tp=="1|0"] <- "00|11"
-  #    tp[tp=="0|1"] <- "1|0"
-  #    tp[tp=="00|11"] <- "0|1"
-  #    mat[i,] <- tp
-  #  }
-  #}
   mat <- mat[,c(seq(19,ncol(mat),1))]
-  # initilize the haplotype of somatic SNVs as 0|1
-  mat[mat=="0/0"] <- "0|0"
-  mat[mat=="0/1"] <- "0|1" 
-  mat[mat=="1/0"] <- "1|0"
-
   n_tol <-nrow(mat)
   if(n_tol > min_size){
     twoloci <- twoloci(mat=mat, germIndex=germlineIndex, somaticIndex = somaticIndex, dis=dis)
@@ -326,6 +313,7 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=50){
     svm$test$p_twoLoci <- NA
     svm$test$p_trioLoci <- NA
     svm$test$p_LDrefine <- NA
+
     for(i in seq(1,nrow(svm$test),1)){
       pos <- which(LDrefine$somaticLD$marker==tp[i])
       if(length(pos)>0){
@@ -334,6 +322,8 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=50){
         svm$test$p_LDrefine[i] <- LDrefine$somaticLD$p_final[pos]
       }
     }
+
+
     res <- list()
     res$svm <- svm
 
@@ -382,19 +372,22 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=50){
     plt_dt <- rbind(table2, table3)
     plt_dt <- plt_dt[!is.na(plt_dt$tol),]
     plt_dt$bin[plt_dt$bin>5*10^5] <- 50*10^5
-
-
-    p <- ggplot(plt_dt, aes(x=bin, y=Prob)) +
-    geom_point(color="cadetblue",size=6)+
-    geom_smooth(color="darksalmon") + scale_x_continuous(trans='log10') +
-    theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + xlab("Physical distance (bp)") +
-    ylab("LD refinement score") +
-    theme(axis.text=element_text(size=12,angle = 45, vjust = 0.5, hjust=1),
-          axis.title=element_text(size=14)) + facet_wrap(~model) + ylim(0,0.65)
-    pdf(file=paste0(dir,"LDrefinement_germline.", region, ".pdf"),width=8,height=4)
-    print(p)
-    dev.off()
+    
+    if(nrow(plt_dt)>1){
+      p <- ggplot(plt_dt, aes(x=bin, y=Prob)) + geom_point(color="cadetblue",size=6)+
+      geom_smooth(color="darksalmon") + scale_x_continuous(trans='log10') +
+      theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(),panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) + xlab("Physical distance (bp)") +
+      ylab("LD refinement score") +
+      theme(axis.text=element_text(size=12,angle = 45, vjust = 0.5, hjust=1),
+            axis.title=element_text(size=14)) + facet_wrap(~model) + ylim(0,0.65)
+      pdf(file=paste0(dir,"LDrefinement_germline.", region, ".pdf"),width=8,height=4)
+      print(p)
+      dev.off()
+    }
+    else{
+      print(paste0("the No.of germline SNVs in ", region, " are not enough to perform LD refinement..., but we still return results without LD refinement."))
+      # quit(status = 1, save="no")
+    }
     return(res)
   }
   else{
@@ -414,18 +407,11 @@ somaticLD <- function(mat=NULL, svm=NULL,  dir=NULL, region=NULL, min_size=50){
 # 19-end genotype at single cell level 
 # dt <- fread("/rsrch1/bcb/kchen_group/jdou/Monopogen/dev/chr20:1000000-2000000.gl.filter.hc.cell.mat.gz")
 
-# outdir <- "/rsrch1/bcb/kchen_group/jdou/Monopogen/dev/"
-# region <- "test"
-
-#mat_gz <- "/rsrch6/home/hema_bio-Malignan/tmbi/jin_sharing/e04_atac_new/somatic/chr22.gl.filter.hc.cell.mat.gz"
-#cellName <-"/rsrch6/home/hema_bio-Malignan/tmbi/jin_sharing/e04_atac_new/somatic/chr22.cell_snv.cellID.filter.csv" 
-
 dt <- fread(mat_gz)
 dt <- data.frame(dt)
 dt$V10[dt$V10=="nan"] <- ".|."
-print(nrow(dt))
 
-### remove INDELs
+### remove INDELs ###
 lst <-c()
 for(i in seq(1,nrow(dt),1)){
   ref_len <- nchar(dt[i,3])
@@ -435,9 +421,6 @@ for(i in seq(1,nrow(dt),1)){
   }
 }
 dt <- dt[lst,]
-print(nrow(dt))
-
-
 
 rownames(dt) <- paste0(dt$V1,":",dt$V2,":",dt$V3,":",dt$V4)
 
@@ -453,37 +436,30 @@ colnames(meta) <-c("chr","pos","ref","alt","Dep","dep1","dep2","dep3","dep4",
 	"genotype","QS","VDB","RPB","MQB","BQB","MQSB","SGB","MQ0F")
 
 
+
+
 LDrefine_somatic <- meta 
 mut_mat <- dt 
 LDrefine_somatic <- as.data.frame(LDrefine_somatic)
 LDrefine_somatic$dep_ref_new <-0
 LDrefine_somatic$dep_alt_new <-0
+LDrefine_somatic$cell_ref <-0
+LDrefine_somatic$cell_alt <-0
+LDrefine_somatic$cell_ref_alt <-0
 for(i in seq(1, nrow(mut_mat),1)){
   N_wild <- 0 
   N_mut <- 0 
   vec <- mut_mat[i,seq(19, ncol(mut_mat),1)]
   sta <- unname(unlist(vec))
-  if(mut_mat[i,10]=="1|0"){
-      sta <- table(c(sta,"1|0","0|1","1|1"))
-      sta <- sta - 1 
-      N_ref <- sta["0|1"] + sta["1|1"]
-      N_alt <- sta["1|0"] + sta["1|1"]
+  sta <- sta[sta!="0/0"]
+  if(length(sta)>1){
+    sta <- colsplit(sta,"/",c("ref","alt"))
+    LDrefine_somatic$dep_ref_new[i] <- sum(sta$ref) 
+    LDrefine_somatic$dep_alt_new[i] <- sum(sta$alt)
+    LDrefine_somatic$cell_ref[i] <- length(which(sta$ref>0 & sta$alt==0))
+    LDrefine_somatic$cell_alt[i] <- length(which(sta$ref==0 & sta$alt>0)) 
+    LDrefine_somatic$cell_ref_alt[i] <- length(which(sta$ref>0 & sta$alt>0)) 
   }
-
-  if(mut_mat[i,10]=="0|1"){
-      sta <- table(c(sta,"1|0","0|1","1|1"))
-      sta <- sta - 1 
-      N_ref <- sta["1|0"] + sta["1|1"]
-      N_alt <- sta["0|1"] + sta["1|1"]
-  }
-  if(mut_mat[i,10]==".|."){
-      sta <- table(c(sta,"0/1","1/0","1/1"))
-      sta <- sta - 1 
-      N_alt <- sta["0/1"] + sta["1/1"]
-      N_ref <- sta["1/0"] + sta["1/1"]
-  }
-  LDrefine_somatic$dep_ref_new[i] <- N_ref 
-  LDrefine_somatic$dep_alt_new[i] <- N_alt
 }
 
 LDrefine_somatic$dep_ref_samtools <- LDrefine_somatic$dep1 + LDrefine_somatic$dep2 
@@ -492,6 +468,9 @@ LDrefine_somatic$dep_alt_samtools <- LDrefine_somatic$dep3 + LDrefine_somatic$de
 
 write.csv(LDrefine_somatic, file=paste0(outdir,region,".allSNVs.csv"),quote=FALSE,row.names = FALSE)
 
+
+# LDrefine_somatic <- read.csv(file="chr20.allSNVs.csv",header=T)
+# rownames(LDrefine_somatic) <- paste0(LDrefine_somatic$chr,":", LDrefine_somatic$pos,":", LDrefine_somatic$ref,":",LDrefine_somatic$alt)
 
 ### for multi-allele locus, only keep the germline variants. 
 
@@ -506,17 +485,16 @@ rm2 <- names(which(table(LDrefine_somatic_pass[,c("pos")])>1))
 LDrefine_somatic_pass  <- LDrefine_somatic_pass[!LDrefine_somatic_pass$pos%in%rm2,]
 
 #### we remove loci showing sequencing depth discordance between samtools and motif-based searching 
-cutoff <- 10  # this cut-off generally works well 
+cutoff <- 1000000  # this cut-off generally works well 
 rm3 <- LDrefine_somatic_pass[abs(LDrefine_somatic_pass$dep_alt_new-LDrefine_somatic_pass$dep_alt_samtools)>cutoff,]
 rm3 <- rownames(rm3[rm3$genotype==".|.",])
 LDrefine_somatic_pass <- LDrefine_somatic_pass[!rownames(LDrefine_somatic_pass)%in%rm3,]
 
 
-### remove all novel loci with alternative sequencing depth lower than 10 
-#LDrefine_somatic_pass <- LDrefine_somatic_pass[LDrefine_somatic_pass$dep_alt_new>=cutoff, ]
-
 meta <- meta[rownames(meta)%in%rownames(LDrefine_somatic_pass),]
+
 dt <- dt[rownames(dt)%in%rownames(LDrefine_somatic_pass), ]
+
 meta$dep2 <- 0 
 meta$dep4 <- 0 
 meta$dep1 <- LDrefine_somatic_pass[rownames(meta),c("dep_ref_new")]
@@ -526,7 +504,28 @@ mutation_block <- SNV_block(summary=meta)
 svm_in <- SVM_prepare(mutation_block)
 svm_out <- SVM_train(label =svm_in,dir=outdir, region=region)
 
-final <- somaticLD(mat=dt, svm=svm_out, dir=outdir, region=region)
+
+### phase the allele at single cell resolution 
+dt_phase <- dt 
+for(i in seq(1, nrow(dt),1)){
+  vec <- as.character(dt[i,]) 
+  dt_phase[i, seq(19, ncol(dt_phase),1)] <- "0|0"
+  #if(vec[10]==".|."){
+  pos <- which(vec!="0/0") 
+  pos <- pos[pos>18]
+  pos_split <- colsplit(vec[pos],"/",c("ref","alt"))
+  pos_split[pos_split>0] <- 1
+  if(vec[10]==".|." | vec[10]=="0|1" | vec[10]=="1|1"){
+      pos_split <- paste0(pos_split[,1],"|", pos_split[,2])
+  }
+  if(vec[10]=="1|0"){
+      pos_split <- paste0(pos_split[,2],"|", pos_split[,1])
+  }
+  dt_phase[i, pos] <- pos_split
+  #}
+}
+
+final <- somaticLD(mat=dt_phase, svm=svm_out, dir=outdir, region=region)
 
 
 mut_mat <- dt[rownames(final$out),]
