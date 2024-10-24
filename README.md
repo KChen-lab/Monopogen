@@ -1,5 +1,8 @@
 # Monopogen: SNV calling from single cell sequencing data
 ## News
+* 10/24/2024:
+  * Resolve the issue by incorporating duplicate reads in the SNV calling.
+  * Update the cellxSNV matrix so that each element reflects the sequencing depth for both wild-type and mutated alleles, rather than using a binary representation.
 * 4/12/2024: Version 1.6.0 released.  
   * We added the guide on putative SNV filtering based on cell type information derived from single cell RNA/ATAC-seq modalites. 
 * 2/26/2024: Version 1.5.0 released.  
