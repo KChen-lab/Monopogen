@@ -111,7 +111,7 @@ def germline(args):
 				#if NSNV>100:
 					f_out.write(cmd3 + "\n")
 					if N_sample == 1:
-						cmd4 = "zless -S " +  out + "/germline/" + jobid + ".gp.vcf.gz | grep -v  0/0  > " +  out + "/germline/" + jobid + ".germline.vcf"
+						cmd4 = "zless -S " +  out + "/germline/" + jobid + ".gp.vcf.gz   > " +  out + "/germline/" + jobid + ".germline.vcf"
 					elif N_sample > 1: 
 						cmd4 = "zless -S " +  out + "/germline/" + jobid + ".gp.vcf.gz   > " +  out + "/germline/" + jobid + ".germline.vcf"
 					f_out.write(cmd4 + "\n")
