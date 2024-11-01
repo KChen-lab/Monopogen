@@ -495,8 +495,8 @@ meta <- meta[rownames(meta)%in%rownames(LDrefine_somatic_pass),]
 
 dt <- dt[rownames(dt)%in%rownames(LDrefine_somatic_pass), ]
 
-meta$dep2 <- 0 
-meta$dep4 <- 0 
+meta$dep2 <- LDrefine_somatic_pass$dep1 + LDrefine_somatic_pass$dep2
+meta$dep4 <- LDrefine_somatic_pass$dep3 + LDrefine_somatic_pass$dep4
 meta$dep1 <- LDrefine_somatic_pass[rownames(meta),c("dep_ref_new")]
 meta$dep3 <- LDrefine_somatic_pass[rownames(meta),c("dep_alt_new")]
 
