@@ -34,7 +34,7 @@ SVM_prepare <-function(x=NULL){
   cutoff <- 10 
 	region_cnt <- table(x$region)
 	filter <- names(region_cnt)[region_cnt>=3]
-  neg_index <- which((x$region%in% filter & x$genotype==".|." & x$dep3<=cutoff))
+  neg_index <- which((x$region%in% filter & x$genotype==".|." & x$dep4<=cutoff))
 	neg <- x[neg_index,]
   pos_index <- which(!x$genotype==".|.")
 	pos <- x[pos_index,]
